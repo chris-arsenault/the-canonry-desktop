@@ -23,4 +23,6 @@
     <ProjectReference Include="..\..\src\Core\TheCanonry.Schema\TheCanonry.Schema.csproj" />
   </ItemGroup>
 
+  <!-- Note: Pressures/PressureInterpreterTests.cs is active (Task 11 complete) -->
+
 </Project>
