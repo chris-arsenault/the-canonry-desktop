@@ -4,13 +4,17 @@
   </Folder>
   <Folder Name="/src/Core/">
     <Project Path="src/Core/TheCanonry.Engine/TheCanonry.Engine.csproj" />
+    <Project Path="src/Core/TheCanonry.NameForge/TheCanonry.NameForge.csproj" />
     <Project Path="src/Core/TheCanonry.Schema/TheCanonry.Schema.csproj" />
   </Folder>
   <Folder Name="/src/Infrastructure/">
+    <Project Path="src/Infrastructure/TheCanonry.ApiClients/TheCanonry.ApiClients.csproj" />
     <Project Path="src/Infrastructure/TheCanonry.Persistence/TheCanonry.Persistence.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/TheCanonry.ApiClients.Tests/TheCanonry.ApiClients.Tests.csproj" />
     <Project Path="tests/TheCanonry.Engine.Tests/TheCanonry.Engine.Tests.csproj" />
+    <Project Path="tests/TheCanonry.NameForge.Tests/TheCanonry.NameForge.Tests.csproj" />
     <Project Path="tests/TheCanonry.Persistence.Tests/TheCanonry.Persistence.Tests.csproj" />
     <Project Path="tests/TheCanonry.Schema.Tests/TheCanonry.Schema.Tests.csproj" />
   </Folder>
