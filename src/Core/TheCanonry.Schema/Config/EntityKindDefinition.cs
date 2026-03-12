@@ -32,11 +32,11 @@ public class EntityKindDefinition
 {
     public required EntityKind Kind { get; init; }
     public required string Description { get; init; }
-    public required bool IsFramework { get; init; }
+    public bool IsFramework { get; init; }
     public required EntityCategory Category { get; init; }
     public required IReadOnlyList<SubtypeDefinition> Subtypes { get; init; }
     public required IReadOnlyList<StatusDefinition> Statuses { get; init; }
-    public required EntityStatus DefaultStatus { get; init; }
+    public EntityStatus DefaultStatus { get; init; }
     public IReadOnlyList<RequiredRelationshipRule> RequiredRelationships { get; init; } = [];
     public EntityKindStyle? Style { get; init; }
     public SemanticPlane? SemanticPlane { get; init; }
@@ -52,6 +52,6 @@ public class RequiredRelationshipRule
 public class EntityKindStyle
 {
     public required string Color { get; init; }
-    public required string Shape { get; init; }
-    public required string DisplayName { get; init; }
+    public string Shape { get; init; } = "";
+    public string DisplayName { get; init; } = "";
 }

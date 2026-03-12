@@ -6,16 +6,16 @@ public class RelationshipVerbs
 {
     public required string Formed { get; init; }
     public required string Ended { get; init; }
-    public required string InverseFormed { get; init; }
-    public required string InverseEnded { get; init; }
+    public string InverseFormed { get; init; } = "";
+    public string InverseEnded { get; init; } = "";
 }
 
 public class RelationshipKindDefinition
 {
     public required RelationshipKind Kind { get; init; }
-    public required string Name { get; init; }
+    public string Name { get; init; } = "";
     public required string Description { get; init; }
-    public required bool IsFramework { get; init; }
+    public bool IsFramework { get; init; }
     public IReadOnlyList<string> SrcKinds { get; init; } = [];
     public IReadOnlyList<string> DstKinds { get; init; } = [];
     public bool Symmetric { get; init; }

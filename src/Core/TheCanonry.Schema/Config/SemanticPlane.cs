@@ -28,7 +28,7 @@ public class SemanticRegion
     public required string Culture { get; init; }
     public IReadOnlyList<string> Tags { get; init; } = [];
     public string Description { get; init; } = "";
-    public required ZRange ZRange { get; init; }
+    public ZRange? ZRange { get; init; }
     public string? ParentRegion { get; init; }
     public bool Emergent { get; init; }
     public int CreatedAt { get; init; }

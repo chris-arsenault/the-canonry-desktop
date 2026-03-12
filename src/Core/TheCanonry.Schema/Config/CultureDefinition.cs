@@ -14,7 +14,7 @@ public class CultureDefinition
     public required CultureId Id { get; init; }
     public required string Name { get; init; }
     public required string Description { get; init; }
-    public required bool IsFramework { get; init; }
+    public bool IsFramework { get; init; }
     public string Homeland { get; init; } = "";
     public string Color { get; init; } = "";
     public Dictionary<string, AxisBias> AxisBiases { get; init; } = [];
