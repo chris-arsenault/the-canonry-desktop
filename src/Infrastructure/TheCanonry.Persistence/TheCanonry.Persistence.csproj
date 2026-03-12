@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\TheCanonry.Schema\TheCanonry.Schema.csproj" />
+    <ProjectReference Include="..\TheCanonry.ApiClients\TheCanonry.ApiClients.csproj" />
   </ItemGroup>
 
 </Project>

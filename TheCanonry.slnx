@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/TheCanonry.Desktop/TheCanonry.Desktop.csproj" />
+    <Project Path="src/TheCanonry.Illuminator/TheCanonry.Illuminator.csproj" />
   </Folder>
   <Folder Name="/src/Core/">
     <Project Path="src/Core/TheCanonry.Engine/TheCanonry.Engine.csproj" />
@@ -14,6 +15,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/TheCanonry.ApiClients.Tests/TheCanonry.ApiClients.Tests.csproj" />
     <Project Path="tests/TheCanonry.Engine.Tests/TheCanonry.Engine.Tests.csproj" />
+    <Project Path="tests/TheCanonry.Illuminator.Tests/TheCanonry.Illuminator.Tests.csproj" />
     <Project Path="tests/TheCanonry.NameForge.Tests/TheCanonry.NameForge.Tests.csproj" />
     <Project Path="tests/TheCanonry.Persistence.Tests/TheCanonry.Persistence.Tests.csproj" />
     <Project Path="tests/TheCanonry.Schema.Tests/TheCanonry.Schema.Tests.csproj" />
