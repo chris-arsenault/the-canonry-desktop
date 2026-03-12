@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Core/">
+    <Project Path="src/Core/TheCanonry.Schema/TheCanonry.Schema.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TheCanonry.Schema.Tests/TheCanonry.Schema.Tests.csproj" />
+  </Folder>
+</Solution>
