@@ -36,6 +36,8 @@ public enum VersionStep
     Creative,
     Combine,
     CopyEdit,
+    PerspectiveSynthesis,
+    ImageRefs,
 }
 
 /// <summary>
