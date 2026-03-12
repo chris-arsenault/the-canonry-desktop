@@ -14,6 +14,7 @@
     <ProjectReference Include="..\Core\TheCanonry.NameForge\TheCanonry.NameForge.csproj" />
     <ProjectReference Include="..\Infrastructure\TheCanonry.Persistence\TheCanonry.Persistence.csproj" />
     <ProjectReference Include="..\Infrastructure\TheCanonry.ApiClients\TheCanonry.ApiClients.csproj" />
+    <ProjectReference Include="..\Infrastructure\TheCanonry.AwsSync\TheCanonry.AwsSync.csproj" />
     <ProjectReference Include="..\TheCanonry.Illuminator\TheCanonry.Illuminator.csproj" />
   </ItemGroup>
 
