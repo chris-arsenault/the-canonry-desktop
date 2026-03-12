@@ -16,6 +16,15 @@ public class CanonryDbContext : DbContext
     public DbSet<EraNarrative> EraNarratives => Set<EraNarrative>();
     public DbSet<ImageRecord> Images => Set<ImageRecord>();
     public DbSet<ApiCostEntry> Costs => Set<ApiCostEntry>();
+    public DbSet<NarrativeEventEntity> NarrativeEvents => Set<NarrativeEventEntity>();
+    public DbSet<TraitPaletteEntity> TraitPalettes => Set<TraitPaletteEntity>();
+    public DbSet<StaticPageEntity> StaticPages => Set<StaticPageEntity>();
+    public DbSet<ContentTreeEntity> ContentTrees => Set<ContentTreeEntity>();
+    public DbSet<PageLayoutEntity> PageLayouts => Set<PageLayoutEntity>();
+    public DbSet<StyleLibraryEntity> StyleLibraries => Set<StyleLibraryEntity>();
+    public DbSet<WorldSchemaEntity> WorldSchemas => Set<WorldSchemaEntity>();
+    public DbSet<DynamicsRunEntity> DynamicsRuns => Set<DynamicsRunEntity>();
+    public DbSet<SummaryRevisionRunEntity> SummaryRevisionRuns => Set<SummaryRevisionRunEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -84,6 +93,65 @@ public class CanonryDbContext : DbContext
             e.HasIndex(x => x.SimulationRunId);
             e.HasIndex(x => x.TaskType);
             e.HasIndex(x => x.Model);
+        });
+
+        modelBuilder.Entity<NarrativeEventEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.SimulationRunId);
+            e.HasIndex(x => x.EraId);
+            e.HasIndex(x => x.Tick);
+        });
+
+        modelBuilder.Entity<TraitPaletteEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.ProjectId, x.EntityKind }).IsUnique();
+        });
+
+        modelBuilder.Entity<StaticPageEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.SimulationRunId);
+            e.HasIndex(x => x.PageId);
+        });
+
+        modelBuilder.Entity<ContentTreeEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.ProjectId, x.SimulationRunId }).IsUnique();
+        });
+
+        modelBuilder.Entity<PageLayoutEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.SimulationRunId, x.PageId }).IsUnique();
+        });
+
+        modelBuilder.Entity<StyleLibraryEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.ProjectId).IsUnique();
+        });
+
+        modelBuilder.Entity<WorldSchemaEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.ProjectId).IsUnique();
+        });
+
+        modelBuilder.Entity<DynamicsRunEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.SimulationRunId);
+            e.HasIndex(x => x.RunId);
+        });
+
+        modelBuilder.Entity<SummaryRevisionRunEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => x.SimulationRunId);
+            e.HasIndex(x => x.RunId);
         });
     }
 }
