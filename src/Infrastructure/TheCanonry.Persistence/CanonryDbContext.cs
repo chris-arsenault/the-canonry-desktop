@@ -25,6 +25,7 @@ public class CanonryDbContext : DbContext
     public DbSet<WorldSchemaEntity> WorldSchemas => Set<WorldSchemaEntity>();
     public DbSet<DynamicsRunEntity> DynamicsRuns => Set<DynamicsRunEntity>();
     public DbSet<SummaryRevisionRunEntity> SummaryRevisionRuns => Set<SummaryRevisionRunEntity>();
+    public DbSet<ConfigSlotEntity> ConfigSlots => Set<ConfigSlotEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -152,6 +153,12 @@ public class CanonryDbContext : DbContext
             e.HasKey(x => x.Id);
             e.HasIndex(x => x.SimulationRunId);
             e.HasIndex(x => x.RunId);
+        });
+
+        modelBuilder.Entity<ConfigSlotEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasIndex(x => new { x.ProjectId, x.ConfigType }).IsUnique();
         });
     }
 }

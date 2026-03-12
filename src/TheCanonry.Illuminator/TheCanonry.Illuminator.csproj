@@ -4,6 +4,7 @@
     <ProjectReference Include="..\Core\TheCanonry.Schema\TheCanonry.Schema.csproj" />
     <ProjectReference Include="..\Core\TheCanonry.Engine\TheCanonry.Engine.csproj" />
     <ProjectReference Include="..\Infrastructure\TheCanonry.ApiClients\TheCanonry.ApiClients.csproj" />
+    <ProjectReference Include="..\Infrastructure\TheCanonry.Persistence\TheCanonry.Persistence.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
