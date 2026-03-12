@@ -3,7 +3,11 @@
   <Folder Name="/src/Core/">
     <Project Path="src/Core/TheCanonry.Schema/TheCanonry.Schema.csproj" />
   </Folder>
+  <Folder Name="/src/Infrastructure/">
+    <Project Path="src/Infrastructure/TheCanonry.Persistence/TheCanonry.Persistence.csproj" />
+  </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/TheCanonry.Persistence.Tests/TheCanonry.Persistence.Tests.csproj" />
     <Project Path="tests/TheCanonry.Schema.Tests/TheCanonry.Schema.Tests.csproj" />
   </Folder>
 </Solution>
