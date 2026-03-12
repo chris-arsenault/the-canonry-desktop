@@ -11,6 +11,7 @@
   </Folder>
   <Folder Name="/src/Infrastructure/">
     <Project Path="src/Infrastructure/TheCanonry.ApiClients/TheCanonry.ApiClients.csproj" />
+    <Project Path="src/Infrastructure/TheCanonry.AwsSync/TheCanonry.AwsSync.csproj" />
     <Project Path="src/Infrastructure/TheCanonry.Persistence/TheCanonry.Persistence.csproj" />
   </Folder>
   <Folder Name="/tests/">
@@ -20,6 +21,7 @@
     <Project Path="tests/TheCanonry.NameForge.Tests/TheCanonry.NameForge.Tests.csproj" />
     <Project Path="tests/TheCanonry.Persistence.Tests/TheCanonry.Persistence.Tests.csproj" />
     <Project Path="tests/TheCanonry.Schema.Tests/TheCanonry.Schema.Tests.csproj" />
+    <Project Path="tests/TheCanonry.AwsSync.Tests/TheCanonry.AwsSync.Tests.csproj" />
     <Project Path="tests/TheCanonry.Coherence.Tests/TheCanonry.Coherence.Tests.csproj" />
   </Folder>
 </Solution>
