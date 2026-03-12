@@ -1,0 +1,92 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:illum="using:TheCanonry.Desktop.Illuminator"
+             x:Class="TheCanonry.Desktop.Illuminator.EntityBrowserView"
+             x:DataType="illum:EntityBrowserViewModel">
+    <DockPanel>
+        <!-- Filter Bar -->
+        <Border DockPanel.Dock="Top" Padding="12,8"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="Refresh" Command="{Binding RefreshCommand}" Margin="8,0,0,0" />
+                <TextBlock DockPanel.Dock="Right" Text="{Binding TotalCount, StringFormat='{}{0} entities'}"
+                           VerticalAlignment="Center" Margin="12,0" Opacity="0.6" />
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <TextBox Text="{Binding SearchText}" Watermark="Search..." Width="200" />
+                    <ComboBox ItemsSource="{Binding AvailableKinds}" SelectedItem="{Binding KindFilter}"
+                              Width="140" PlaceholderText="All Kinds" />
+                    <ComboBox ItemsSource="{Binding AvailableStatuses}" SelectedItem="{Binding StatusFilter}"
+                              Width="140" PlaceholderText="All Statuses" />
+                    <Button Content="Search" Command="{Binding SearchCommand}" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Entity List + Detail -->
+        <Grid ColumnDefinitions="*,400">
+            <!-- Entity List -->
+            <ListBox Grid.Column="0" ItemsSource="{Binding Entities}"
+                     SelectedItem="{Binding SelectedEntity}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="illum:EntityListItem">
+                        <DockPanel Margin="4,4">
+                            <TextBlock DockPanel.Dock="Right" Text="{Binding Status}" Opacity="0.5"
+                                       VerticalAlignment="Center" Margin="8,0" FontSize="12" />
+                            <TextBlock DockPanel.Dock="Right" Text="{Binding Kind}" Opacity="0.6"
+                                       VerticalAlignment="Center" FontSize="12" />
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding Subtype, StringFormat='({0})'}" Opacity="0.6"
+                                               FontSize="12" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding Culture}" FontSize="11" Opacity="0.5" />
+                            </StackPanel>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Detail Panel -->
+            <Border Grid.Column="1"
+                    Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1,0,0,0"
+                    Padding="16">
+                <ScrollViewer>
+                    <StackPanel Spacing="8"
+                                IsVisible="{Binding SelectedEntity, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                DataContext="{Binding SelectedEntity}">
+                        <TextBlock Text="{Binding Name}" FontSize="20" FontWeight="Bold" TextWrapping="Wrap" />
+
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Text="{Binding Kind}" Opacity="0.7" />
+                            <TextBlock Text="{Binding Subtype}" Opacity="0.7" />
+                            <TextBlock Text="{Binding Status}" Opacity="0.7" />
+                        </StackPanel>
+
+                        <Separator Margin="0,4" />
+
+                        <TextBlock Text="Culture" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding Culture}" />
+
+                        <TextBlock Text="Prominence" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding Prominence, StringFormat='{}{0:F2}'}" />
+
+                        <TextBlock Text="Description" FontSize="11" Opacity="0.6" Margin="0,8,0,0" />
+                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Opacity="0.9" />
+
+                        <Border Margin="0,8,0,0" Padding="8,4"
+                                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                                CornerRadius="4"
+                                IsVisible="{Binding HasEnrichment}">
+                            <TextBlock Text="Has enrichment data" FontSize="12" Opacity="0.7" />
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </DockPanel>
+</UserControl>

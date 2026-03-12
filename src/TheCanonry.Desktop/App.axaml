@@ -1,8 +1,43 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:forge="using:TheCanonry.Desktop.Forge"
+             xmlns:illum="using:TheCanonry.Desktop.Illuminator"
+             xmlns:arch="using:TheCanonry.Desktop.Archivist"
+             xmlns:de="using:TheCanonry.Desktop.DomainEditor"
+             xmlns:aws="using:TheCanonry.Desktop.AwsSync"
              x:Class="TheCanonry.Desktop.App"
              RequestedThemeVariant="Dark">
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>
+
+    <Application.DataTemplates>
+        <DataTemplate DataType="{x:Type forge:ForgeViewModel}">
+            <forge:ForgeView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type illum:IlluminatorViewModel}">
+            <illum:IlluminatorView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type illum:EntityBrowserViewModel}">
+            <illum:EntityBrowserView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type illum:ChronicleViewModel}">
+            <illum:ChronicleView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type illum:ImageCurationViewModel}">
+            <illum:ImageCurationView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type illum:CatalogViewModel}">
+            <illum:CatalogView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type arch:ArchivistViewModel}">
+            <arch:ArchivistView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type de:DomainEditorViewModel}">
+            <de:DomainEditorView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type aws:AwsSyncViewModel}">
+            <aws:AwsSyncView />
+        </DataTemplate>
+    </Application.DataTemplates>
 </Application>

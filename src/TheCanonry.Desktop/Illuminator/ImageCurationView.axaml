@@ -1,0 +1,102 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:illum="using:TheCanonry.Desktop.Illuminator"
+             x:Class="TheCanonry.Desktop.Illuminator.ImageCurationView"
+             x:DataType="illum:ImageCurationViewModel">
+    <DockPanel>
+        <!-- Filter Bar -->
+        <Border DockPanel.Dock="Top" Padding="12,8"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Right" Text="{Binding TotalCount, StringFormat='{}{0} images'}"
+                           VerticalAlignment="Center" Margin="12,0" Opacity="0.6" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBox Text="{Binding SearchText}" Watermark="Search prompts..." Width="200" />
+                    <TextBox Text="{Binding TypeFilter}" Watermark="Type filter..." Width="120" />
+                    <Button Content="Refresh" Command="{Binding RefreshCommand}" />
+                    <Button Content="Delete" Command="{Binding DeleteImageCommand}" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Grid ColumnDefinitions="*,380">
+            <!-- Image Grid (list mode) -->
+            <ListBox Grid.Column="0" ItemsSource="{Binding Images}" SelectedItem="{Binding SelectedImage}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="illum:ImageListItem">
+                        <Border Padding="8" Width="200" Margin="4">
+                            <StackPanel Spacing="4">
+                                <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                                        Height="120" CornerRadius="4">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding Width, StringFormat='{}{0}'}" HorizontalAlignment="Center"
+                                                   Opacity="0.5" FontSize="11" />
+                                        <TextBlock Text="x" HorizontalAlignment="Center" Opacity="0.3" FontSize="11" />
+                                        <TextBlock Text="{Binding Height, StringFormat='{}{0}'}" HorizontalAlignment="Center"
+                                                   Opacity="0.5" FontSize="11" />
+                                    </StackPanel>
+                                </Border>
+                                <TextBlock Text="{Binding Type}" FontWeight="SemiBold" FontSize="12" />
+                                <TextBlock Text="{Binding Prompt}" FontSize="11" Opacity="0.6"
+                                           TextTrimming="CharacterEllipsis" MaxLines="2" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Detail Panel -->
+            <Border Grid.Column="1"
+                    Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1,0,0,0"
+                    Padding="16">
+                <ScrollViewer>
+                    <StackPanel Spacing="8"
+                                IsVisible="{Binding SelectedImage, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                DataContext="{Binding SelectedImage}">
+                        <TextBlock Text="Image Detail" FontSize="18" FontWeight="Bold" />
+
+                        <TextBlock Text="Type" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding Type}" />
+
+                        <TextBlock Text="Entity" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding EntityId}" />
+
+                        <TextBlock Text="Model" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding Model}" />
+
+                        <TextBlock Text="Dimensions" FontSize="11" Opacity="0.6" />
+                        <TextBlock>
+                            <Run Text="{Binding Width}" /><Run Text=" x " /><Run Text="{Binding Height}" />
+                            <Run Text=" (" /><Run Text="{Binding Aspect}" /><Run Text=")" />
+                        </TextBlock>
+
+                        <TextBlock Text="File" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding FilePath}" TextWrapping="Wrap" FontSize="12" />
+
+                        <Border Margin="0,4,0,0" Padding="8,4"
+                                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                                CornerRadius="4"
+                                IsVisible="{Binding HasHq}">
+                            <TextBlock Text="HQ version available" FontSize="12" Opacity="0.7" />
+                        </Border>
+
+                        <TextBlock Text="Prompt" FontSize="11" Opacity="0.6" Margin="0,8,0,0" />
+                        <TextBlock Text="{Binding Prompt}" TextWrapping="Wrap" FontSize="13" />
+
+                        <TextBlock Text="{Binding CreatedAt, StringFormat='Created: {0:yyyy-MM-dd HH:mm}'}"
+                                   FontSize="11" Opacity="0.5" Margin="0,8,0,0" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </DockPanel>
+</UserControl>

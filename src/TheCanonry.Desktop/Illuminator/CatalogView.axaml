@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:illum="using:TheCanonry.Desktop.Illuminator"
+             x:Class="TheCanonry.Desktop.Illuminator.CatalogView"
+             x:DataType="illum:CatalogViewModel">
+    <DockPanel>
+        <!-- Header -->
+        <Border DockPanel.Dock="Top" Padding="16,12"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="Run Analysis" Command="{Binding RunAnalysisCommand}" />
+                <StackPanel Orientation="Horizontal" Spacing="24">
+                    <StackPanel>
+                        <TextBlock Text="Entities" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding EntityCount}" FontSize="20" FontWeight="Bold" />
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Images" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding ImageCount}" FontSize="20" FontWeight="Bold" />
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Completion" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding CompletionPercentage, StringFormat='{}{0:F1}%'}"
+                                   FontSize="20" FontWeight="Bold" />
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <ProgressBar DockPanel.Dock="Top" IsIndeterminate="{Binding IsAnalyzing}"
+                     IsVisible="{Binding IsAnalyzing}" Height="4" />
+
+        <!-- Coverage Report -->
+        <ScrollViewer Padding="20">
+            <StackPanel Spacing="16" MaxWidth="700">
+                <TextBlock Text="Catalog Coverage Report" FontSize="20" FontWeight="SemiBold" />
+
+                <ItemsControl ItemsSource="{Binding CoverageItems}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="illum:FieldCoverageItem">
+                            <StackPanel Spacing="4" Margin="0,4">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Right"
+                                               Text="{Binding Percentage, StringFormat='{}{0:F1}%'}"
+                                               Opacity="0.7" />
+                                    <TextBlock Text="{Binding FieldName}" FontWeight="SemiBold" />
+                                </DockPanel>
+                                <ProgressBar Value="{Binding Percentage}" Maximum="100" Height="12" />
+                                <TextBlock FontSize="11" Opacity="0.5">
+                                    <Run Text="{Binding FilledCount}" />
+                                    <Run Text=" / " />
+                                    <Run Text="{Binding TotalCount}" />
+                                </TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

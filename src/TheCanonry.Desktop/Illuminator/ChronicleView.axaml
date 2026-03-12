@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:illum="using:TheCanonry.Desktop.Illuminator"
+             x:Class="TheCanonry.Desktop.Illuminator.ChronicleView"
+             x:DataType="illum:ChronicleViewModel">
+    <DockPanel>
+        <!-- Action Bar -->
+        <Border DockPanel.Dock="Top" Padding="12,8"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="Refresh" Command="{Binding RefreshCommand}" />
+                <Button Content="Accept" Command="{Binding AcceptCommand}" />
+                <Button Content="Delete" Command="{Binding DeleteCommand}" />
+                <ProgressBar IsIndeterminate="{Binding IsGenerating}" IsVisible="{Binding IsGenerating}"
+                             Width="100" Height="4" VerticalAlignment="Center" Margin="12,0,0,0" />
+            </StackPanel>
+        </Border>
+
+        <Grid ColumnDefinitions="320,*">
+            <!-- Chronicle List -->
+            <Border Grid.Column="0"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="0,0,1,0">
+                <ListBox ItemsSource="{Binding Chronicles}" SelectedItem="{Binding SelectedChronicle}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="illum:ChronicleListItem">
+                            <DockPanel Margin="4,4">
+                                <TextBlock DockPanel.Dock="Right" Text="{Binding Format}" Opacity="0.5"
+                                           VerticalAlignment="Top" Margin="8,0" FontSize="11" />
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="{Binding CreatedAt, StringFormat='{}{0:MMM dd HH:mm}'}"
+                                                   FontSize="11" Opacity="0.5" />
+                                        <TextBlock Text="Accepted" FontSize="11" Opacity="0.7"
+                                                   IsVisible="{Binding IsAccepted}" />
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding Summary}" FontSize="12" Opacity="0.6"
+                                               TextTrimming="CharacterEllipsis" MaxLines="2"
+                                               IsVisible="{Binding Summary, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                </StackPanel>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Border>
+
+            <!-- Content Viewer -->
+            <Border Grid.Column="1" Padding="20">
+                <ScrollViewer>
+                    <StackPanel Spacing="12"
+                                IsVisible="{Binding SelectedChronicle, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <TextBlock Text="{Binding Title}" FontSize="22" FontWeight="Bold" TextWrapping="Wrap" />
+
+                        <TextBlock Text="{Binding Summary}" FontSize="14" Opacity="0.7" TextWrapping="Wrap"
+                                   IsVisible="{Binding Summary, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+                        <Separator Margin="0,4" />
+
+                        <TextBlock Text="{Binding Content}" TextWrapping="Wrap" FontSize="14" LineHeight="22" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </DockPanel>
+</UserControl>

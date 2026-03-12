@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:arch="using:TheCanonry.Desktop.Archivist"
+             x:Class="TheCanonry.Desktop.Archivist.ArchivistView"
+             x:DataType="arch:ArchivistViewModel">
+    <DockPanel>
+        <!-- Stats Header -->
+        <Border DockPanel.Dock="Top" Padding="16,12"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="Refresh Stats" Command="{Binding RefreshCommand}" />
+                <StackPanel Orientation="Horizontal" Spacing="24">
+                    <StackPanel>
+                        <TextBlock Text="Entities" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding TotalEntities}" FontSize="20" FontWeight="Bold" />
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Relationships" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding TotalRelationships}" FontSize="20" FontWeight="Bold" />
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Kinds" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding KindCount}" FontSize="20" FontWeight="Bold" />
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Grid ColumnDefinitions="320,*">
+            <!-- Entity List -->
+            <DockPanel Grid.Column="0">
+                <Border DockPanel.Dock="Top" Padding="8">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Go" Command="{Binding SearchCommand}" Margin="4,0,0,0" />
+                        <TextBox Text="{Binding SearchText}" Watermark="Search entities..." />
+                    </DockPanel>
+                </Border>
+
+                <ListBox ItemsSource="{Binding Entities}" SelectedItem="{Binding SelectedEntity}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="arch:ArchivistEntityItem">
+                            <DockPanel Margin="4,2">
+                                <TextBlock DockPanel.Dock="Right"
+                                           Text="{Binding RelationshipCount, StringFormat='R:{0}'}"
+                                           Opacity="0.5" FontSize="11" VerticalAlignment="Center" Margin="8,0" />
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="{Binding Kind}" FontSize="11" Opacity="0.6" />
+                                        <TextBlock Text="{Binding Status}" FontSize="11" Opacity="0.5" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+
+            <!-- Relationship Detail -->
+            <Border Grid.Column="1"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1,0,0,0"
+                    Padding="16">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,12"
+                               IsVisible="{Binding SelectedEntity, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <Run Text="Relationships for " />
+                        <Run Text="{Binding SelectedEntity.Name}" FontWeight="Bold" />
+                    </TextBlock>
+
+                    <ListBox ItemsSource="{Binding Relationships}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="arch:RelationshipDisplayItem">
+                                <DockPanel Margin="4,4">
+                                    <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Margin="12,0,0,0">
+                                        <TextBlock Text="{Binding Strength, StringFormat='S:{0:F2}'}"
+                                                   FontSize="11" Opacity="0.5" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Text="{Binding SourceName}" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding Kind}" Opacity="0.6" FontStyle="Italic" />
+                                            <TextBlock Text="{Binding TargetName}" FontWeight="SemiBold" />
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Category}" FontSize="11" Opacity="0.5" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:de="using:TheCanonry.Desktop.DomainEditor"
+             x:Class="TheCanonry.Desktop.DomainEditor.DomainEditorView"
+             x:DataType="de:DomainEditorViewModel">
+    <DockPanel>
+        <!-- Toolbar -->
+        <Border DockPanel.Dock="Top" Padding="12,8"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Right" Text="{Binding ValidationMessage}" Opacity="0.7"
+                           VerticalAlignment="Center" Margin="12,0" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBox Text="{Binding ConfigPath}" Watermark="Config directory..." Width="300" />
+                    <Button Content="Load" Command="{Binding LoadCommand}" />
+                    <Button Content="Save" Command="{Binding SaveCommand}" />
+                    <Button Content="Validate" Command="{Binding ValidateCommand}" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Grid ColumnDefinitions="280,*">
+            <!-- Tree View -->
+            <Border Grid.Column="0"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="0,0,1,0">
+                <TreeView ItemsSource="{Binding TreeItems}">
+                    <TreeView.ItemTemplate>
+                        <TreeDataTemplate ItemsSource="{Binding Children}" x:DataType="de:DomainTreeItem">
+                            <TextBlock Text="{Binding Name}" />
+                        </TreeDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </Border>
+
+            <!-- JSON Editor -->
+            <Border Grid.Column="1" Padding="12">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="{Binding SelectedItem.Name}" FontSize="16"
+                               FontWeight="SemiBold" Margin="0,0,0,8" />
+                    <TextBox Text="{Binding EditorContent}"
+                             AcceptsReturn="True"
+                             AcceptsTab="True"
+                             FontFamily="Cascadia Code,Consolas,monospace"
+                             FontSize="13"
+                             TextWrapping="NoWrap" />
+                </DockPanel>
+            </Border>
+        </Grid>
+    </DockPanel>
+</UserControl>

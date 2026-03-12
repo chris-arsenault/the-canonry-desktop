@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="using:TheCanonry.Desktop.Shell"
+        xmlns:shared="using:TheCanonry.Desktop.Shared"
         x:Class="TheCanonry.Desktop.Shell.ShellWindow"
         x:DataType="shell:ShellViewModel"
         Title="The Canonry" Height="800" Width="1200"
@@ -14,21 +15,22 @@
                 <MenuItem Header="E_xit" Click="Exit_Click" InputGesture="Alt+F4" />
             </MenuItem>
             <MenuItem Header="_Simulation">
-                <MenuItem Header="_Run" InputGesture="F5" />
+                <MenuItem Header="_Run" Command="{Binding NavigateToForgeCommand}" InputGesture="F5" />
                 <MenuItem Header="_Stop" InputGesture="Shift+F5" />
             </MenuItem>
             <MenuItem Header="_Enrichment">
-                <MenuItem Header="_Dashboard" />
-                <MenuItem Header="_Queue Status" />
+                <MenuItem Header="_Dashboard" Command="{Binding NavigateToIlluminatorCommand}" />
+                <MenuItem Header="_Entity Browser" Command="{Binding NavigateToEntityBrowserCommand}" />
+                <MenuItem Header="_Chronicles" Command="{Binding NavigateToChronicleCommand}" />
+                <MenuItem Header="_Image Curation" Command="{Binding NavigateToImageCurationCommand}" />
+                <MenuItem Header="C_atalog Review" Command="{Binding NavigateToCatalogCommand}" />
+                <MenuItem Header="A_WS Sync" Command="{Binding NavigateToAwsSyncCommand}" />
             </MenuItem>
             <MenuItem Header="_View">
-                <MenuItem Header="_Illuminator" />
-                <MenuItem Header="_Archivist" />
-                <MenuItem Header="_Chronicler" />
-                <MenuItem Header="_Forge" />
-                <MenuItem Header="_Coherence" />
-                <MenuItem Header="_Cosmographer" />
-                <MenuItem Header="_Domain Editor" />
+                <MenuItem Header="_Forge" Command="{Binding NavigateToForgeCommand}" />
+                <MenuItem Header="_Illuminator" Command="{Binding NavigateToIlluminatorCommand}" />
+                <MenuItem Header="_Archivist" Command="{Binding NavigateToArchivistCommand}" />
+                <MenuItem Header="_Domain Editor" Command="{Binding NavigateToDomainEditorCommand}" />
             </MenuItem>
             <MenuItem Header="_Window">
                 <MenuItem Header="_New Window" />
@@ -45,16 +47,46 @@
                 <TextBlock Text="{Binding StatusText}" />
                 <TextBlock Text="|" Margin="8,0" Opacity="0.5" />
                 <TextBlock Text="{Binding DatabaseStatus}" />
+                <TextBlock Text="|" Margin="8,0" Opacity="0.5" />
+                <TextBlock Text="{Binding Navigation.CurrentViewName}" Opacity="0.7" />
             </DockPanel>
         </Border>
 
-        <!-- Main Content Area -->
-        <Grid>
-            <TextBlock Text="The Canonry Desktop"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       FontSize="24"
-                       Opacity="0.4" />
-        </Grid>
+        <!-- Sidebar -->
+        <Border DockPanel.Dock="Left" Width="200"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,1,0">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Navigation" FontWeight="SemiBold"
+                           Margin="12,12,12,8" Opacity="0.6" FontSize="11" />
+                <ListBox ItemsSource="{Binding Navigation.NavigationItems}"
+                         SelectedItem="{Binding Navigation.SelectedItem}"
+                         Background="Transparent">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="shared:NavigationItem">
+                            <StackPanel Orientation="Horizontal" Margin="4,2">
+                                <TextBlock Text="{Binding Icon}" Width="24" FontSize="14" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!-- Content Area -->
+        <ContentControl Content="{Binding Navigation.CurrentView}">
+            <ContentControl.ContentTemplate>
+                <DataTemplate>
+                    <!-- Fallback: shows nothing when CurrentView has a mapped DataTemplate -->
+                    <TextBlock Text="The Canonry Desktop"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               FontSize="24"
+                               Opacity="0.4" />
+                </DataTemplate>
+            </ContentControl.ContentTemplate>
+        </ContentControl>
     </DockPanel>
 </Window>
