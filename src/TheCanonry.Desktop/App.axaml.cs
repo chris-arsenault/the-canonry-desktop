@@ -1,7 +1,10 @@
 namespace TheCanonry.Desktop;
 
+using System;
 using System.IO;
-using System.Windows;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TheCanonry.Desktop.Shell;
@@ -11,10 +14,13 @@ public partial class App : Application
 {
     private ServiceProvider? _serviceProvider;
 
-    protected override void OnStartup(StartupEventArgs e)
+    public override void Initialize()
     {
-        base.OnStartup(e);
+        AvaloniaXamlLoader.Load(this);
+    }
 
+    public override void OnFrameworkInitializationCompleted()
+    {
         var dataDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "TheCanonry");
@@ -27,7 +33,6 @@ public partial class App : Application
             options.UseSqlite($"Data Source={dbPath}"));
 
         services.AddTransient<ShellViewModel>();
-        services.AddTransient<ShellWindow>();
 
         _serviceProvider = services.BuildServiceProvider();
 
@@ -38,16 +43,16 @@ public partial class App : Application
             db.Database.EnsureCreated();
         }
 
-        var shell = _serviceProvider.GetRequiredService<ShellWindow>();
-        var vm = (ShellViewModel)shell.DataContext;
-        vm.DatabaseStatus = $"DB: {dbPath}";
-        vm.StatusText = "Ready";
-        shell.Show();
-    }
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            var vm = _serviceProvider.GetRequiredService<ShellViewModel>();
+            vm.DatabaseStatus = $"DB: {dbPath}";
+            vm.StatusText = "Ready";
 
-    protected override void OnExit(ExitEventArgs e)
-    {
-        _serviceProvider?.Dispose();
-        base.OnExit(e);
+            desktop.MainWindow = new ShellWindow { DataContext = vm };
+            desktop.ShutdownRequested += (_, _) => _serviceProvider?.Dispose();
+        }
+
+        base.OnFrameworkInitializationCompleted();
     }
 }

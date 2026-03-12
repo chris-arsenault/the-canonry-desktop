@@ -2,17 +2,26 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Core\TheCanonry.Schema\TheCanonry.Schema.csproj" />
+    <ProjectReference Include="..\Core\TheCanonry.Engine\TheCanonry.Engine.csproj" />
+    <ProjectReference Include="..\Core\TheCanonry.NameForge\TheCanonry.NameForge.csproj" />
     <ProjectReference Include="..\Infrastructure\TheCanonry.Persistence\TheCanonry.Persistence.csproj" />
+    <ProjectReference Include="..\Infrastructure\TheCanonry.ApiClients\TheCanonry.ApiClients.csproj" />
+    <ProjectReference Include="..\TheCanonry.Illuminator\TheCanonry.Illuminator.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.*" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.*" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.*" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.*" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.*" />
   </ItemGroup>

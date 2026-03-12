@@ -1,6 +1,8 @@
-<Window x:Class="TheCanonry.Desktop.Shell.ShellWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="using:TheCanonry.Desktop.Shell"
+        x:Class="TheCanonry.Desktop.Shell.ShellWindow"
+        x:DataType="shell:ShellViewModel"
         Title="The Canonry" Height="800" Width="1200"
         WindowStartupLocation="CenterScreen">
     <DockPanel>
@@ -9,11 +11,11 @@
             <MenuItem Header="_File">
                 <MenuItem Header="_Open Project..." />
                 <Separator />
-                <MenuItem Header="E_xit" Click="Exit_Click" InputGestureText="Alt+F4" />
+                <MenuItem Header="E_xit" Click="Exit_Click" InputGesture="Alt+F4" />
             </MenuItem>
             <MenuItem Header="_Simulation">
-                <MenuItem Header="_Run" InputGestureText="F5" />
-                <MenuItem Header="_Stop" InputGestureText="Shift+F5" />
+                <MenuItem Header="_Run" InputGesture="F5" />
+                <MenuItem Header="_Stop" InputGesture="Shift+F5" />
             </MenuItem>
             <MenuItem Header="_Enrichment">
                 <MenuItem Header="_Dashboard" />
@@ -37,15 +39,14 @@
         </Menu>
 
         <!-- Status Bar -->
-        <StatusBar DockPanel.Dock="Bottom">
-            <StatusBarItem>
+        <Border DockPanel.Dock="Bottom" Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                Padding="8,4">
+            <DockPanel>
                 <TextBlock Text="{Binding StatusText}" />
-            </StatusBarItem>
-            <Separator />
-            <StatusBarItem>
+                <TextBlock Text="|" Margin="8,0" Opacity="0.5" />
                 <TextBlock Text="{Binding DatabaseStatus}" />
-            </StatusBarItem>
-        </StatusBar>
+            </DockPanel>
+        </Border>
 
         <!-- Main Content Area -->
         <Grid>
@@ -53,7 +54,7 @@
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        FontSize="24"
-                       Foreground="Gray" />
+                       Opacity="0.4" />
         </Grid>
     </DockPanel>
 </Window>
