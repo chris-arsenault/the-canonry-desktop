@@ -1,3 +1,5 @@
+using TheCanonry.Illuminator.Chronicle.V2;
+
 namespace TheCanonry.Illuminator.Chronicle;
 
 /// <summary>
@@ -7,19 +9,15 @@ public static class ChroniclePrompts
 {
     /// <summary>
     /// Build the system prompt for chronicle generation.
+    /// Dispatches to V2 builders based on format.
     /// </summary>
-    public static string BuildGenerationSystemPrompt(ChronicleGenerationContext ctx, string format)
-    {
-        return $"""
-            You are a world-building author writing a {format} set in {ctx.WorldName}.
-            {ctx.WorldDescription}
-
-            TONE: {ctx.Tone}
-
-            Write in the style of the world. Stay grounded in the given facts and entity descriptions.
-            Do not invent new entities not provided in the cast. Use the name bank for any invented minor characters.
-            """;
-    }
+    public static string BuildGenerationSystemPrompt(ChronicleGenerationContext ctx, string format) =>
+        format.ToLowerInvariant() switch
+        {
+            "story" => StoryPromptBuilder.GetSystemPrompt(),
+            "document" => DocumentPromptBuilder.GetSystemPrompt(),
+            _ => StoryPromptBuilder.GetSystemPrompt(), // fallback
+        };
 
     /// <summary>
     /// Build the user prompt for chronicle generation.
