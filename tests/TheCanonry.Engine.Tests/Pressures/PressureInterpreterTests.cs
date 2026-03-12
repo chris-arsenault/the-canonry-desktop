@@ -402,7 +402,7 @@ public class PressureInterpreterTests
 
         var system = SystemInterpreter.Create(config, runtime);
 
-        Assert.IsType<Systems.EraTransition>(system);
+        Assert.IsType<TheCanonry.Engine.Systems.EraTransition>(system);
         Assert.Equal("era-transition-1", system.Id);
         Assert.Equal("Era Transition", system.Name);
     }
@@ -428,7 +428,7 @@ public class PressureInterpreterTests
 
         var system = SystemInterpreter.Create(config, runtime);
 
-        Assert.IsType<Systems.UniversalCatalyst>(system);
+        Assert.IsType<TheCanonry.Engine.Systems.UniversalCatalyst>(system);
         Assert.Equal("catalyst-1", system.Id);
         Assert.Equal("Universal Catalyst", system.Name);
     }
@@ -477,7 +477,7 @@ public class PressureInterpreterTests
 
         var system = SystemInterpreter.Create(config, runtime);
 
-        Assert.IsType<Systems.RelationshipMaintenance>(system);
+        Assert.IsType<TheCanonry.Engine.Systems.RelationshipMaintenance>(system);
         Assert.Equal("rel-maint-1", system.Id);
         Assert.Equal("Relationship Maintenance", system.Name);
     }
@@ -548,17 +548,18 @@ public class PressureInterpreterTests
     {
         var runtime = CreateRuntime();
 
-        var systemConfigs = new (SystemType Type, string Id)[]
+        // Implemented systems return non-empty results even on empty graphs
+        var implementedConfigs = new (SystemType Type, string Id)[]
         {
             (SystemType.ConnectionEvolution, "ce"),
-            (SystemType.GraphContagion, "gc"),
             (SystemType.ThresholdTrigger, "tt"),
+            (SystemType.GraphContagion, "gc"),
             (SystemType.ClusterFormation, "cf"),
             (SystemType.TagDiffusion, "td"),
             (SystemType.PlaneDiffusion, "pd"),
         };
 
-        foreach (var (type, id) in systemConfigs)
+        foreach (var (type, id) in implementedConfigs)
         {
             var config = new DeclarativeSystem(
                 type, true,
@@ -568,7 +569,8 @@ public class PressureInterpreterTests
             system.Initialize(); // Should not throw
 
             var result = await system.ApplyAsync(1.0);
-            Assert.Same(SystemResult.Empty, result);
+            Assert.NotNull(result);
+            Assert.Empty(result.RelationshipsAdded);
         }
     }
 }
