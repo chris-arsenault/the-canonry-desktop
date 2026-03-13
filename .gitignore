@@ -483,3 +483,8 @@ $RECYCLE.BIN/
 
 # Publish staging
 .publish-staging/
+
+# Build artifact directories (web/node)
+**/dist/
+**/build/
+**/out/
