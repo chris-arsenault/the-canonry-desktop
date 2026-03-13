@@ -1,1 +1,2 @@
 web/viewer/webui/dist/bundles/default/bundle.json filter=lfs diff=lfs merge=lfs -text
+web/viewer/webui/public/bundles/default/bundle.json filter=lfs diff=lfs merge=lfs -text
