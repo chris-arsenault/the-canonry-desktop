@@ -1,12 +1,11 @@
-namespace TheCanonry.Engine.Systems;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
-using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Systems;
 
 /// <summary>
 /// Spreads states/relationships through network connections using an SIR

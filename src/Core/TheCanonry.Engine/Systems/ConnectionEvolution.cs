@@ -1,5 +1,3 @@
-namespace TheCanonry.Engine.Systems;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Rules;
@@ -7,8 +5,9 @@ using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
-using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Systems;
 
 /// <summary>
 /// Handles relationship strength changes over time based on shared context.
@@ -456,7 +455,7 @@ file sealed class RuntimeGraphAdapter : IGraph
         get
         {
             var dict = new Dictionary<string, double>();
-            foreach (var kvp in _runtime.GetAllPressures())
+            foreach (var kvp in _runtime.AllPressures)
                 dict[kvp.Key] = kvp.Value;
             return dict;
         }

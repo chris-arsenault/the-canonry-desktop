@@ -1,7 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="using:TheCanonry.Desktop.Shell"
-        xmlns:shared="using:TheCanonry.Desktop.Shared"
         x:Class="TheCanonry.Desktop.Shell.ShellWindow"
         x:DataType="shell:ShellViewModel"
         Title="The Canonry" Height="800" Width="1200"
@@ -14,26 +13,43 @@
                 <Separator />
                 <MenuItem Header="E_xit" Click="Exit_Click" InputGesture="Alt+F4" />
             </MenuItem>
-            <MenuItem Header="_Simulation">
-                <MenuItem Header="_Run" Command="{Binding NavigateToForgeCommand}" InputGesture="F5" />
-                <MenuItem Header="_Stop" InputGesture="Shift+F5" />
+            <MenuItem Header="_Enumerist">
+                <MenuItem Header="_Entity Kinds" Command="{Binding NavigateToEnumeristEntityKindsCommand}" />
+                <MenuItem Header="_Relationships" Command="{Binding NavigateToEnumeristRelationshipsCommand}" />
+                <MenuItem Header="Rel. _Matrix" Command="{Binding NavigateToEnumeristRelMatrixCommand}" />
+                <MenuItem Header="_Cultures" Command="{Binding NavigateToEnumeristCulturesCommand}" />
+                <MenuItem Header="_Tags" Command="{Binding NavigateToEnumeristTagsCommand}" />
             </MenuItem>
-            <MenuItem Header="_Enrichment">
+            <MenuItem Header="_Name Forge">
+                <MenuItem Header="_Workshop" Command="{Binding NavigateToNameForgeWorkshopCommand}" />
+                <MenuItem Header="_Generate" Command="{Binding NavigateToNameForgeGenerateCommand}" />
+                <MenuItem Header="_Coverage" Command="{Binding NavigateToNameForgeCoverageCommand}" />
+            </MenuItem>
+            <MenuItem Header="C_osmographer">
+                <MenuItem Header="_Axis Registry" Command="{Binding NavigateToCosmographerAxesCommand}" />
+                <MenuItem Header="Semantic _Planes" Command="{Binding NavigateToCosmographerPlanesCommand}" />
+                <MenuItem Header="Culture _Biases" Command="{Binding NavigateToCosmographerCulturesCommand}" />
+                <MenuItem Header="_Entities" Command="{Binding NavigateToCosmographerEntitiesCommand}" />
+                <MenuItem Header="_Relationships" Command="{Binding NavigateToCosmographerRelationshipsCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Simulation">
+                <MenuItem Header="_Lore Weave" Command="{Binding NavigateToLoreWeaveCommand}" InputGesture="F5" />
+            </MenuItem>
+            <MenuItem Header="E_nrichment">
                 <MenuItem Header="_Dashboard" Command="{Binding NavigateToIlluminatorCommand}" />
+                <Separator />
                 <MenuItem Header="_Entity Browser" Command="{Binding NavigateToEntityBrowserCommand}" />
                 <MenuItem Header="_Chronicles" Command="{Binding NavigateToChronicleCommand}" />
+                <MenuItem Header="Chronicle _Wizard" Command="{Binding NavigateToChronicleWizardCommand}" />
+                <Separator />
                 <MenuItem Header="_Image Curation" Command="{Binding NavigateToImageCurationCommand}" />
-                <MenuItem Header="C_atalog Review" Command="{Binding NavigateToCatalogCommand}" />
-                <MenuItem Header="A_WS Sync" Command="{Binding NavigateToAwsSyncCommand}" />
+                <MenuItem Header="C_overage Report" Command="{Binding NavigateToCatalogCommand}" />
+                <Separator />
+                <MenuItem Header="Edition Co_mparison" Command="{Binding NavigateToEditionComparisonCommand}" />
             </MenuItem>
-            <MenuItem Header="_View">
-                <MenuItem Header="_Forge" Command="{Binding NavigateToForgeCommand}" />
-                <MenuItem Header="_Illuminator" Command="{Binding NavigateToIlluminatorCommand}" />
+            <MenuItem Header="_Tools">
                 <MenuItem Header="_Archivist" Command="{Binding NavigateToArchivistCommand}" />
-                <MenuItem Header="_Domain Editor" Command="{Binding NavigateToDomainEditorCommand}" />
-            </MenuItem>
-            <MenuItem Header="_Window">
-                <MenuItem Header="_New Window" />
+                <MenuItem Header="A_WS Sync" Command="{Binding NavigateToAwsSyncCommand}" />
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About" />
@@ -52,41 +68,15 @@
             </DockPanel>
         </Border>
 
-        <!-- Sidebar -->
-        <Border DockPanel.Dock="Left" Width="200"
-                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
-                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
-                BorderThickness="0,0,1,0">
-            <DockPanel>
-                <TextBlock DockPanel.Dock="Top" Text="Navigation" FontWeight="SemiBold"
-                           Margin="12,12,12,8" Opacity="0.6" FontSize="11" />
-                <ListBox ItemsSource="{Binding Navigation.NavigationItems}"
-                         SelectedItem="{Binding Navigation.SelectedItem}"
-                         Background="Transparent">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="shared:NavigationItem">
-                            <StackPanel Orientation="Horizontal" Margin="4,2">
-                                <TextBlock Text="{Binding Icon}" Width="24" FontSize="14" VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </DockPanel>
-        </Border>
-
         <!-- Content Area -->
-        <ContentControl Content="{Binding Navigation.CurrentView}">
-            <ContentControl.ContentTemplate>
-                <DataTemplate>
-                    <!-- Fallback: shows nothing when CurrentView has a mapped DataTemplate -->
-                    <TextBlock Text="The Canonry Desktop"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               FontSize="24"
-                               Opacity="0.4" />
-                </DataTemplate>
-            </ContentControl.ContentTemplate>
-        </ContentControl>
+        <Panel>
+            <TextBlock Text="The Canonry Desktop"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="24"
+                       Opacity="0.4"
+                       IsVisible="{Binding Navigation.CurrentView, Converter={x:Static ObjectConverters.IsNull}}" />
+            <ContentControl Content="{Binding Navigation.CurrentView}" />
+        </Panel>
     </DockPanel>
 </Window>

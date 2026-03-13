@@ -1,0 +1,530 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:nf="using:TheCanonry.Desktop.NameForge"
+             xmlns:nft="using:TheCanonry.NameForge.Types"
+             x:Class="TheCanonry.Desktop.NameForge.NameForgeView"
+             x:DataType="nf:NameForgeViewModel">
+    <DockPanel>
+        <!-- Top toolbar: section switcher + status -->
+        <Border DockPanel.Dock="Top" Padding="12,8"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Right" Text="{Binding StatusMessage}" Opacity="0.7"
+                           VerticalAlignment="Center" Margin="12,0" FontSize="12" />
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <Button Content="Workshop" Command="{Binding SwitchToWorkshopCommand}"
+                            Classes.accent="{Binding IsWorkshopActive}" />
+                    <Button Content="Generate" Command="{Binding SwitchToGenerateCommand}"
+                            Classes.accent="{Binding IsGenerateActive}" />
+                    <Button Content="Coverage" Command="{Binding SwitchToCoverageCommand}"
+                            Classes.accent="{Binding IsCoverageActive}" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ================================================================ -->
+        <!-- Workshop Section                                                 -->
+        <!-- ================================================================ -->
+        <Grid IsVisible="{Binding IsWorkshopActive}" ColumnDefinitions="220,*">
+
+            <!-- Culture list (left sidebar) -->
+            <Border Grid.Column="0"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="0,0,1,0">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="Cultures" FontWeight="SemiBold" FontSize="14"
+                               Margin="12,8" />
+                    <ListBox ItemsSource="{Binding Cultures}"
+                             SelectedItem="{Binding SelectedCulture}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="nf:CultureListItem">
+                                <DockPanel Margin="4,4">
+                                    <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center"
+                                                Margin="8,0,0,0">
+                                        <TextBlock FontSize="10" Opacity="0.5"
+                                                   IsVisible="{Binding IsConfigured}">
+                                            <Run Text="D:" /><Run Text="{Binding DomainCount}" />
+                                            <Run Text=" L:" /><Run Text="{Binding LexemeListCount}" />
+                                            <Run Text=" G:" /><Run Text="{Binding GrammarCount}" />
+                                            <Run Text=" P:" /><Run Text="{Binding ProfileCount}" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding Id}" FontSize="11" Opacity="0.5" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+
+            <!-- Workshop content (right side) -->
+            <DockPanel Grid.Column="1">
+
+                <!-- Workshop tab switcher -->
+                <Border DockPanel.Dock="Top" Padding="8,6"
+                        BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        BorderThickness="0,0,0,1">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Button Content="Domains" Command="{Binding SwitchToDomainsTabCommand}"
+                                Classes.accent="{Binding IsDomainsTab}" />
+                        <Button Content="Lexeme Lists" Command="{Binding SwitchToLexemesTabCommand}"
+                                Classes.accent="{Binding IsLexemesTab}" />
+                        <Button Content="Grammars" Command="{Binding SwitchToGrammarsTabCommand}"
+                                Classes.accent="{Binding IsGrammarsTab}" />
+                        <Button Content="Profiles" Command="{Binding SwitchToProfilesTabCommand}"
+                                Classes.accent="{Binding IsProfilesTab}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- ======== Domains Tab ======== -->
+                <Grid IsVisible="{Binding IsDomainsTab}" ColumnDefinitions="200,*">
+                    <!-- Domain list -->
+                    <DockPanel Grid.Column="0">
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="4"
+                                    Margin="4,4" HorizontalAlignment="Center">
+                            <Button Content="+" Command="{Binding AddDomainCommand}" Width="36" />
+                            <Button Content="-" Command="{Binding RemoveDomainCommand}" Width="36" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding Domains}"
+                                 SelectedItem="{Binding SelectedDomain}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="nft:NamingDomain">
+                                    <TextBlock Text="{Binding Id}" Margin="4,2" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+
+                    <!-- Domain editor -->
+                    <ScrollViewer Grid.Column="1">
+                        <StackPanel Spacing="8" Margin="12">
+                            <TextBlock Text="Domain Editor" FontWeight="SemiBold" FontSize="14" />
+
+                            <TextBlock Text="Domain ID" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditDomainId}" />
+
+                            <!-- AppliesTo -->
+                            <TextBlock Text="Applies To" FontWeight="SemiBold" FontSize="13" Margin="0,8,0,0" />
+                            <TextBlock Text="Entity Kinds (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditDomainAppliesKinds}" />
+                            <TextBlock Text="Sub-Kinds (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditDomainAppliesSubKinds}" />
+                            <TextBlock Text="Tags (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditDomainAppliesTags}" />
+
+                            <!-- Phonology -->
+                            <TextBlock Text="Phonology" FontWeight="SemiBold" FontSize="13" Margin="0,8,0,0" />
+                            <TextBlock Text="Consonants (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditConsonants}" />
+                            <TextBlock Text="Vowels (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditVowels}" />
+                            <TextBlock Text="Syllable Templates (comma-separated, e.g. CV, CVC)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditSyllableTemplates}" />
+                            <TextBlock Text="Forbidden Clusters (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditForbiddenClusters}" />
+                            <TextBlock Text="Favored Clusters (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditFavoredClusters}" />
+                            <Grid ColumnDefinitions="*,*" Margin="0,4,0,0">
+                                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                    <TextBlock Text="Length Min" FontSize="11" Opacity="0.6" />
+                                    <TextBox Text="{Binding EditLengthMin}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                    <TextBlock Text="Length Max" FontSize="11" Opacity="0.6" />
+                                    <TextBox Text="{Binding EditLengthMax}" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Morphology -->
+                            <TextBlock Text="Morphology" FontWeight="SemiBold" FontSize="13" Margin="0,8,0,0" />
+                            <TextBlock Text="Prefixes (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditPrefixes}" />
+                            <TextBlock Text="Suffixes (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditSuffixes}" />
+                            <TextBlock Text="Infixes (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditInfixes}" />
+                            <TextBlock Text="Word Roots (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditWordRoots}" />
+                            <TextBlock Text="Honorifics (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditHonorifics}" />
+                            <TextBlock Text="Structure (comma-separated, e.g. root, prefix-root-suffix)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditStructure}" />
+
+                            <!-- Style -->
+                            <TextBlock Text="Style" FontWeight="SemiBold" FontSize="13" Margin="0,8,0,0" />
+                            <Grid ColumnDefinitions="*,*" Margin="0,4,0,0">
+                                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                    <TextBlock Text="Apostrophe Rate (0-1)" FontSize="11" Opacity="0.6" />
+                                    <NumericUpDown Value="{Binding EditApostropheRate}"
+                                                   Minimum="0" Maximum="1" Increment="0.05" FormatString="F2" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                    <TextBlock Text="Hyphen Rate (0-1)" FontSize="11" Opacity="0.6" />
+                                    <NumericUpDown Value="{Binding EditHyphenRate}"
+                                                   Minimum="0" Maximum="1" Increment="0.05" FormatString="F2" />
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Text="Capitalization (Title, TitleWords, AllCaps, Lowercase, Mixed)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditStyleCapitalization}" />
+                            <TextBlock Text="Preferred Endings (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditPreferredEndings}" />
+                            <TextBlock Text="Rhythm Bias (Soft, Harsh, Staccato, Flowing, Neutral)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditRhythmBias}" />
+
+                            <Button Content="Save Domain" Command="{Binding SaveDomainCommand}"
+                                    HorizontalAlignment="Left" Margin="0,12,0,0" Classes="accent" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+
+                <!-- ======== Lexeme Lists Tab ======== -->
+                <Grid IsVisible="{Binding IsLexemesTab}" ColumnDefinitions="200,*">
+                    <!-- Lexeme list -->
+                    <DockPanel Grid.Column="0">
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="4"
+                                    Margin="4,4" HorizontalAlignment="Center">
+                            <Button Content="+" Command="{Binding AddLexemeListCommand}" Width="36" />
+                            <Button Content="-" Command="{Binding RemoveLexemeListCommand}" Width="36" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding LexemeLists}"
+                                 SelectedItem="{Binding SelectedLexemeList}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="nft:LexemeList">
+                                    <DockPanel Margin="4,2">
+                                        <TextBlock DockPanel.Dock="Right"
+                                                   Text="{Binding Entries.Length, StringFormat='({0})'}"
+                                                   Opacity="0.5" FontSize="11" VerticalAlignment="Center"
+                                                   Margin="4,0" />
+                                        <TextBlock Text="{Binding Id}" />
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+
+                    <!-- Lexeme editor -->
+                    <DockPanel Grid.Column="1" Margin="12">
+                        <TextBlock DockPanel.Dock="Top" Text="Lexeme List Editor" FontWeight="SemiBold"
+                                   FontSize="14" Margin="0,0,0,8" />
+
+                        <StackPanel DockPanel.Dock="Top" Spacing="8">
+                            <TextBlock Text="List ID" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditLexemeId}" />
+
+                            <TextBlock Text="Description" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditLexemeDescription}" />
+
+                            <TextBlock Text="Source" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditLexemeSource}" />
+                        </StackPanel>
+
+                        <Button DockPanel.Dock="Bottom" Content="Save Lexeme List"
+                                Command="{Binding SaveLexemeListCommand}"
+                                HorizontalAlignment="Left" Margin="0,8,0,0" Classes="accent" />
+
+                        <DockPanel Margin="0,8,0,0">
+                            <TextBlock DockPanel.Dock="Top" Text="Entries (one per line)" FontSize="11"
+                                       Opacity="0.6" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding EditLexemeEntries}"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     FontFamily="Cascadia Code,Consolas,monospace"
+                                     FontSize="12" />
+                        </DockPanel>
+                    </DockPanel>
+                </Grid>
+
+                <!-- ======== Grammars Tab ======== -->
+                <Grid IsVisible="{Binding IsGrammarsTab}" ColumnDefinitions="200,*">
+                    <!-- Grammar list -->
+                    <ListBox Grid.Column="0" ItemsSource="{Binding Grammars}"
+                             SelectedItem="{Binding SelectedGrammar}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="nft:Grammar">
+                                <DockPanel Margin="4,2">
+                                    <TextBlock DockPanel.Dock="Right"
+                                               Text="{Binding Capitalization}"
+                                               Opacity="0.5" FontSize="10" VerticalAlignment="Center"
+                                               Margin="4,0" />
+                                    <TextBlock Text="{Binding Id}" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <!-- Grammar detail -->
+                    <DockPanel Grid.Column="1" Margin="12">
+                        <TextBlock DockPanel.Dock="Top" Text="Grammar Detail" FontWeight="SemiBold"
+                                   FontSize="14" Margin="0,0,0,8" />
+
+                        <StackPanel DockPanel.Dock="Top" Spacing="8">
+                            <Grid ColumnDefinitions="*,*">
+                                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                    <TextBlock Text="Grammar ID" FontSize="11" Opacity="0.6" />
+                                    <TextBox Text="{Binding EditGrammarId}" IsReadOnly="True" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                    <TextBlock Text="Start Symbol" FontSize="11" Opacity="0.6" />
+                                    <TextBox Text="{Binding EditGrammarStart}" IsReadOnly="True" />
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="Description" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditGrammarDescription}" IsReadOnly="True" />
+
+                            <TextBlock Text="Capitalization" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditGrammarCapitalization}" IsReadOnly="True" />
+                        </StackPanel>
+
+                        <DockPanel Margin="0,8,0,0">
+                            <TextBlock DockPanel.Dock="Top" Text="Rules (read-only)" FontSize="11"
+                                       Opacity="0.6" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding GrammarRulesDisplay}"
+                                     IsReadOnly="True"
+                                     AcceptsReturn="True"
+                                     TextWrapping="NoWrap"
+                                     FontFamily="Cascadia Code,Consolas,monospace"
+                                     FontSize="12" />
+                        </DockPanel>
+                    </DockPanel>
+                </Grid>
+
+                <!-- ======== Profiles Tab ======== -->
+                <Grid IsVisible="{Binding IsProfilesTab}" ColumnDefinitions="200,*">
+                    <!-- Profile list -->
+                    <DockPanel Grid.Column="0">
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="4"
+                                    Margin="4,4" HorizontalAlignment="Center">
+                            <Button Content="+" Command="{Binding AddProfileCommand}" Width="36" />
+                            <Button Content="-" Command="{Binding RemoveProfileCommand}" Width="36" />
+                        </StackPanel>
+                        <ListBox ItemsSource="{Binding Profiles}"
+                                 SelectedItem="{Binding SelectedProfile}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="nft:Profile">
+                                    <DockPanel Margin="4,2">
+                                        <TextBlock DockPanel.Dock="Right" Text="*"
+                                                   IsVisible="{Binding IsDefault}"
+                                                   FontWeight="Bold" Opacity="0.7"
+                                                   VerticalAlignment="Center" Margin="4,0" />
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Id}" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding Name}" FontSize="11" Opacity="0.5" />
+                                        </StackPanel>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+
+                    <!-- Profile editor -->
+                    <DockPanel Grid.Column="1" Margin="12">
+                        <TextBlock DockPanel.Dock="Top" Text="Profile Editor" FontWeight="SemiBold"
+                                   FontSize="14" Margin="0,0,0,8" />
+
+                        <StackPanel DockPanel.Dock="Top" Spacing="8">
+                            <Grid ColumnDefinitions="*,*">
+                                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                    <TextBlock Text="Profile ID" FontSize="11" Opacity="0.6" />
+                                    <TextBox Text="{Binding EditProfileId}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                    <TextBlock Text="Display Name" FontSize="11" Opacity="0.6" />
+                                    <TextBox Text="{Binding EditProfileName}" />
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="Entity Kinds (comma-separated)" FontSize="11" Opacity="0.6" />
+                            <TextBox Text="{Binding EditProfileEntityKinds}" />
+
+                            <CheckBox IsChecked="{Binding EditProfileIsDefault}" Content="Is Default Profile" />
+
+                            <Button Content="Save Profile" Command="{Binding SaveProfileCommand}"
+                                    HorizontalAlignment="Left" Classes="accent" />
+                        </StackPanel>
+
+                        <DockPanel Margin="0,12,0,0">
+                            <TextBlock DockPanel.Dock="Top" Text="Strategy Groups (read-only)" FontSize="11"
+                                       Opacity="0.6" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding ProfileStrategyDisplay}"
+                                     IsReadOnly="True"
+                                     AcceptsReturn="True"
+                                     TextWrapping="NoWrap"
+                                     FontFamily="Cascadia Code,Consolas,monospace"
+                                     FontSize="12" />
+                        </DockPanel>
+                    </DockPanel>
+                </Grid>
+
+            </DockPanel>
+        </Grid>
+
+        <!-- ================================================================ -->
+        <!-- Generate Section                                                 -->
+        <!-- ================================================================ -->
+        <Grid IsVisible="{Binding IsGenerateActive}" ColumnDefinitions="300,*">
+
+            <!-- Generate controls (left) -->
+            <Border Grid.Column="0"
+                    Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="0,0,1,0"
+                    Padding="16">
+                <ScrollViewer>
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Generate Names" FontWeight="SemiBold" FontSize="16" />
+
+                        <TextBlock Text="Culture" FontSize="11" Opacity="0.6" />
+                        <ComboBox ItemsSource="{Binding Cultures}"
+                                  SelectedValue="{Binding GenerateCultureId}"
+                                  SelectedValueBinding="{Binding Id}"
+                                  HorizontalAlignment="Stretch">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="nf:CultureListItem">
+                                    <TextBlock>
+                                        <Run Text="{Binding Name}" />
+                                        <Run Text=" (" /><Run Text="{Binding Id}" /><Run Text=")" />
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <TextBlock Text="Profile (optional)" FontSize="11" Opacity="0.6" />
+                        <ComboBox ItemsSource="{Binding AvailableProfiles}"
+                                  SelectedValue="{Binding GenerateProfileId}"
+                                  SelectedValueBinding="{Binding Id}"
+                                  HorizontalAlignment="Stretch">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="nft:Profile">
+                                    <TextBlock>
+                                        <Run Text="{Binding Id}" />
+                                        <Run Text="{Binding Name, StringFormat=' ({0})'}" />
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <Separator Margin="0,4" />
+
+                        <TextBlock Text="Entity Kind (optional)" FontSize="11" Opacity="0.6" />
+                        <TextBox Text="{Binding GenerateEntityKind}"
+                                 Watermark="e.g. person, place..." />
+
+                        <TextBlock Text="Subtype (optional)" FontSize="11" Opacity="0.6" />
+                        <ComboBox ItemsSource="{Binding AvailableSubtypes}"
+                                  SelectedItem="{Binding GenerateSubtype}"
+                                  HorizontalAlignment="Stretch"
+                                  IsEnabled="{Binding AvailableSubtypes.Count}" />
+
+                        <TextBlock Text="Prominence (optional)" FontSize="11" Opacity="0.6" />
+                        <ComboBox SelectedItem="{Binding GenerateProminence}"
+                                  HorizontalAlignment="Stretch">
+                            <ComboBox.Items>
+                                <x:String></x:String>
+                                <x:String>Forgotten</x:String>
+                                <x:String>Marginal</x:String>
+                                <x:String>Recognized</x:String>
+                                <x:String>Renowned</x:String>
+                                <x:String>Mythic</x:String>
+                            </ComboBox.Items>
+                        </ComboBox>
+
+                        <Separator Margin="0,4" />
+
+                        <TextBlock Text="Count" FontSize="11" Opacity="0.6" />
+                        <NumericUpDown Value="{Binding GenerateCount}"
+                                       Minimum="1" Maximum="100" Increment="1" />
+
+                        <TextBlock Text="Seed (optional)" FontSize="11" Opacity="0.6" />
+                        <TextBox Text="{Binding GenerateSeed}" Watermark="Random if empty" />
+
+                        <Button Content="Generate" Command="{Binding GenerateCommand}"
+                                HorizontalAlignment="Stretch" Classes="accent" Margin="0,8,0,0" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Generate results (right) -->
+            <DockPanel Grid.Column="1" Margin="12">
+                <TextBlock DockPanel.Dock="Top" Text="Generated Names" FontWeight="SemiBold"
+                           FontSize="16" Margin="0,0,0,4" />
+
+                <Border DockPanel.Dock="Bottom" Padding="8,6" Margin="0,8,0,0"
+                        Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                        CornerRadius="4"
+                        IsVisible="{Binding StrategyUsageDisplay, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                    <StackPanel>
+                        <TextBlock Text="Strategy Usage" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{Binding StrategyUsageDisplay}" FontSize="13" />
+                    </StackPanel>
+                </Border>
+
+                <ListBox ItemsSource="{Binding GeneratedNames}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="nf:GeneratedNameItem">
+                            <DockPanel Margin="4,4">
+                                <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Margin="12,0,0,0">
+                                    <TextBlock Text="{Binding Strategy}" FontSize="11" Opacity="0.5" />
+                                    <TextBlock Text="{Binding Detail}" FontSize="10" Opacity="0.4" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold"
+                                           VerticalAlignment="Center" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Grid>
+
+        <!-- ================================================================ -->
+        <!-- Coverage Section                                                 -->
+        <!-- ================================================================ -->
+        <DockPanel IsVisible="{Binding IsCoverageActive}" Margin="12">
+            <TextBlock DockPanel.Dock="Top" Text="Entity Kind / Profile Coverage Matrix"
+                       FontWeight="SemiBold" FontSize="16" Margin="0,0,0,12" />
+
+            <TextBlock DockPanel.Dock="Top" FontSize="12" Opacity="0.6" Margin="0,0,0,8"
+                       Text="Y = profile covers this entity kind.  - = not covered.  * = default profile (covers all)." />
+
+            <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding CoverageRows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="nf:CoverageRow">
+                            <DockPanel Margin="0,1">
+                                <Border DockPanel.Dock="Left" Width="160" Padding="4,2">
+                                    <TextBlock Text="{Binding EntityKindName}" FontWeight="SemiBold"
+                                               VerticalAlignment="Center" />
+                                </Border>
+                                <ItemsControl ItemsSource="{Binding Cells}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="nf:CoverageCell">
+                                            <Border Width="80" Padding="4,2"
+                                                    Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                                                    CornerRadius="2" Margin="1,0">
+                                                <TextBlock Text="{Binding Label}"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"
+                                                           FontWeight="SemiBold" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </DockPanel>
+
+    </DockPanel>
+</UserControl>

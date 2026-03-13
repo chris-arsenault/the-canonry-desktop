@@ -1,9 +1,9 @@
-namespace TheCanonry.Illuminator.Tests.Content;
-
 using Microsoft.EntityFrameworkCore;
 using TheCanonry.Illuminator.Content;
 using TheCanonry.Persistence;
 using TheCanonry.Persistence.Repositories;
+
+namespace TheCanonry.Illuminator.Tests.Content;
 
 // ─── StaticPageService Tests ──────────────────────────────────────────────────
 

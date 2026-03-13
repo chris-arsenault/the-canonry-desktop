@@ -1,5 +1,3 @@
-namespace TheCanonry.Engine.Systems;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Rules;
@@ -9,6 +7,8 @@ using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Systems;
 
 /// <summary>
 /// Handles transitions between eras based on exit/entry conditions defined per-era.
@@ -232,7 +232,7 @@ public sealed class EraTransition : ISimulationSystem
             NarrationsByGroup: new Dictionary<string, string>());
     }
 
-    private Dictionary<string, double> CollectPressureChanges(Era currentConfig, Era nextConfig)
+    private static Dictionary<string, double> CollectPressureChanges(Era currentConfig, Era nextConfig)
     {
         var changes = new Dictionary<string, double>();
 
@@ -372,7 +372,7 @@ file sealed class RuntimeGraphAdapter : IGraph
         {
             // Reconstruct mutable dictionary from read-only pressures
             var dict = new Dictionary<string, double>();
-            foreach (var kvp in _runtime.GetAllPressures())
+            foreach (var kvp in _runtime.AllPressures)
                 dict[kvp.Key] = kvp.Value;
             return dict;
         }

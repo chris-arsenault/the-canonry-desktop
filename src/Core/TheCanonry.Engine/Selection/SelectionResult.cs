@@ -1,6 +1,6 @@
-namespace TheCanonry.Engine.Selection;
-
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Selection;
 
 /// <summary>
 /// Result of target selection with selected entities and diagnostic info.

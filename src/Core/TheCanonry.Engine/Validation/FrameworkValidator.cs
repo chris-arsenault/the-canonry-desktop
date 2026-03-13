@@ -1,7 +1,7 @@
-namespace TheCanonry.Engine.Validation;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Schema.Primitives;
+
+namespace TheCanonry.Engine.Validation;
 
 /// <summary>
 /// Validates that framework primitives are present in the domain configuration.

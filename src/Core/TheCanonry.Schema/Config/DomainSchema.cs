@@ -8,4 +8,8 @@ public class DomainSchema
     public required IReadOnlyList<EntityKindDefinition> EntityKinds { get; init; }
     public required IReadOnlyList<RelationshipKindDefinition> RelationshipKinds { get; init; }
     public required IReadOnlyList<CultureDefinition> Cultures { get; init; }
+    public IReadOnlyList<TagDefinition> TagRegistry { get; init; } = [];
+    public IReadOnlyList<AxisDefinition> AxisDefinitions { get; init; } = [];
+    public IReadOnlyList<SeedEntity> SeedEntities { get; init; } = [];
+    public IReadOnlyList<SeedRelationship> SeedRelationships { get; init; } = [];
 }

@@ -1,5 +1,3 @@
-namespace TheCanonry.Engine.Systems;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Engine.Selection;
@@ -7,6 +5,8 @@ using TheCanonry.Engine.Statistics;
 using TheCanonry.Engine.Templates;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Systems;
 
 // =============================================================================
 // GROWTH EPOCH SUMMARY
@@ -121,14 +121,18 @@ public sealed class GrowthSystem
     }
 
     /// <summary>
-    /// Return the current epoch's entity creation target.
+    /// The current epoch's entity creation target.
     /// </summary>
-    public int GetEpochTarget() => _epochTarget;
+    public int EpochTarget => _epochTarget;
 
     /// <summary>
     /// Return per-template yield stats for the current epoch.
     /// Maps template ID to number of entities produced.
     /// </summary>
+    // CA1024 suppressed: this allocates a defensive copy of _templateRunCounts on every call,
+    // so a property would mislead callers into treating it as a cheap accessor.
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1024:Use properties where appropriate",
+        Justification = "Allocates a defensive copy on each call; property semantics would be misleading.")]
     public IReadOnlyDictionary<string, int> GetEpochYield()
     {
         return new Dictionary<string, int>(_templateRunCounts);
@@ -156,7 +160,7 @@ public sealed class GrowthSystem
             return CreateResult("No era set for growth");
 
         _runtime.UpdatePopulationMetrics();
-        var metrics = _runtime.GetPopulationMetrics();
+        var metrics = _runtime.PopulationMetrics;
         var budget = ComputeBudget(remaining, modifier);
 
         var applied = 0;

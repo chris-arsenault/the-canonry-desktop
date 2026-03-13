@@ -1,10 +1,10 @@
-namespace TheCanonry.Engine.Rules;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Rules;
 
 /// <summary>
 /// Static evaluator for all Condition subtypes.

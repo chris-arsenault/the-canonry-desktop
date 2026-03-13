@@ -1,5 +1,3 @@
-namespace TheCanonry.Engine.Templates;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Rules;
@@ -9,6 +7,9 @@ using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Engine.Templates;
 
 /// <summary>
 /// Interprets and executes declarative templates.
@@ -183,7 +184,7 @@ public static class TemplateInterpreter
         var selectRule = definition.Select;
 
         // Determine base candidates based on source
-        var candidates = GetVariableCandidates(selectRule, ruleCtx);
+        IReadOnlyList<Entity> candidates = GetVariableCandidates(selectRule, ruleCtx);
         if (candidates.Count == 0) return null;
 
         // Apply kind/subtype/status filters
@@ -302,8 +303,8 @@ public static class TemplateInterpreter
         return current;
     }
 
-    private static List<Entity> ApplyBasicFilters(
-        List<Entity> candidates,
+    private static IReadOnlyList<Entity> ApplyBasicFilters(
+        IReadOnlyList<Entity> candidates,
         VariableSelectionRule selectRule)
     {
         var result = candidates;
@@ -871,7 +872,7 @@ public static class TemplateInterpreter
             get
             {
                 var dict = new Dictionary<string, double>();
-                foreach (var kvp in _runtime.GetAllPressures())
+                foreach (var kvp in _runtime.AllPressures)
                     dict[kvp.Key] = kvp.Value;
                 return dict;
             }

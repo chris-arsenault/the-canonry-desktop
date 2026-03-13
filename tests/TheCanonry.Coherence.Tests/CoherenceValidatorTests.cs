@@ -1,13 +1,12 @@
-namespace TheCanonry.Coherence.Tests;
-
 using TheCanonry.Coherence.Types;
 using TheCanonry.Engine.Engine;
-using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Rules.Types;
-using TheCanonry.Schema.Config;
 using TheCanonry.Engine.Templates;
+using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
+
+namespace TheCanonry.Coherence.Tests;
 
 /// <summary>
 /// Tests for the top-level CoherenceValidator.Validate() orchestration.

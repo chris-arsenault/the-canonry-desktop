@@ -1,16 +1,13 @@
-namespace TheCanonry.Engine.Tests.Templates;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
-using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Engine.Statistics;
-using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Domain;
+using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Ids;
-using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
 
 using TemplateInterpreter = TheCanonry.Engine.Templates.TemplateInterpreter;
 using DeclarativeTemplate = TheCanonry.Engine.Templates.DeclarativeTemplate;
@@ -19,7 +16,6 @@ using RelationshipRule = TheCanonry.Engine.Templates.RelationshipRule;
 using VariableDefinition = TheCanonry.Engine.Templates.VariableDefinition;
 using PlacementSpec = TheCanonry.Engine.Templates.PlacementSpec;
 using PlacementStep = TheCanonry.Engine.Templates.PlacementStep;
-using TemplateResult = TheCanonry.Engine.Templates.TemplateResult;
 using FixedSubtype = TheCanonry.Engine.Templates.FixedSubtype;
 using FixedCulture = TheCanonry.Engine.Templates.FixedCulture;
 using InheritCulture = TheCanonry.Engine.Templates.InheritCulture;
@@ -30,6 +26,8 @@ using PlacementRegionPolicy = TheCanonry.Engine.Templates.PlacementRegionPolicy;
 using CountRange = TheCanonry.Engine.Templates.CountRange;
 using VariantSelectionMode = TheCanonry.Engine.Templates.VariantSelectionMode;
 using TemplateVariants = TheCanonry.Engine.Templates.TemplateVariants;
+
+namespace TheCanonry.Engine.Tests.Templates;
 
 // =============================================================================
 // TEST STUBS

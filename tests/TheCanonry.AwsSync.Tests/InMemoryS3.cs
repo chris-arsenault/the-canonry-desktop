@@ -1,11 +1,11 @@
-namespace TheCanonry.AwsSync.Tests;
-
 using TheCanonry.AwsSync.S3;
+
+namespace TheCanonry.AwsSync.Tests;
 
 /// <summary>
 /// In-memory implementation of <see cref="IS3Operations"/> for testing without AWS.
 /// </summary>
-public sealed class InMemoryS3 : IS3Operations
+internal sealed class InMemoryS3 : IS3Operations
 {
     private readonly Dictionary<string, (byte[] Data, string ContentType, Dictionary<string, string>? Tags)> _objects = [];
 

@@ -1,9 +1,9 @@
-namespace TheCanonry.Desktop.Shared;
-
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-public abstract class ViewModelBase : INotifyPropertyChanged
+namespace TheCanonry.Desktop.Shared;
+
+internal abstract class ViewModelBase : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 

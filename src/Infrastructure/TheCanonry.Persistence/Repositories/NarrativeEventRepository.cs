@@ -1,7 +1,7 @@
-namespace TheCanonry.Persistence.Repositories;
-
 using Microsoft.EntityFrameworkCore;
 using TheCanonry.Persistence.Entities;
+
+namespace TheCanonry.Persistence.Repositories;
 
 public class NarrativeEventRepository
 {
@@ -43,7 +43,7 @@ public class NarrativeEventRepository
         return narrativeEvent;
     }
 
-    public async Task BulkCreate(List<NarrativeEventEntity> events)
+    public async Task BulkCreate(IReadOnlyList<NarrativeEventEntity> events)
     {
         _db.NarrativeEvents.AddRange(events);
         await _db.SaveChangesAsync();

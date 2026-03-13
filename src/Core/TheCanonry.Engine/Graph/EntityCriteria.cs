@@ -1,7 +1,7 @@
-namespace TheCanonry.Engine.Graph;
-
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
+
+namespace TheCanonry.Engine.Graph;
 
 /// <summary>
 /// Filter criteria for finding entities in the graph.

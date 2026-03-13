@@ -51,7 +51,11 @@ public sealed class DalleImageClient : IImageClient
         {
             response = await _httpClient.SendAsync(httpRequest, ct);
         }
-        catch (Exception ex)
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             return new ImageResult { Error = ex.Message };
         }

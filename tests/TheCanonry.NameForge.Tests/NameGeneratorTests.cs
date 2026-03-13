@@ -106,9 +106,8 @@ public class NameGeneratorTests
     public void Generate_ReturnsRequestedCount()
     {
         var culture = CreateMinimalCulture();
-        var generator = new NameGenerator([culture]);
 
-        var result = generator.Generate(culture, new GenerateRequest
+        var result = NameGenerator.Generate(culture, new GenerateRequest
         {
             CultureId = "elves",
             Count = 5,
@@ -124,17 +123,14 @@ public class NameGeneratorTests
     {
         var culture = CreateMinimalCulture();
 
-        var gen1 = new NameGenerator([culture]);
-        var gen2 = new NameGenerator([culture]);
-
-        var result1 = gen1.Generate(culture, new GenerateRequest
+        var result1 = NameGenerator.Generate(culture, new GenerateRequest
         {
             CultureId = "elves",
             Count = 10,
             Seed = "determinism-test"
         });
 
-        var result2 = gen2.Generate(culture, new GenerateRequest
+        var result2 = NameGenerator.Generate(culture, new GenerateRequest
         {
             CultureId = "elves",
             Count = 10,
@@ -148,16 +144,15 @@ public class NameGeneratorTests
     public void Generate_DifferentSeeds_ProduceDifferentNames()
     {
         var culture = CreateMinimalCulture();
-        var generator = new NameGenerator([culture]);
 
-        var result1 = generator.Generate(culture, new GenerateRequest
+        var result1 = NameGenerator.Generate(culture, new GenerateRequest
         {
             CultureId = "elves",
             Count = 5,
             Seed = "seed-a"
         });
 
-        var result2 = generator.Generate(culture, new GenerateRequest
+        var result2 = NameGenerator.Generate(culture, new GenerateRequest
         {
             CultureId = "elves",
             Count = 5,
@@ -173,9 +168,8 @@ public class NameGeneratorTests
     public void Generate_TracksStrategyUsage()
     {
         var culture = CreateMinimalCulture();
-        var generator = new NameGenerator([culture]);
 
-        var result = generator.Generate(culture, new GenerateRequest
+        var result = NameGenerator.Generate(culture, new GenerateRequest
         {
             CultureId = "elves",
             Count = 20,
@@ -241,8 +235,7 @@ public class NameGeneratorTests
             ]
         };
 
-        var generator = new NameGenerator([culture]);
-        var result = generator.Generate(culture, new GenerateRequest
+        var result = NameGenerator.Generate(culture, new GenerateRequest
         {
             CultureId = "simple",
             Count = 10,
@@ -261,9 +254,8 @@ public class NameGeneratorTests
     public void GenerateOne_ReturnsSingleName()
     {
         var culture = CreateMinimalCulture();
-        var generator = new NameGenerator([culture]);
 
-        var name = generator.GenerateOne(culture, "npc", "merchant", "recognized", []);
+        var name = NameGenerator.GenerateOne(culture, "npc", "merchant", "recognized", []);
 
         Assert.NotEmpty(name);
     }
@@ -280,10 +272,9 @@ public class NameGeneratorTests
             Grammars = [],
             Profiles = []
         };
-        var generator = new NameGenerator([culture]);
 
         Assert.Throws<InvalidOperationException>(() =>
-            generator.Generate(culture, new GenerateRequest
+            NameGenerator.Generate(culture, new GenerateRequest
             {
                 CultureId = "empty",
                 Kind = "npc",
@@ -381,10 +372,8 @@ public class NameGeneratorTests
             ]
         };
 
-        var generator = new NameGenerator([culture]);
-
         // Request for location should use grammar strategy
-        var locResult = generator.Generate(culture, new GenerateRequest
+        var locResult = NameGenerator.Generate(culture, new GenerateRequest
         {
             CultureId = "cond-test",
             Kind = "location",

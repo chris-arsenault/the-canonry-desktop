@@ -1,10 +1,8 @@
-namespace TheCanonry.Coherence.Rules;
-
 using TheCanonry.Coherence.Types;
 using TheCanonry.Engine.Engine;
-using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Rules.Types;
-using TheCanonry.Engine.Templates;
+
+namespace TheCanonry.Coherence.Rules;
 
 /// <summary>
 /// Rules that check pressure source/sink completeness.

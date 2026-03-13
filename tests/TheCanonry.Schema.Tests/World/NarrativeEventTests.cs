@@ -1,8 +1,8 @@
-namespace TheCanonry.Schema.Tests.World;
-
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Schema.Tests.World;
 
 public class NarrativeEventTests
 {

@@ -1,7 +1,5 @@
 namespace TheCanonry.Schema.Config;
 
-using TheCanonry.Schema.World;
-
 public class SemanticAxis
 {
     public required string AxisId { get; init; }

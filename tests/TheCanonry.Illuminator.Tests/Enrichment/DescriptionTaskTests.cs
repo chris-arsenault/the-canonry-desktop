@@ -1,13 +1,11 @@
 using TheCanonry.Illuminator.Enrichment;
 using TheCanonry.Illuminator.Enrichment.Tasks;
-using TheCanonry.Illuminator.Types;
-using TheCanonry.Schema.Ids;
 
 namespace TheCanonry.Illuminator.Tests.Enrichment;
 
 public sealed class DescriptionTaskTests
 {
-    private static readonly string NarrativeJson = """
+    private const string NarrativeJson = """
         {
             "summary": "A wandering scholar of the northern reaches.",
             "description": "Tall and gaunt, the scholar moves through icy corridors with purpose.",

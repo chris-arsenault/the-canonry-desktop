@@ -1,8 +1,8 @@
-namespace TheCanonry.Engine.Graph;
-
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Graph;
 
 /// <summary>
 /// Static helper methods for common graph query patterns.

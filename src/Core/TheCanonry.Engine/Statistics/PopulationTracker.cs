@@ -1,6 +1,6 @@
-namespace TheCanonry.Engine.Statistics;
-
 using TheCanonry.Engine.Graph;
+
+namespace TheCanonry.Engine.Statistics;
 
 /// <summary>
 /// Real-time monitoring of entity/relationship populations for feedback control.
@@ -74,14 +74,14 @@ public class PopulationTracker
             var deviation = target > 0 ? (double)(count - target) / target : 0.0;
 
             // Update history and calculate trend
-            existing.History.Add(count);
-            if (existing.History.Count > _historyWindow)
-                existing.History.RemoveAt(0);
+            existing.MutableHistory.Add(count);
+            if (existing.MutableHistory.Count > _historyWindow)
+                existing.MutableHistory.RemoveAt(0);
 
             existing.Count = count;
             existing.Target = target;
             existing.Deviation = deviation;
-            existing.Trend = CalculateTrend(existing.History);
+            existing.Trend = CalculateTrend(existing.MutableHistory);
         }
 
         // Add any NEW subtypes discovered at runtime (not in distribution targets)
@@ -105,7 +105,7 @@ public class PopulationTracker
                 Deviation = deviation,
                 Trend = 0
             };
-            metric.History.Add(count);
+            metric.MutableHistory.Add(count);
             _metrics.Entities[key] = metric;
         }
     }
@@ -132,14 +132,14 @@ public class PopulationTracker
             var target = 0;
             var deviation = target > 0 ? (double)(count - target) / target : 0.0;
 
-            existing.History.Add(count);
-            if (existing.History.Count > _historyWindow)
-                existing.History.RemoveAt(0);
+            existing.MutableHistory.Add(count);
+            if (existing.MutableHistory.Count > _historyWindow)
+                existing.MutableHistory.RemoveAt(0);
 
             existing.Count = count;
             existing.Target = target;
             existing.Deviation = deviation;
-            existing.Trend = CalculateTrend(existing.History);
+            existing.Trend = CalculateTrend(existing.MutableHistory);
         }
     }
 
@@ -156,14 +156,14 @@ public class PopulationTracker
             var target = GetPressureTarget(id);
             var deviation = target > 0 ? (value - target) / target : 0.0;
 
-            existing.History.Add(value);
-            if (existing.History.Count > _historyWindow)
-                existing.History.RemoveAt(0);
+            existing.MutableHistory.Add(value);
+            if (existing.MutableHistory.Count > _historyWindow)
+                existing.MutableHistory.RemoveAt(0);
 
             existing.Value = value;
             existing.Target = target;
             existing.Deviation = deviation;
-            existing.Trend = CalculateTrendDouble(existing.History);
+            existing.Trend = CalculateTrendDouble(existing.MutableHistory);
         }
     }
 
@@ -207,9 +207,9 @@ public class PopulationTracker
     }
 
     /// <summary>
-    /// Get current metrics snapshot.
+    /// Current metrics snapshot.
     /// </summary>
-    public PopulationMetrics GetMetrics() => _metrics;
+    public PopulationMetrics Metrics => _metrics;
 
     /// <summary>
     /// Get entities that are significantly over or under their target.

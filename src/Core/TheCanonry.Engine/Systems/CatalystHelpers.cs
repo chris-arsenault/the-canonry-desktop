@@ -1,6 +1,6 @@
-namespace TheCanonry.Engine.Systems;
-
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Systems;
 
 /// <summary>
 /// Shared helper methods for catalyst/action evaluation.

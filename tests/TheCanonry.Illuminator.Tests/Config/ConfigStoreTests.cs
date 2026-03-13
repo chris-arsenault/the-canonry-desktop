@@ -1,10 +1,11 @@
-namespace TheCanonry.Illuminator.Tests.Config;
-
 using Microsoft.EntityFrameworkCore;
+using TheCanonry.Illuminator.Chronicle.PerspectiveSynthesis;
 using TheCanonry.Illuminator.Config;
 using TheCanonry.Persistence;
 
-public class ConfigStoreTests : IDisposable
+namespace TheCanonry.Illuminator.Tests.Config;
+
+public sealed class ConfigStoreTests : IDisposable
 {
     private readonly CanonryDbContext _db;
 
@@ -18,7 +19,11 @@ public class ConfigStoreTests : IDisposable
         _db.Database.EnsureCreated();
     }
 
-    public void Dispose() => _db.Dispose();
+    public void Dispose()
+    {
+        _db.Dispose();
+        GC.SuppressFinalize(this);
+    }
 
     [Fact]
     public async Task WorldContext_round_trip_preserves_all_fields()
@@ -35,7 +40,11 @@ public class ConfigStoreTests : IDisposable
                 new CanonFact("f-2", "The old empire fell three centuries ago", "world_truth", Required: false, Disabled: false),
             ],
             SpeciesConstraint = "humans only",
-            WorldDynamics = "rising tension between city-states",
+            WorldDynamics =
+            [
+                new WorldDynamic { Id = "wd-1", Text = "Rising tension between city-states", Cultures = ["northern", "southern"] },
+                new WorldDynamic { Id = "wd-2", Text = "Trade routes shifting eastward", Kinds = ["city", "guild"] },
+            ],
         };
 
         await store.SaveWorldContextAsync("proj-1", context);
@@ -49,7 +58,13 @@ public class ConfigStoreTests : IDisposable
         Assert.Equal("f-1", loaded.CanonFacts[0].Id);
         Assert.True(loaded.CanonFacts[0].Required);
         Assert.Equal("humans only", loaded.SpeciesConstraint);
-        Assert.Equal("rising tension between city-states", loaded.WorldDynamics);
+        Assert.NotNull(loaded.WorldDynamics);
+        Assert.Equal(2, loaded.WorldDynamics.Count);
+        Assert.Equal("wd-1", loaded.WorldDynamics[0].Id);
+        Assert.Equal("Rising tension between city-states", loaded.WorldDynamics[0].Text);
+        Assert.Equal(2, loaded.WorldDynamics[0].Cultures!.Count);
+        Assert.Equal("wd-2", loaded.WorldDynamics[1].Id);
+        Assert.Equal(2, loaded.WorldDynamics[1].Kinds!.Count);
     }
 
     [Fact]

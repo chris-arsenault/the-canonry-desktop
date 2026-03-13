@@ -1,11 +1,10 @@
-namespace TheCanonry.Persistence.Tests.Repositories;
-
 using Microsoft.EntityFrameworkCore;
-using TheCanonry.Persistence;
 using TheCanonry.Persistence.Entities;
 using TheCanonry.Persistence.Repositories;
 
-public class RepositoryTests : IDisposable
+namespace TheCanonry.Persistence.Tests.Repositories;
+
+public sealed class RepositoryTests : IDisposable
 {
     private readonly CanonryDbContext _db;
 
@@ -350,5 +349,9 @@ public class RepositoryTests : IDisposable
         Assert.Equal(1, dalleImage.Count);
     }
 
-    public void Dispose() => _db.Dispose();
+    public void Dispose()
+    {
+        _db.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }

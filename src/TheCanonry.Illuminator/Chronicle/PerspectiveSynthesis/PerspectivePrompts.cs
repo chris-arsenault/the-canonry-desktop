@@ -86,10 +86,13 @@ public static class PerspectivePrompts
             ENTITY PORTRAYAL GUIDELINES (per entity kind):
             {sections.ProseHintsDisplay}
 
+            WORLD DYNAMICS (narrative context about inter-group forces and behaviors):
+            {sections.WorldDynamicsDisplay}
+
             {constellationBlock}
 
             === FACT SELECTION ===
-            Fact selection target: default (4-6). Required facts must still be included.
+            {sections.FactSelectionLine}
             {requiredFactsLine}
 
             === YOUR TASK ===
@@ -100,17 +103,17 @@ public static class PerspectivePrompts
 
             Provide a JSON object with:
 
-            1. "brief": A perspective brief (150-200 words) describing what matters emotionally for THIS story type.
+            1. "brief": A perspective brief (100-150 words) describing what matters emotionally for THIS story type. Let the style's prose guidance inform what to focus on.
 
-            2. "facets": Select 4-6 facts most relevant to this chronicle. REQUIRED facts must be included. For each, provide a 1-2 sentence interpretation explaining how this fact specifically manifests for the entities and story type in this chronicle.
+            2. "facets": {sections.FacetSelectionInstruction} facts most relevant to this chronicle. REQUIRED facts (if any) must be included; if required facts exceed the default range, include all required and do not add optional facts. For each, provide a 1-2 sentence interpretation explaining how this fact specifically manifests or matters for the entities and story type in this chronicle. The original fact will be included; your interpretation adds the specific lens.
 
-            3. "suggestedMotifs": 2-3 short phrases that might echo through this chronicle.
+            3. "suggestedMotifs": 2-3 short phrases that might echo through this chronicle — appropriate to the style.
 
-            4. "narrativeVoice": 3-5 atmospheric anchors appropriate to THIS narrative style.
+            4. "narrativeVoice": 3-5 atmospheric anchors appropriate to THIS narrative style. Choose dimensions that serve the story type. Do NOT provide ending or closure guidance.
 
-            5. "entityDirectives": For each entity, 1-2 sentences on what matters about them for THIS story. Include entityId, entityName, and directive.
+            5. "entityDirectives": For each entity, 1-2 sentences on what matters about them for THIS story. Let the style guide what to focus on. Include entityId, entityName, and directive.
 
-            6. "temporalNarrative" (optional): If world dynamics were provided, synthesize them into 2-4 sentences of story-specific stakes. Omit if no world dynamics.
+            6. "temporalNarrative" (optional): If WORLD DYNAMICS were provided above, synthesize them into 2-4 sentences of story-specific stakes for THIS chronicle. What conditions shape what's possible? What pressures bear on these characters? If no world dynamics are provided, omit this field entirely.
 
             Output format:
             """ + OutputFormatExample;
@@ -127,7 +130,11 @@ public static class PerspectivePrompts
         IReadOnlyList<string> PresentCultureIds,
         string CulturalIdentitiesDisplay,
         string ProseHintsDisplay,
-        string EntitySummaries);
+        string EntitySummaries,
+        string WorldDynamicsDisplay,
+        IReadOnlyList<ResolvedWorldDynamic> ResolvedWorldDynamics,
+        string FactSelectionLine,
+        string FacetSelectionInstruction);
 
     private static PromptSections BuildSections(PerspectiveSynthesisInput input)
     {
@@ -136,10 +143,10 @@ public static class PerspectivePrompts
         var worldTruthFacts = input.FactsWithMetadata
             .Where(f => f.Type != FactType.GenerationConstraint && !f.Disabled)
             .ToList();
-        var requiredFactIds = worldTruthFacts
+        var requiredFacts = worldTruthFacts
             .Where(f => f.Required)
-            .Select(f => f.Id)
             .ToList();
+        var requiredFactIds = requiredFacts.Select(f => f.Id).ToList();
         var worldTruthFactsDisplay = string.Join('\n',
             worldTruthFacts.Select(f => $"- [{f.Id}]{(f.Required ? " (REQUIRED)" : "")}: {f.Text}"));
 
@@ -153,6 +160,14 @@ public static class PerspectivePrompts
 
         var entitySummaries = BuildEntitySummaries(input.Entities, input.RoleAssignments);
 
+        var resolvedWorldDynamics = ResolveWorldDynamics(input);
+        var worldDynamicsDisplay = resolvedWorldDynamics.Count > 0
+            ? string.Join('\n', resolvedWorldDynamics.Select(d => $"- {d.Text}"))
+            : "No world dynamics declared.";
+
+        var (factSelectionLine, facetSelectionInstruction) =
+            ComputeFactSelectionDisplay(input.FactSelection, requiredFacts.Count);
+
         return new PromptSections(
             NarrativeStyleDisplay: narrativeStyleDisplay,
             WorldTruthFactsDisplay: worldTruthFactsDisplay,
@@ -160,7 +175,11 @@ public static class PerspectivePrompts
             PresentCultureIds: presentCultureIds,
             CulturalIdentitiesDisplay: culturalIdentitiesDisplay,
             ProseHintsDisplay: proseHintsDisplay,
-            EntitySummaries: entitySummaries);
+            EntitySummaries: entitySummaries,
+            WorldDynamicsDisplay: worldDynamicsDisplay,
+            ResolvedWorldDynamics: resolvedWorldDynamics,
+            FactSelectionLine: factSelectionLine,
+            FacetSelectionInstruction: facetSelectionInstruction);
     }
 
     private static string BuildNarrativeStyleDisplay(NarrativeStyle? style)
@@ -168,10 +187,19 @@ public static class PerspectivePrompts
         if (style is null)
             return "No specific narrative style.";
 
-        var parts = new List<string>(4)
+        var parts = new List<string>(8)
         {
             $"Name: {style.Name}",
         };
+
+        if (style.Format is { Length: > 0 })
+            parts.Add($"Format: {style.Format}");
+
+        if (style.Description is { Length: > 0 })
+            parts.Add($"Description: {style.Description}");
+
+        if (style.Tags is { Count: > 0 })
+            parts.Add($"Tags: {string.Join(", ", style.Tags)}");
 
         if (style.ProseGuidance is { Length: > 0 })
             parts.Add($"\nProse guidance:\n{style.ProseGuidance}");
@@ -235,10 +263,13 @@ public static class PerspectivePrompts
 
         return string.Join('\n', entities.Take(10).Select(e =>
         {
+            var tags = e.Tags is { Count: > 0 }
+                ? $" [{string.Join(", ", e.Tags.Select(kv => $"{kv.Key}={kv.Value}"))}]"
+                : "";
             var roleLabel = roleByEntityId.TryGetValue(e.Id, out var ra)
                 ? $", role: {ra.Role}{(ra.IsPrimary ? " (primary)" : "")}"
                 : "";
-            return $"- {e.Name} ({e.Kind}, {e.Culture ?? "unknown"}, {e.Prominence}{roleLabel}): {e.Summary ?? "(no summary)"}";
+            return $"- {e.Name} ({e.Kind}, {e.Culture ?? "unknown"}, {e.Prominence}{roleLabel}){tags}: {e.Summary ?? "(no summary)"}";
         }));
     }
 
@@ -282,4 +313,86 @@ public static class PerspectivePrompts
             {entitySummaries}
             """;
     }
+
+    // =========================================================================
+    // Fact selection
+    // =========================================================================
+
+    public static (string FactSelectionLine, string FacetSelectionInstruction)
+        ComputeFactSelectionDisplay(FactSelectionConfig? factSelection, int requiredFactCount)
+    {
+        var requestedMin = factSelection?.MinCount;
+        var requestedMax = factSelection?.MaxCount;
+        var hasCustomRange =
+            (requestedMin is > 0) || (requestedMax is > 0);
+
+        if (!hasCustomRange)
+        {
+            return (
+                "Fact selection target: default (4-6). Required facts must still be included.",
+                "Select 4-6");
+        }
+
+        var effectiveMin = Math.Max(requestedMin ?? 4, requiredFactCount);
+        var effectiveMax = Math.Max(requestedMax ?? effectiveMin, effectiveMin);
+
+        if (effectiveMin == effectiveMax)
+        {
+            return (
+                $"Fact selection target: exactly {effectiveMin} (required facts count toward this).",
+                $"Select exactly {effectiveMin}");
+        }
+
+        return (
+            $"Fact selection target: {effectiveMin}-{effectiveMax} (required facts count toward this).",
+            $"Select {effectiveMin}-{effectiveMax}");
+    }
+
+    // =========================================================================
+    // World dynamics resolution
+    // =========================================================================
+
+    internal static IReadOnlyList<ResolvedWorldDynamic> ResolveWorldDynamics(
+        PerspectiveSynthesisInput input)
+    {
+        if (input.WorldDynamics is not { Count: > 0 })
+            return Array.Empty<ResolvedWorldDynamic>();
+
+        var presentCultureIds = input.Constellation.Cultures.Keys.ToHashSet(StringComparer.Ordinal);
+        var cultureTokenSet = new HashSet<string>(
+            presentCultureIds.Select(NormalizeToken), StringComparer.Ordinal);
+        var entityKinds = new HashSet<string>(
+            input.Entities.Select(e => e.Kind), StringComparer.OrdinalIgnoreCase);
+        var kindTokenSet = new HashSet<string>(
+            entityKinds.Select(NormalizeToken), StringComparer.Ordinal);
+        var focalEraId = input.FocalEra?.Id;
+
+        return input.WorldDynamics
+            .Where(d =>
+            {
+                var cultures = d.Cultures ?? (IReadOnlyList<string>)Array.Empty<string>();
+                var kinds = d.Kinds ?? (IReadOnlyList<string>)Array.Empty<string>();
+
+                var cultureMatch = cultures.Count == 0
+                    || cultures.Contains("*")
+                    || cultures.Any(c => presentCultureIds.Contains(c) || cultureTokenSet.Contains(NormalizeToken(c)));
+
+                var kindMatch = kinds.Count == 0
+                    || kinds.Contains("*")
+                    || kinds.Any(k => entityKinds.Contains(k) || kindTokenSet.Contains(NormalizeToken(k)));
+
+                return cultureMatch && kindMatch;
+            })
+            .Select(d =>
+            {
+                var text = d.Text;
+                if (focalEraId is not null && d.EraOverrides?.TryGetValue(focalEraId, out var ov) == true)
+                    text = ov.Replace ? ov.Text : $"{d.Text} {ov.Text}";
+                return new ResolvedWorldDynamic(d.Id, text);
+            })
+            .ToList();
+    }
+
+    private static string NormalizeToken(string value) =>
+        new(value.ToLowerInvariant().Where(c => char.IsLetterOrDigit(c)).ToArray());
 }

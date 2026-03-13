@@ -6,9 +6,10 @@
  * Replacement is applied at specified positions in reverse order.
  */
 
-namespace TheCanonry.Illuminator.Operations;
-
 using TheCanonry.Persistence.Entities;
+using ChronicleEntity = TheCanonry.Persistence.Entities.Chronicle;
+
+namespace TheCanonry.Illuminator.Operations;
 
 public static class CorpusFindReplace
 {
@@ -61,7 +62,7 @@ public static class CorpusFindReplace
         bool caseSensitive,
         IReadOnlyList<SearchContext> contexts,
         IReadOnlyList<PersistedEntity>? entities = null,
-        IReadOnlyList<Chronicle>? chronicles = null,
+        IReadOnlyList<ChronicleEntity>? chronicles = null,
         IReadOnlyList<StaticPageEntity>? staticPages = null)
     {
         if (string.IsNullOrEmpty(query)) return [];

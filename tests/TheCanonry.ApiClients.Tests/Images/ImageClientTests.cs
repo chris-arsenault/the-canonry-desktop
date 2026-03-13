@@ -6,6 +6,8 @@ namespace TheCanonry.ApiClients.Tests.Images;
 
 public sealed class ImageClientTests
 {
+    private static readonly string[] WaveSpeedOutputUrls = ["https://wavespeed.ai/output/result-1.png"];
+
     // ── DALL-E ──────────────────────────────────────────────
 
     [Fact]
@@ -18,7 +20,7 @@ public sealed class ImageClientTests
             data = new[] { new { b64_json = b64, revised_prompt = "A revised prompt" } },
         });
 
-        var handler = new MockHandler().Respond(HttpStatusCode.OK, responseJson);
+        using var handler = new MockHandler().Respond(HttpStatusCode.OK, responseJson);
         using var httpClient = new HttpClient(handler);
         var client = new DalleImageClient(httpClient, "test-key", "dall-e-3");
 
@@ -61,7 +63,7 @@ public sealed class ImageClientTests
     [Fact]
     public async Task DalleClient_HandlesApiError()
     {
-        var handler = new MockHandler()
+        using var handler = new MockHandler()
             .Respond(HttpStatusCode.BadRequest, """{"error":{"message":"Invalid prompt"}}""");
         using var httpClient = new HttpClient(handler);
         var client = new DalleImageClient(httpClient, "test-key", "dall-e-3");
@@ -84,7 +86,7 @@ public sealed class ImageClientTests
     {
         var imageBytes = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
 
-        var handler = new MockHandler()
+        using var handler = new MockHandler()
             // Step 1: Submit -> returns task id and polling URL
             .Respond(HttpStatusCode.OK, JsonSerializer.Serialize(new
             {
@@ -132,7 +134,7 @@ public sealed class ImageClientTests
     [Fact]
     public async Task BflClient_HandlesTerminalFailure()
     {
-        var handler = new MockHandler()
+        using var handler = new MockHandler()
             .Respond(HttpStatusCode.OK, JsonSerializer.Serialize(new
             {
                 id = "task-456",
@@ -166,7 +168,7 @@ public sealed class ImageClientTests
     {
         var imageBytes = new byte[] { 0xFF, 0xD8, 0xFF, 0xE0 }; // JPEG magic bytes
 
-        var handler = new MockHandler()
+        using var handler = new MockHandler()
             // Step 1: Queue submit
             .Respond(HttpStatusCode.OK, JsonSerializer.Serialize(new
             {
@@ -222,7 +224,7 @@ public sealed class ImageClientTests
     [Fact]
     public async Task FalClient_HandlesFalFailure()
     {
-        var handler = new MockHandler()
+        using var handler = new MockHandler()
             .Respond(HttpStatusCode.OK, JsonSerializer.Serialize(new
             {
                 request_id = "fal-req-fail",
@@ -255,7 +257,7 @@ public sealed class ImageClientTests
     {
         var imageBytes = new byte[] { 0x89, 0x50, 0x4E, 0x47 };
 
-        var handler = new MockHandler()
+        using var handler = new MockHandler()
             // Step 1: Submit
             .Respond(HttpStatusCode.OK, JsonSerializer.Serialize(new
             {
@@ -290,7 +292,7 @@ public sealed class ImageClientTests
                     id = "ws-task-1",
                     model = "flux-schnell",
                     status = "completed",
-                    outputs = new[] { "https://wavespeed.ai/output/result-1.png" },
+                    outputs = WaveSpeedOutputUrls,
                 },
             }))
             // Step 4: Image download

@@ -1,6 +1,6 @@
-namespace TheCanonry.Illuminator.Chronicle;
-
 using TheCanonry.Illuminator.Types;
+
+namespace TheCanonry.Illuminator.Chronicle;
 
 /// <summary>
 /// Manages ChronicleVersion snapshots — pure logic, no I/O.

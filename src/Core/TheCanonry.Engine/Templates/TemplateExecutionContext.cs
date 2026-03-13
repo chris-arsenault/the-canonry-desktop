@@ -1,10 +1,10 @@
-namespace TheCanonry.Engine.Templates;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Rules;
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Templates;
 
 /// <summary>
 /// Execution context maintained during template expansion.

@@ -1,8 +1,8 @@
-namespace TheCanonry.Schema.Tests.Config;
-
 using System.Text.Json;
 using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Json;
+
+namespace TheCanonry.Schema.Tests.Config;
 
 public class JsonDeserializationTests
 {

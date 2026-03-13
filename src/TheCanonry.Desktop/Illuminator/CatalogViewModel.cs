@@ -1,12 +1,12 @@
-namespace TheCanonry.Desktop.Illuminator;
-
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using TheCanonry.Desktop.Shared;
 using TheCanonry.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-public class FieldCoverageItem : ViewModelBase
+namespace TheCanonry.Desktop.Illuminator;
+
+internal sealed class FieldCoverageItem : ViewModelBase
 {
     public string FieldName { get; init; } = "";
     public int FilledCount { get; init; }
@@ -14,23 +14,28 @@ public class FieldCoverageItem : ViewModelBase
     public double Percentage => TotalCount > 0 ? (double)FilledCount / TotalCount * 100 : 0;
 }
 
-public class CatalogViewModel : ViewModelBase
+internal sealed class CatalogViewModel : ViewModelBase
 {
     private readonly IDbContextFactory<CanonryDbContext> _dbFactory;
     private int _imageCount;
     private int _entityCount;
     private double _completionPercentage;
+    private double _imageCompletionPercentage;
     private bool _isAnalyzing;
 
     public CatalogViewModel(IDbContextFactory<CanonryDbContext> dbFactory)
     {
         _dbFactory = dbFactory;
         CoverageItems = new ObservableCollection<FieldCoverageItem>();
+        ImageCoverageItems = new ObservableCollection<FieldCoverageItem>();
 
         RunAnalysisCommand = new AsyncRelayCommand(RunAnalysisAsync, () => !IsAnalyzing);
+
+        _ = RunAnalysisAsync();
     }
 
     public ObservableCollection<FieldCoverageItem> CoverageItems { get; }
+    public ObservableCollection<FieldCoverageItem> ImageCoverageItems { get; }
 
     public int ImageCount
     {
@@ -48,6 +53,12 @@ public class CatalogViewModel : ViewModelBase
     {
         get => _completionPercentage;
         private set => SetProperty(ref _completionPercentage, value);
+    }
+
+    public double ImageCompletionPercentage
+    {
+        get => _imageCompletionPercentage;
+        private set => SetProperty(ref _imageCompletionPercentage, value);
     }
 
     public bool IsAnalyzing
@@ -77,6 +88,7 @@ public class CatalogViewModel : ViewModelBase
             var totalEntities = entities.Count;
 
             CoverageItems.Clear();
+            ImageCoverageItems.Clear();
 
             if (totalEntities > 0)
             {
@@ -132,6 +144,52 @@ public class CatalogViewModel : ViewModelBase
                 var totalFilled = CoverageItems.Sum(c => c.FilledCount);
                 var totalPossible = CoverageItems.Sum(c => c.TotalCount);
                 CompletionPercentage = totalPossible > 0 ? (double)totalFilled / totalPossible * 100 : 0;
+            }
+
+            // Image catalog field coverage
+            var images = await db.Images.ToListAsync();
+            var totalImages = images.Count;
+
+            if (totalImages > 0)
+            {
+                ImageCoverageItems.Add(new FieldCoverageItem
+                {
+                    FieldName = "Title",
+                    FilledCount = images.Count(i => !string.IsNullOrWhiteSpace(i.Title)),
+                    TotalCount = totalImages,
+                });
+
+                ImageCoverageItems.Add(new FieldCoverageItem
+                {
+                    FieldName = "Tags",
+                    FilledCount = images.Count(i => !string.IsNullOrWhiteSpace(i.Tags)),
+                    TotalCount = totalImages,
+                });
+
+                ImageCoverageItems.Add(new FieldCoverageItem
+                {
+                    FieldName = "Artistic Style",
+                    FilledCount = images.Count(i => !string.IsNullOrWhiteSpace(i.ArtisticStyleId)),
+                    TotalCount = totalImages,
+                });
+
+                ImageCoverageItems.Add(new FieldCoverageItem
+                {
+                    FieldName = "Composition Style",
+                    FilledCount = images.Count(i => !string.IsNullOrWhiteSpace(i.CompositionStyleId)),
+                    TotalCount = totalImages,
+                });
+
+                ImageCoverageItems.Add(new FieldCoverageItem
+                {
+                    FieldName = "Color Palette",
+                    FilledCount = images.Count(i => !string.IsNullOrWhiteSpace(i.ColorPaletteId)),
+                    TotalCount = totalImages,
+                });
+
+                var imgFilled = ImageCoverageItems.Sum(c => c.FilledCount);
+                var imgPossible = ImageCoverageItems.Sum(c => c.TotalCount);
+                ImageCompletionPercentage = imgPossible > 0 ? (double)imgFilled / imgPossible * 100 : 0;
             }
         }
         finally

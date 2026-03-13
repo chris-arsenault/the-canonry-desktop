@@ -1,10 +1,10 @@
-namespace TheCanonry.AwsSync.S3;
-
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
 using Amazon.S3;
 using Amazon.S3.Model;
 using TheCanonry.AwsSync.Types;
+
+namespace TheCanonry.AwsSync.S3;
 
 public sealed class S3Operations : IS3Operations, IDisposable
 {

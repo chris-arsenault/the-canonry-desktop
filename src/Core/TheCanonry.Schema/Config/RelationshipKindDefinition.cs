@@ -1,6 +1,6 @@
-namespace TheCanonry.Schema.Config;
-
 using TheCanonry.Schema.Domain;
+
+namespace TheCanonry.Schema.Config;
 
 public class RelationshipVerbs
 {

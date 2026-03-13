@@ -22,7 +22,7 @@ public static class ContentTree
     /// Creates the default scaffold: Front Matter, Body, and Back Matter folders,
     /// each pre-populated with standard sub-folders.
     /// </summary>
-    public static List<ContentTreeNode> CreateScaffold() =>
+    public static IList<ContentTreeNode> CreateScaffold() =>
     [
         new ContentTreeNode
         {
@@ -65,7 +65,7 @@ public static class ContentTree
     /// <summary>
     /// Depth-first search for a node by ID.
     /// </summary>
-    public static ContentTreeNode? FindNode(IReadOnlyList<ContentTreeNode> tree, string id)
+    public static ContentTreeNode? FindNode(IList<ContentTreeNode> tree, string id)
     {
         foreach (var node in tree)
         {
@@ -86,7 +86,7 @@ public static class ContentTree
     /// <summary>
     /// Renames the node with the given ID. Returns true if found.
     /// </summary>
-    public static bool RenameNode(IReadOnlyList<ContentTreeNode> tree, string id, string newName)
+    public static bool RenameNode(IList<ContentTreeNode> tree, string id, string newName)
     {
         foreach (var node in tree)
         {
@@ -104,7 +104,7 @@ public static class ContentTree
     /// <summary>
     /// Deletes the node (and all its children) with the given ID. Returns true if found.
     /// </summary>
-    public static bool DeleteNode(List<ContentTreeNode> tree, string id)
+    public static bool DeleteNode(IList<ContentTreeNode> tree, string id)
     {
         for (var i = 0; i < tree.Count; i++)
         {
@@ -123,7 +123,7 @@ public static class ContentTree
     /// Moves a node to a new parent at a specific index.
     /// Returns true if the node was found and moved.
     /// </summary>
-    public static bool MoveNode(List<ContentTreeNode> tree, string nodeId, string targetParentId, int index)
+    public static bool MoveNode(IList<ContentTreeNode> tree, string nodeId, string targetParentId, int index)
     {
         var node = FindNode(tree, nodeId);
         if (node is null) return false;
@@ -133,7 +133,7 @@ public static class ContentTree
         return InsertIntoParent(tree, targetParentId, node, index);
     }
 
-    private static bool InsertIntoParent(List<ContentTreeNode> tree, string parentId, ContentTreeNode item, int index)
+    private static bool InsertIntoParent(IList<ContentTreeNode> tree, string parentId, ContentTreeNode item, int index)
     {
         foreach (var node in tree)
         {
@@ -154,7 +154,7 @@ public static class ContentTree
     /// Returns the new node.
     /// </summary>
     public static ContentTreeNode AddContentItem(
-        List<ContentTreeNode> tree,
+        IList<ContentTreeNode> tree,
         string parentId,
         string name,
         ContentNodeType type,
@@ -172,7 +172,7 @@ public static class ContentTree
         return newNode;
     }
 
-    private static bool AppendToParent(List<ContentTreeNode> tree, string parentId, ContentTreeNode item)
+    private static bool AppendToParent(IList<ContentTreeNode> tree, string parentId, ContentTreeNode item)
     {
         foreach (var node in tree)
         {
@@ -196,14 +196,14 @@ public static class ContentTree
     /// Depth-first walk that produces a flat list with slugified paths.
     /// Each node's path segment is zero-padded index + slugified name, e.g. "01-front-matter/01-title-page".
     /// </summary>
-    public static IReadOnlyList<FlattenedNode> FlattenForExport(IReadOnlyList<ContentTreeNode> tree)
+    public static IReadOnlyList<FlattenedNode> FlattenForExport(IList<ContentTreeNode> tree)
     {
         var result = new List<FlattenedNode>();
         Walk(tree, "", 0, result);
         return result;
     }
 
-    private static void Walk(IReadOnlyList<ContentTreeNode> nodes, string parentPath, int depth, List<FlattenedNode> result)
+    private static void Walk(IList<ContentTreeNode> nodes, string parentPath, int depth, List<FlattenedNode> result)
     {
         for (var i = 0; i < nodes.Count; i++)
         {
@@ -234,7 +234,7 @@ public static class ContentTree
     /// adapted to the C# signature that receives plain value tuples instead of rich objects.
     /// </summary>
     public static void AutoPopulateBody(
-        List<ContentTreeNode> tree,
+        IList<ContentTreeNode> tree,
         IReadOnlyList<(string Id, string Name, string Kind)> entities,
         IReadOnlyList<(string Id, string Title)> chronicles,
         IReadOnlyList<(string Id, string EraName)> eraNarratives,

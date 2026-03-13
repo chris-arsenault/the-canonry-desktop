@@ -1,9 +1,11 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:forge="using:TheCanonry.Desktop.Forge"
+             xmlns:lw="using:TheCanonry.Desktop.LoreWeave"
              xmlns:illum="using:TheCanonry.Desktop.Illuminator"
              xmlns:arch="using:TheCanonry.Desktop.Archivist"
-             xmlns:de="using:TheCanonry.Desktop.DomainEditor"
+             xmlns:enum="using:TheCanonry.Desktop.Enumerist"
+             xmlns:nf="using:TheCanonry.Desktop.NameForge"
+             xmlns:cosmo="using:TheCanonry.Desktop.Cosmographer"
              xmlns:aws="using:TheCanonry.Desktop.AwsSync"
              x:Class="TheCanonry.Desktop.App"
              RequestedThemeVariant="Dark">
@@ -12,8 +14,17 @@
     </Application.Styles>
 
     <Application.DataTemplates>
-        <DataTemplate DataType="{x:Type forge:ForgeViewModel}">
-            <forge:ForgeView />
+        <DataTemplate DataType="{x:Type enum:EnumeristViewModel}">
+            <enum:EnumeristView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type nf:NameForgeViewModel}">
+            <nf:NameForgeView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type cosmo:CosmographerViewModel}">
+            <cosmo:CosmographerView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type lw:LoreWeaveViewModel}">
+            <lw:LoreWeaveView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type illum:IlluminatorViewModel}">
             <illum:IlluminatorView />
@@ -33,11 +44,14 @@
         <DataTemplate DataType="{x:Type arch:ArchivistViewModel}">
             <arch:ArchivistView />
         </DataTemplate>
-        <DataTemplate DataType="{x:Type de:DomainEditorViewModel}">
-            <de:DomainEditorView />
-        </DataTemplate>
         <DataTemplate DataType="{x:Type aws:AwsSyncViewModel}">
             <aws:AwsSyncView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type illum:ChronicleWizardViewModel}">
+            <illum:ChronicleWizardView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type illum:EditionComparisonViewModel}">
+            <illum:EditionComparisonView />
         </DataTemplate>
     </Application.DataTemplates>
 </Application>

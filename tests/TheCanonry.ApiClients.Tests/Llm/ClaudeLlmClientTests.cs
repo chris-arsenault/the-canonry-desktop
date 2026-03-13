@@ -43,7 +43,7 @@ public sealed class ClaudeLlmClientTests
     [Fact]
     public async Task CompleteAsync_BuildsCorrectRequestBody()
     {
-        var handler = new MockHandler()
+        using var handler = new MockHandler()
             .Respond(HttpStatusCode.OK, MakeJsonResponse());
         using var httpClient = new HttpClient(handler);
         var client = new ClaudeLlmClient(httpClient, "test-key");
@@ -78,7 +78,7 @@ public sealed class ClaudeLlmClientTests
     [Fact]
     public async Task CompleteAsync_ParsesNonStreamingResponse()
     {
-        var handler = new MockHandler()
+        using var handler = new MockHandler()
             .Respond(HttpStatusCode.OK, MakeJsonResponse("World hello!", inputTokens: 42, outputTokens: 7));
         using var httpClient = new HttpClient(handler);
         var client = new ClaudeLlmClient(httpClient, "test-key");
@@ -96,7 +96,7 @@ public sealed class ClaudeLlmClientTests
     [Fact]
     public async Task CompleteAsync_ParsesThinkingResponse()
     {
-        var handler = new MockHandler()
+        using var handler = new MockHandler()
             .Respond(HttpStatusCode.OK, MakeJsonResponse(
                 text: "The answer is 42.",
                 thinking: "Let me think about this carefully...",
@@ -116,7 +116,7 @@ public sealed class ClaudeLlmClientTests
     [Fact]
     public async Task CompleteAsync_ThinkingBudget_IncludedInRequestBody()
     {
-        var handler = new MockHandler()
+        using var handler = new MockHandler()
             .Respond(HttpStatusCode.OK, MakeJsonResponse());
         using var httpClient = new HttpClient(handler);
         var client = new ClaudeLlmClient(httpClient, "test-key");
@@ -138,7 +138,7 @@ public sealed class ClaudeLlmClientTests
     [Fact]
     public async Task CompleteAsync_RetriesOn429()
     {
-        var handler = new MockHandler()
+        using var handler = new MockHandler()
             .Respond(HttpStatusCode.TooManyRequests, """{"error":{"message":"rate limited"}}""")
             .Respond(HttpStatusCode.OK, MakeJsonResponse("Success after retry"));
         using var httpClient = new HttpClient(handler);
@@ -154,7 +154,7 @@ public sealed class ClaudeLlmClientTests
     [Fact]
     public async Task CompleteAsync_CacheHitReturnsSameResponse()
     {
-        var handler = new MockHandler()
+        using var handler = new MockHandler()
             .Respond(HttpStatusCode.OK, MakeJsonResponse("Cached response", inputTokens: 10, outputTokens: 3));
         using var httpClient = new HttpClient(handler);
         var client = new ClaudeLlmClient(httpClient, "test-key");
@@ -175,7 +175,7 @@ public sealed class ClaudeLlmClientTests
     [Fact]
     public async Task CompleteAsync_ReturnsErrorAfterAllRetriesExhausted()
     {
-        var handler = new MockHandler()
+        using var handler = new MockHandler()
             .Respond(HttpStatusCode.TooManyRequests, """{"error":"rate limited"}""")
             .Respond(HttpStatusCode.TooManyRequests, """{"error":"rate limited"}""")
             .Respond(HttpStatusCode.TooManyRequests, """{"error":"rate limited"}""");

@@ -20,7 +20,7 @@ public sealed class NameGenerator
     /// <summary>
     /// Generate names using a culture's configuration.
     /// </summary>
-    public GenerateResult Generate(Culture culture, GenerateRequest request)
+    public static GenerateResult Generate(Culture culture, GenerateRequest request)
     {
         var profile = SelectProfile(culture.Profiles, request.ProfileId, request.Kind);
         if (profile == null)
@@ -86,7 +86,7 @@ public sealed class NameGenerator
     /// <summary>
     /// Generate a single name. Convenience method for engine integration.
     /// </summary>
-    public string GenerateOne(
+    public static string GenerateOne(
         Culture culture,
         string kind,
         string subtype,

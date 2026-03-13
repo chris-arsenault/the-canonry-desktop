@@ -1,5 +1,3 @@
-namespace TheCanonry.Desktop.Archivist;
-
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using TheCanonry.Desktop.Shared;
@@ -7,7 +5,9 @@ using TheCanonry.Persistence;
 using TheCanonry.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 
-public class ArchivistEntityItem : ViewModelBase
+namespace TheCanonry.Desktop.Archivist;
+
+internal sealed class ArchivistEntityItem : ViewModelBase
 {
     public string Id { get; init; } = "";
     public string Name { get; init; } = "";
@@ -16,7 +16,7 @@ public class ArchivistEntityItem : ViewModelBase
     public int RelationshipCount { get; init; }
 }
 
-public class RelationshipDisplayItem
+internal sealed class RelationshipDisplayItem
 {
     public string SourceName { get; init; } = "";
     public string TargetName { get; init; } = "";
@@ -25,7 +25,7 @@ public class RelationshipDisplayItem
     public string Category { get; init; } = "";
 }
 
-public class ArchivistViewModel : ViewModelBase
+internal sealed class ArchivistViewModel : ViewModelBase
 {
     private readonly IDbContextFactory<CanonryDbContext> _dbFactory;
     private ArchivistEntityItem? _selectedEntity;
@@ -43,6 +43,14 @@ public class ArchivistViewModel : ViewModelBase
         SearchCommand = new AsyncRelayCommand(SearchAsync);
         RefreshCommand = new AsyncRelayCommand(RefreshStatsAsync);
         FocusEntityCommand = new AsyncRelayCommand(LoadRelationshipsAsync, () => SelectedEntity is not null);
+
+        _ = InitializeAsync();
+    }
+
+    private async Task InitializeAsync()
+    {
+        await RefreshStatsAsync();
+        await SearchAsync();
     }
 
     public ObservableCollection<ArchivistEntityItem> Entities { get; }

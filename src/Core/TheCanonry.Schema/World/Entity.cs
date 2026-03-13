@@ -1,8 +1,8 @@
-namespace TheCanonry.Schema.World;
-
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
+
+namespace TheCanonry.Schema.World;
 
 public class Entity
 {

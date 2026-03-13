@@ -1,6 +1,6 @@
-namespace TheCanonry.AwsSync.Types;
-
 using System.Text.Json.Serialization;
+
+namespace TheCanonry.AwsSync.Types;
 
 public sealed class ImageManifest
 {
@@ -11,7 +11,7 @@ public sealed class ImageManifest
     public DateTime UpdatedAt { get; set; }
 
     [JsonPropertyName("entries")]
-    public Dictionary<string, ManifestEntry> Entries { get; set; } = [];
+    public Dictionary<string, ManifestEntry> Entries { get; init; } = [];
 }
 
 public sealed class ManifestEntry

@@ -1,4 +1,4 @@
-/**
+/*
  * Image Style Assignment — Deterministic corpus-level distribution balancer
  *
  * Ported from apps/illuminator/webui/src/lib/imageStyleAssignment.ts

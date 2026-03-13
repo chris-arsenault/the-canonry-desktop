@@ -1,10 +1,9 @@
-namespace TheCanonry.Engine.Coordinates;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Domain;
-using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Coordinates;
 
 /// <summary>
 /// Centralized coordinate services with culture support.
@@ -275,7 +274,7 @@ public class CoordinateContext
     /// <summary>
     /// Find nearest entities of a target kind to a reference entity, sorted by distance.
     /// </summary>
-    public List<(Entity Entity, double Distance)> FindNearestEntities(
+    public static IReadOnlyList<(Entity Entity, double Distance)> FindNearestEntities(
         IGraph graph, Entity reference, EntityKind targetKind, int limit)
     {
         var candidates = graph.GetEntitiesByKind(targetKind);
@@ -325,7 +324,7 @@ public class CoordinateContext
     // INTERNAL: SAMPLING
     // =========================================================================
 
-    private SemanticCoordinates? SampleInCircleRegion(
+    private static SemanticCoordinates? SampleInCircleRegion(
         SemanticRegion region,
         List<SemanticCoordinates> existingPoints,
         double minDistance)
@@ -351,7 +350,7 @@ public class CoordinateContext
         return null;
     }
 
-    private SemanticCoordinates? SampleNearPoint(
+    private static SemanticCoordinates? SampleNearPoint(
         SemanticCoordinates reference,
         List<SemanticCoordinates> existingPoints,
         double maxSearchRadius,
@@ -453,7 +452,7 @@ public class CoordinateContext
         return new SemanticCoordinates(sumX / n, sumY / n, sumZ / n);
     }
 
-    private List<SemanticCoordinates> GetExistingPoints(string entityKind)
+    private static List<SemanticCoordinates> GetExistingPoints(string entityKind)
     {
         // The caller doesn't pass a graph, so existing points come from regions' history.
         // In the full engine, PlaceEntity would receive an IGraph to get entity coordinates.
@@ -472,7 +471,7 @@ public class CoordinateContext
         return shuffled;
     }
 
-    private List<SemanticRegion> WeightedSparseSelection(
+    private static List<SemanticRegion> WeightedSparseSelection(
         List<SemanticRegion> regions,
         List<SemanticCoordinates> existingPoints)
     {

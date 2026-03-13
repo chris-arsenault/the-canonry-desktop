@@ -1,3 +1,5 @@
+using TheCanonry.Illuminator.Chronicle.PerspectiveSynthesis;
+
 namespace TheCanonry.Illuminator.Config;
 
 public sealed class WorldContext
@@ -7,7 +9,7 @@ public sealed class WorldContext
     public required string ToneCore { get; init; }
     public required IReadOnlyList<CanonFact> CanonFacts { get; init; }
     public string? SpeciesConstraint { get; init; }
-    public string? WorldDynamics { get; set; }
+    public IReadOnlyList<WorldDynamic>? WorldDynamics { get; set; }
 }
 
 /// <summary>

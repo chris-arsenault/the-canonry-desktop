@@ -1,8 +1,5 @@
-namespace TheCanonry.Engine.Tests.Systems;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
-using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Engine.Selection;
@@ -12,8 +9,10 @@ using TheCanonry.Engine.Templates;
 using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
-using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Engine.Tests.Systems;
 
 // =============================================================================
 // TEST STUBS
@@ -241,7 +240,7 @@ public class GrowthSystemTests
         growth.StartEpoch(era);
 
         // Total target = 10 + 5 + 15 = 30, scaleFactor = 1.0
-        Assert.Equal(30, growth.GetEpochTarget());
+        Assert.Equal(30, growth.EpochTarget);
     }
 
     [Fact]
@@ -255,7 +254,7 @@ public class GrowthSystemTests
         growth.StartEpoch(CreateTestEra());
 
         // 10 * 2.5 = 25
-        Assert.Equal(25, growth.GetEpochTarget());
+        Assert.Equal(25, growth.EpochTarget);
     }
 
     // =========================================================================
@@ -464,7 +463,7 @@ public class GrowthSystemTests
         });
 
         growth.StartEpoch(era);
-        Assert.Equal(3, growth.GetEpochTarget());
+        Assert.Equal(3, growth.EpochTarget);
 
         // First tick should create entities
         growth.Apply(1.0);

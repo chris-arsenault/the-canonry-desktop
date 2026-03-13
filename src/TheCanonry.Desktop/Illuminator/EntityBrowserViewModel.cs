@@ -1,5 +1,3 @@
-namespace TheCanonry.Desktop.Illuminator;
-
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using TheCanonry.Desktop.Shared;
@@ -7,7 +5,9 @@ using TheCanonry.Persistence;
 using TheCanonry.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 
-public class EntityListItem : ViewModelBase
+namespace TheCanonry.Desktop.Illuminator;
+
+internal sealed class EntityListItem : ViewModelBase
 {
     public string Id { get; init; } = "";
     public string Name { get; init; } = "";
@@ -20,7 +20,7 @@ public class EntityListItem : ViewModelBase
     public bool HasEnrichment { get; init; }
 }
 
-public class EntityBrowserViewModel : ViewModelBase
+internal sealed class EntityBrowserViewModel : ViewModelBase
 {
     private readonly IDbContextFactory<CanonryDbContext> _dbFactory;
     private EntityListItem? _selectedEntity;
@@ -38,6 +38,8 @@ public class EntityBrowserViewModel : ViewModelBase
 
         RefreshCommand = new AsyncRelayCommand(RefreshAsync);
         SearchCommand = new AsyncRelayCommand(RefreshAsync);
+
+        _ = RefreshAsync();
     }
 
     public ObservableCollection<EntityListItem> Entities { get; }

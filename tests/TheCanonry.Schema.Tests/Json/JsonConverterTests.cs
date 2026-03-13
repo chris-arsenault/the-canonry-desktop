@@ -1,8 +1,8 @@
-namespace TheCanonry.Schema.Tests.Json;
-
 using System.Text.Json;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Json;
+
+namespace TheCanonry.Schema.Tests.Json;
 
 public class JsonConverterTests
 {

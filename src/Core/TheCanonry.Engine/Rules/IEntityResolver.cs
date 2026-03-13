@@ -1,6 +1,6 @@
-namespace TheCanonry.Engine.Rules;
-
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Rules;
 
 /// <summary>
 /// Interface for resolving entity references (like $actor, $target, literal IDs)

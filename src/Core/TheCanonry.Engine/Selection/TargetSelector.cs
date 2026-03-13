@@ -1,14 +1,14 @@
-namespace TheCanonry.Engine.Selection;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Selection;
 
 /// <summary>
 /// Framework-level weighted target selection that prevents super-hub formation.
 /// Score-based selection with exponential penalties for existing connections.
 /// </summary>
-public class TargetSelector
+public static class TargetSelector
 {
     /// <summary>
     /// Select entities of a given kind using weighted scoring with hub penalties.
@@ -17,7 +17,7 @@ public class TargetSelector
     /// <param name="kind">Entity kind to select.</param>
     /// <param name="count">Number of entities to select.</param>
     /// <param name="bias">Selection preferences and penalties (null uses defaults).</param>
-    public SelectionResult SelectTargets(
+    public static SelectionResult SelectTargets(
         IGraph graph, EntityKind kind, int count, SelectionBias? bias = null)
     {
         bias ??= new SelectionBias();

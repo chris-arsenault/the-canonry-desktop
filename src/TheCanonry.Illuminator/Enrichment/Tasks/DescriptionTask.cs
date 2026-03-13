@@ -140,7 +140,7 @@ public sealed class DescriptionTask : EnrichmentTaskBase
 
             return (summary.Trim(), description.Trim(), aliases);
         }
-        catch
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             return ("", "", []);
         }

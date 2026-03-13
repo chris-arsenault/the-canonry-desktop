@@ -1,5 +1,3 @@
-namespace TheCanonry.Coherence.Tests;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Pressures;
@@ -12,11 +10,13 @@ using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
 
+namespace TheCanonry.Coherence.Tests;
+
 // =============================================================================
 // TEST STUBS
 // =============================================================================
 
-file class StubNameService : INameGenerationService
+file sealed class StubNameService : INameGenerationService
 {
     public Task<string> GenerateAsync(
         EntityKind kind, string subtype, Prominence prominence,
@@ -24,7 +24,7 @@ file class StubNameService : INameGenerationService
         => Task.FromResult("Test Name");
 }
 
-file class StubEmitter : ISimulationEmitter
+file sealed class StubEmitter : ISimulationEmitter
 {
     public void Progress(ProgressPayload payload) { }
     public void Log(LogLevel level, string message, IReadOnlyDictionary<string, object?>? context = null) { }

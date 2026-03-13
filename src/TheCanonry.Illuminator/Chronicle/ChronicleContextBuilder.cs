@@ -16,6 +16,7 @@ public sealed record EntityContext
     public required string Status { get; init; }
     public string? Summary { get; init; }
     public string? Description { get; init; }
+    public IReadOnlyDictionary<string, string>? Tags { get; init; }
 }
 
 /// <summary>

@@ -1,8 +1,8 @@
-namespace TheCanonry.Desktop.Shared;
-
 using System.Windows.Input;
 
-public class RelayCommand : ICommand
+namespace TheCanonry.Desktop.Shared;
+
+internal sealed class RelayCommand : ICommand
 {
     private readonly Action _execute;
     private readonly Func<bool>? _canExecute;
@@ -22,7 +22,7 @@ public class RelayCommand : ICommand
     public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 }
 
-public class RelayCommand<T> : ICommand
+internal sealed class RelayCommand<T> : ICommand
 {
     private readonly Action<T?> _execute;
     private readonly Func<T?, bool>? _canExecute;

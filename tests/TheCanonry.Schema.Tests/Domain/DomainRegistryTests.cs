@@ -1,8 +1,8 @@
-namespace TheCanonry.Schema.Tests.Domain;
-
 using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Primitives;
+
+namespace TheCanonry.Schema.Tests.Domain;
 
 public class DomainRegistryTests
 {

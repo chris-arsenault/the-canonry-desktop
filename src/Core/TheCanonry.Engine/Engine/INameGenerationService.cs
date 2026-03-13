@@ -1,8 +1,8 @@
-namespace TheCanonry.Engine.Engine;
-
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Engine;
 
 /// <summary>
 /// Service for generating culturally appropriate names for entities.

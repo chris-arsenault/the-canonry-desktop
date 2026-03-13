@@ -13,9 +13,9 @@
  * hyphens in normalized form).
  */
 
-namespace TheCanonry.Illuminator.Content;
-
 using System.Text.RegularExpressions;
+
+namespace TheCanonry.Illuminator.Content;
 
 public sealed record WikiLinkEntity(string Id, string Name);
 

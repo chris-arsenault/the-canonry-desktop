@@ -32,6 +32,12 @@ public sealed class EnrichmentJob
     public string? ProgressMessage { get; private set; }
     public double? ProgressFraction { get; private set; }
 
+    /// <summary>
+    /// Optional typed payload for tasks that need structured input beyond the entity ID.
+    /// Tasks cast this to their expected payload type.
+    /// </summary>
+    public object? Payload { get; init; }
+
     public EnrichmentJob(EnrichmentType taskType, EntityId targetEntityId, SimulationSlotId slotId)
     {
         Id = Interlocked.Increment(ref _nextId);

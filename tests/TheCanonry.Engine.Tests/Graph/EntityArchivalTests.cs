@@ -1,10 +1,11 @@
-namespace TheCanonry.Engine.Tests.Graph;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Engine.Tests.Graph;
 
 public class EntityArchivalTests
 {

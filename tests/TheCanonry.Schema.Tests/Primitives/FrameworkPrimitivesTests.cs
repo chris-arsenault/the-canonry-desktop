@@ -1,7 +1,7 @@
-namespace TheCanonry.Schema.Tests.Primitives;
-
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Primitives;
+
+namespace TheCanonry.Schema.Tests.Primitives;
 
 public class FrameworkPrimitivesTests
 {

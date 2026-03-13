@@ -1,13 +1,12 @@
-namespace TheCanonry.Desktop.Illuminator;
-
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using TheCanonry.Desktop.Shared;
 using TheCanonry.Persistence;
-using TheCanonry.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 
-public class ChronicleListItem : ViewModelBase
+namespace TheCanonry.Desktop.Illuminator;
+
+internal sealed class ChronicleListItem : ViewModelBase
 {
     private string _title = "";
     private string? _summary;
@@ -36,7 +35,7 @@ public class ChronicleListItem : ViewModelBase
     }
 }
 
-public class ChronicleViewModel : ViewModelBase
+internal sealed class ChronicleViewModel : ViewModelBase
 {
     private readonly IDbContextFactory<CanonryDbContext> _dbFactory;
     private ChronicleListItem? _selectedChronicle;
@@ -53,6 +52,8 @@ public class ChronicleViewModel : ViewModelBase
         RefreshCommand = new AsyncRelayCommand(RefreshAsync);
         AcceptCommand = new AsyncRelayCommand(AcceptAsync, () => SelectedChronicle is not null);
         DeleteCommand = new AsyncRelayCommand(DeleteAsync, () => SelectedChronicle is not null);
+
+        _ = RefreshAsync();
     }
 
     public ObservableCollection<ChronicleListItem> Chronicles { get; }

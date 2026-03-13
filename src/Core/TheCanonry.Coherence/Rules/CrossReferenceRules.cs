@@ -1,9 +1,9 @@
-namespace TheCanonry.Coherence.Rules;
-
 using TheCanonry.Coherence.Types;
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Templates;
 using TheCanonry.Schema.Config;
+
+namespace TheCanonry.Coherence.Rules;
 
 /// <summary>
 /// Rules that validate cross-references between configuration elements.

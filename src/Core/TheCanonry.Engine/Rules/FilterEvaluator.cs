@@ -1,10 +1,10 @@
-namespace TheCanonry.Engine.Rules;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Rules;
 
 /// <summary>
 /// Static evaluator for all SelectionFilter subtypes.
@@ -31,12 +31,12 @@ public static class FilterEvaluator
     }
 
     /// <summary>Apply all filters to a list of entities (AND logic).</summary>
-    public static List<Entity> ApplyFilters(
+    public static IReadOnlyList<Entity> ApplyFilters(
         IReadOnlyList<Entity> entities,
         IReadOnlyList<SelectionFilter> filters,
         RuleContext context)
     {
-        var result = new List<Entity>(entities);
+        IReadOnlyList<Entity> result = new List<Entity>(entities);
 
         foreach (var filter in filters)
         {
@@ -48,7 +48,7 @@ public static class FilterEvaluator
     }
 
     /// <summary>Apply a single filter to a list of entities.</summary>
-    public static List<Entity> ApplyFilter(
+    public static IReadOnlyList<Entity> ApplyFilter(
         IReadOnlyList<Entity> entities,
         SelectionFilter filter,
         RuleContext context) => filter switch

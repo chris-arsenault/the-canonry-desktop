@@ -1,8 +1,8 @@
-namespace TheCanonry.Engine.Rules;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Rules;
 
 /// <summary>
 /// Simple entity resolver that only handles literal entity IDs.

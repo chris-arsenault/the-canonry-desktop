@@ -1,7 +1,7 @@
-namespace TheCanonry.Schema.Config;
-
 using System.Text.Json;
 using TheCanonry.Schema.Json;
+
+namespace TheCanonry.Schema.Config;
 
 public static class DomainSchemaLoader
 {
@@ -15,6 +15,10 @@ public static class DomainSchemaLoader
         var entityKinds = LoadFile<List<EntityKindDefinition>>(domainDir, "entityKinds.json") ?? [];
         var relationshipKinds = LoadFile<List<RelationshipKindDefinition>>(domainDir, "relationshipKinds.json") ?? [];
         var cultures = LoadFile<List<CultureDefinition>>(domainDir, "cultures.json") ?? [];
+        var tagRegistry = LoadFile<List<TagDefinition>>(domainDir, "tagRegistry.json") ?? [];
+        var axisDefinitions = LoadFile<List<AxisDefinition>>(domainDir, "axisDefinitions.json") ?? [];
+        var seedEntities = LoadFile<List<SeedEntity>>(domainDir, "seedEntities.json") ?? [];
+        var seedRelationships = LoadFile<List<SeedRelationship>>(domainDir, "seedRelationships.json") ?? [];
 
         return new DomainSchema
         {
@@ -24,6 +28,10 @@ public static class DomainSchemaLoader
             EntityKinds = entityKinds,
             RelationshipKinds = relationshipKinds,
             Cultures = cultures,
+            TagRegistry = tagRegistry,
+            AxisDefinitions = axisDefinitions,
+            SeedEntities = seedEntities,
+            SeedRelationships = seedRelationships,
         };
     }
 

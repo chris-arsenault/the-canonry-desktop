@@ -46,7 +46,7 @@ public sealed class NameForgeService : INameGenerationService
             // Parse context string into a dictionary if provided
             var contextDict = ParseContext(context);
 
-            var name = _generator.GenerateOne(
+            var name = NameGenerator.GenerateOne(
                 nfCulture,
                 kind.Value,
                 subtype,
@@ -56,7 +56,7 @@ public sealed class NameForgeService : INameGenerationService
 
             return Task.FromResult(name);
         }
-        catch
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             return Task.FromResult("unnamed");
         }

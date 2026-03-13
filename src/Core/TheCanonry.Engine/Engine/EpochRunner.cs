@@ -1,7 +1,7 @@
-namespace TheCanonry.Engine.Engine;
-
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Engine.Systems;
+
+namespace TheCanonry.Engine.Engine;
 
 // =============================================================================
 // EPOCH RESULT

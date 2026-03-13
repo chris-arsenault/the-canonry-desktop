@@ -37,7 +37,11 @@ public sealed class BflImageClient : IImageClient
         {
             return await ExecuteRequest(request, ct);
         }
-        catch (Exception ex)
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             return new ImageResult { Error = ex.Message };
         }

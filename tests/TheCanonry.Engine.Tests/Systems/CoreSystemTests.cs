@@ -1,18 +1,17 @@
-namespace TheCanonry.Engine.Tests.Systems;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
-using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Engine.Statistics;
 using TheCanonry.Engine.Systems;
-using TheCanonry.Engine.Templates;
 using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Engine.Tests.Systems;
 
 // =============================================================================
 // TEST STUBS

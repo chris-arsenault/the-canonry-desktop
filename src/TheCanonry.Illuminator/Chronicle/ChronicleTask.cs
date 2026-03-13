@@ -24,6 +24,12 @@ public sealed record ChronicleData
 /// </summary>
 public sealed class ChronicleTask : EnrichmentTaskBase
 {
+    private static readonly JsonSerializerOptions TitleParseOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        AllowTrailingCommas = true,
+    };
+
     private readonly Func<Schema.Ids.EntityId, ChronicleGenerationContext?> _contextResolver;
 
     public override EnrichmentType TaskType => EnrichmentType.EntityChronicle;
@@ -118,14 +124,10 @@ public sealed class ChronicleTask : EnrichmentTaskBase
         try
         {
             var json = LlmResponseParser.ExtractJson(text);
-            var candidates = JsonSerializer.Deserialize<List<string>>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                AllowTrailingCommas = true,
-            });
+            var candidates = JsonSerializer.Deserialize<List<string>>(json, TitleParseOptions);
             return candidates?.Where(t => !string.IsNullOrWhiteSpace(t)).ToList() ?? [];
         }
-        catch
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             return [];
         }

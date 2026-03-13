@@ -1,5 +1,3 @@
-using TheCanonry.Schema.Ids;
-
 namespace TheCanonry.Illuminator.Types;
 
 /// <summary>
@@ -124,6 +122,168 @@ public sealed record ChronicleImageRefs(
     long GeneratedAt,
     string Model);
 
+// =============================================================================
+// Cover Image
+// =============================================================================
+
+/// <summary>
+/// Generation state for a chronicle cover image.
+/// </summary>
+public enum CoverImageStatus
+{
+    Pending,
+    Generating,
+    Complete,
+    Failed,
+}
+
+/// <summary>
+/// Cover image metadata for a chronicle — LLM-generated scene description
+/// with style assignments and generation state.
+/// </summary>
+public sealed record ChronicleCoverImage
+{
+    public required string SceneDescription { get; init; }
+    public required IReadOnlyList<string> InvolvedEntityIds { get; init; }
+    public required CoverImageStatus Status { get; init; }
+    public string? GeneratedImageId { get; init; }
+    public string? Error { get; init; }
+    public IReadOnlyList<string>? VisualTags { get; init; }
+    public string? SuggestedArtisticStyleId { get; init; }
+    public string? SuggestedCompositionStyleId { get; init; }
+    public string? SuggestedColorPaletteId { get; init; }
+    public IReadOnlyList<string>? RankedArtisticStyleIds { get; init; }
+    public IReadOnlyList<string>? RankedCompositionStyleIds { get; init; }
+    public IReadOnlyList<string>? RankedColorPaletteIds { get; init; }
+    public string? SecondaryArtisticStyleId { get; init; }
+    public string? SecondaryCompositionStyleId { get; init; }
+    public string? SecondaryColorPaletteId { get; init; }
+}
+
+// =============================================================================
+// Tertiary Cast
+// =============================================================================
+
+/// <summary>
+/// An entity mentioned in chronicle text but not in the declared cast.
+/// Detected by text analysis, user-confirmable.
+/// </summary>
+public sealed record TertiaryCastEntry
+{
+    public required string EntityId { get; init; }
+    public required string Name { get; init; }
+    public required string Kind { get; init; }
+    public required string MatchedAs { get; init; }
+    public int? MatchStart { get; init; }
+    public int? MatchEnd { get; init; }
+    public required bool Accepted { get; init; }
+}
+
+// =============================================================================
+// Cohesion Report
+// =============================================================================
+
+/// <summary>
+/// A single cohesion check result.
+/// </summary>
+public sealed record CohesionCheck(bool Pass, string Notes);
+
+/// <summary>
+/// A section-level goal check result.
+/// </summary>
+public sealed record SectionGoalCheck(string SectionId, bool Pass, string Notes);
+
+/// <summary>
+/// Severity level for cohesion issues.
+/// </summary>
+public enum CohesionIssueSeverity
+{
+    Critical,
+    Minor,
+}
+
+/// <summary>
+/// A specific cohesion issue identified during validation.
+/// </summary>
+public sealed record CohesionIssue
+{
+    public required CohesionIssueSeverity Severity { get; init; }
+    public string? SectionId { get; init; }
+    public required string CheckType { get; init; }
+    public required string Description { get; init; }
+    public required string Suggestion { get; init; }
+}
+
+/// <summary>
+/// Structured container for the six cohesion checks.
+/// </summary>
+public sealed record CohesionChecks
+{
+    public required CohesionCheck PlotStructure { get; init; }
+    public required CohesionCheck EntityConsistency { get; init; }
+    public required IReadOnlyList<SectionGoalCheck> SectionGoals { get; init; }
+    public required CohesionCheck Resolution { get; init; }
+    public required CohesionCheck FactualAccuracy { get; init; }
+    public required CohesionCheck ThemeExpression { get; init; }
+}
+
+/// <summary>
+/// Full cohesion validation report — 6 checks, issues, and overall score.
+/// </summary>
+public sealed record CohesionReport
+{
+    public required int OverallScore { get; init; }
+    public required CohesionChecks Checks { get; init; }
+    public required IReadOnlyList<CohesionIssue> Issues { get; init; }
+    public long? GeneratedAt { get; init; }
+    public string? Model { get; init; }
+}
+
+// =============================================================================
+// Quick Check Report
+// =============================================================================
+
+/// <summary>
+/// Confidence level for a quick-check suspect.
+/// </summary>
+public enum QuickCheckConfidence
+{
+    High,
+    Medium,
+    Low,
+}
+
+/// <summary>
+/// Overall assessment of quick-check results.
+/// </summary>
+public enum QuickCheckAssessment
+{
+    Clean,
+    Minor,
+    Flagged,
+}
+
+/// <summary>
+/// A suspicious unanchored reference detected by quick check.
+/// </summary>
+public sealed record QuickCheckSuspect
+{
+    public required string Phrase { get; init; }
+    public required string Context { get; init; }
+    public required string Reasoning { get; init; }
+    public required QuickCheckConfidence Confidence { get; init; }
+}
+
+/// <summary>
+/// Fast unanchored-reference scan report.
+/// </summary>
+public sealed record QuickCheckReport
+{
+    public required IReadOnlyList<QuickCheckSuspect> Suspects { get; init; }
+    public required QuickCheckAssessment Assessment { get; init; }
+    public required string Summary { get; init; }
+}
+
 /// <summary>
 /// Snapshot of a chronicle generation version.
 /// </summary>
@@ -160,6 +320,8 @@ public sealed class ChronicleRecord
     public required IReadOnlyList<ChronicleRoleAssignment> RoleAssignments { get; init; }
     public NarrativeLens? Lens { get; init; }
     public required string NarrativeStyleId { get; init; }
+    public string? NarrativeStyleName { get; init; }
+    public string? CraftPosture { get; init; }
     public required IReadOnlyList<string> SelectedEntityIds { get; init; }
     public required IReadOnlyList<string> SelectedEventIds { get; init; }
     public required IReadOnlyList<string> SelectedRelationshipIds { get; init; }
@@ -175,11 +337,43 @@ public sealed class ChronicleRecord
     public long? AssembledAt { get; set; }
     public IReadOnlyList<ChronicleVersion>? GenerationHistory { get; set; }
     public string? ActiveVersionId { get; set; }
+    public string? AcceptedVersionId { get; set; }
+
+    // Generation prompts (the actual prompts sent to LLM)
+    public string? GenerationSystemPrompt { get; set; }
+    public string? GenerationUserPrompt { get; set; }
 
     // Refinements
     public string? Summary { get; set; }
     public ChronicleImageRefs? ImageRefs { get; set; }
     public string? NarrativeDirection { get; init; }
+
+    // Cover image
+    public ChronicleCoverImage? CoverImage { get; set; }
+    public long? CoverImageGeneratedAt { get; set; }
+    public string? CoverImageModel { get; set; }
+
+    // Cohesion validation
+    public CohesionReport? CohesionReport { get; set; }
+    public long? ValidatedAt { get; set; }
+    public bool ValidationStale { get; set; }
+
+    // Version comparison (user-triggered)
+    public string? ComparisonReport { get; set; }
+    public long? ComparisonReportGeneratedAt { get; set; }
+    public string? CombineInstructions { get; set; }
+
+    // Temporal alignment check (user-triggered)
+    public string? TemporalCheckReport { get; set; }
+    public long? TemporalCheckReportGeneratedAt { get; set; }
+
+    // Quick check — unanchored entity reference scan (user-triggered)
+    public QuickCheckReport? QuickCheckReport { get; set; }
+    public long? QuickCheckReportGeneratedAt { get; set; }
+
+    // Tertiary cast — entities detected in text but not in declared cast
+    public IReadOnlyList<TertiaryCastEntry>? TertiaryCast { get; set; }
+    public long? TertiaryCastDetectedAt { get; set; }
 
     // Revision tracking
     public int EditVersion { get; set; }
@@ -187,6 +381,10 @@ public sealed class ChronicleRecord
     // Final content
     public string? FinalContent { get; set; }
     public long? AcceptedAt { get; set; }
+
+    // Historian-assigned chronological year
+    public int? EraYear { get; set; }
+    public string? EraYearReasoning { get; set; }
 
     // Cost tracking (aggregated across all LLM calls)
     public decimal TotalEstimatedCost { get; set; }

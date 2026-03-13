@@ -1,8 +1,8 @@
-namespace TheCanonry.Desktop.AwsSync;
-
 using Avalonia.Controls;
 
-public partial class AwsSyncView : UserControl
+namespace TheCanonry.Desktop.AwsSync;
+
+internal sealed partial class AwsSyncView : UserControl
 {
     public AwsSyncView()
     {

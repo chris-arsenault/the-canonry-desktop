@@ -1,11 +1,12 @@
-namespace TheCanonry.Engine.Rules;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Engine.Rules;
 
 /// <summary>
 /// Static applier for all Mutation subtypes.

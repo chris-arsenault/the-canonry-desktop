@@ -1,9 +1,9 @@
-namespace TheCanonry.Engine.Graph;
-
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Graph;
 
 /// <summary>
 /// In-memory implementation of IGraph.

@@ -1,10 +1,11 @@
-namespace TheCanonry.Engine.Tests.Selection;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Selection;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Engine.Tests.Selection;
 
 public class TargetSelectorTests
 {
@@ -46,10 +47,9 @@ public class TargetSelectorTests
     [Fact]
     public void SelectTargets_EmptyGraph_ReturnsEmpty()
     {
-        var selector = new TargetSelector();
         var graph = new GraphStore();
 
-        var result = selector.SelectTargets(graph, new EntityKind("faction"), 3);
+        var result = TargetSelector.SelectTargets(graph, new EntityKind("faction"), 3);
 
         Assert.Empty(result.Existing);
         Assert.Equal(0, result.Diagnostics.CandidatesEvaluated);
@@ -58,13 +58,12 @@ public class TargetSelectorTests
     [Fact]
     public void SelectTargets_ReturnsMatchingEntities()
     {
-        var selector = new TargetSelector();
         var graph = new GraphStore();
         graph.CreateEntity(CreateEntity("f1", "faction", "merchant"));
         graph.CreateEntity(CreateEntity("f2", "faction", "criminal"));
         graph.CreateEntity(CreateEntity("n1", "npc", "warrior"));
 
-        var result = selector.SelectTargets(graph, new EntityKind("faction"), 5);
+        var result = TargetSelector.SelectTargets(graph, new EntityKind("faction"), 5);
 
         // Should select both factions, not the npc
         Assert.Equal(2, result.Existing.Count);
@@ -75,12 +74,11 @@ public class TargetSelectorTests
     [Fact]
     public void SelectTargets_CountLimitRespected()
     {
-        var selector = new TargetSelector();
         var graph = new GraphStore();
         for (var i = 0; i < 10; i++)
             graph.CreateEntity(CreateEntity($"f{i}", "faction", "merchant"));
 
-        var result = selector.SelectTargets(graph, new EntityKind("faction"), 3);
+        var result = TargetSelector.SelectTargets(graph, new EntityKind("faction"), 3);
 
         Assert.Equal(3, result.Existing.Count);
     }
@@ -88,7 +86,6 @@ public class TargetSelectorTests
     [Fact]
     public void SelectTargets_CultureFilter_RequireApplied()
     {
-        var selector = new TargetSelector();
         var graph = new GraphStore();
         graph.CreateEntity(CreateEntity("f1", "faction", "merchant", culture: "northern"));
         graph.CreateEntity(CreateEntity("f2", "faction", "merchant", culture: "southern"));
@@ -99,7 +96,7 @@ public class TargetSelectorTests
             Culture = new CultureRequirement { Require = "northern" }
         };
 
-        var result = selector.SelectTargets(graph, new EntityKind("faction"), 10, bias);
+        var result = TargetSelector.SelectTargets(graph, new EntityKind("faction"), 10, bias);
 
         Assert.Equal(2, result.Existing.Count);
         Assert.All(result.Existing, e => Assert.Equal(new CultureId("northern"), e.Culture));
@@ -108,7 +105,6 @@ public class TargetSelectorTests
     [Fact]
     public void SelectTargets_CultureFilter_ExcludeApplied()
     {
-        var selector = new TargetSelector();
         var graph = new GraphStore();
         graph.CreateEntity(CreateEntity("f1", "faction", "merchant", culture: "northern"));
         graph.CreateEntity(CreateEntity("f2", "faction", "merchant", culture: "southern"));
@@ -119,7 +115,7 @@ public class TargetSelectorTests
             Culture = new CultureRequirement { Exclude = ["southern", "eastern"] }
         };
 
-        var result = selector.SelectTargets(graph, new EntityKind("faction"), 10, bias);
+        var result = TargetSelector.SelectTargets(graph, new EntityKind("faction"), 10, bias);
 
         Assert.Single(result.Existing);
         Assert.Equal(new CultureId("northern"), result.Existing[0].Culture);
@@ -128,7 +124,6 @@ public class TargetSelectorTests
     [Fact]
     public void SelectTargets_HubPenalty_ReducesScoreForHighlyConnected()
     {
-        var selector = new TargetSelector();
         var graph = new GraphStore();
 
         // Create a hub entity with many connections
@@ -153,7 +148,7 @@ public class TargetSelectorTests
             }
         };
 
-        var result = selector.SelectTargets(graph, new EntityKind("faction"), 1, bias);
+        var result = TargetSelector.SelectTargets(graph, new EntityKind("faction"), 1, bias);
 
         Assert.Single(result.Existing);
         Assert.Equal(new EntityId("leaf"), result.Existing[0].Id);
@@ -162,7 +157,6 @@ public class TargetSelectorTests
     [Fact]
     public void SelectTargets_PreferenceBoost_ForMatchingSubtypes()
     {
-        var selector = new TargetSelector();
         var graph = new GraphStore();
         graph.CreateEntity(CreateEntity("f1", "faction", "merchant"));
         graph.CreateEntity(CreateEntity("f2", "faction", "criminal"));
@@ -176,7 +170,7 @@ public class TargetSelectorTests
             }
         };
 
-        var result = selector.SelectTargets(graph, new EntityKind("faction"), 1, bias);
+        var result = TargetSelector.SelectTargets(graph, new EntityKind("faction"), 1, bias);
 
         Assert.Single(result.Existing);
         Assert.Equal("criminal", result.Existing[0].Subtype);
@@ -185,7 +179,6 @@ public class TargetSelectorTests
     [Fact]
     public void SelectTargets_PreferenceBoost_ForMatchingTags()
     {
-        var selector = new TargetSelector();
         var graph = new GraphStore();
 
         var tagged = CreateEntity("f1", "faction", "merchant");
@@ -204,7 +197,7 @@ public class TargetSelectorTests
             }
         };
 
-        var result = selector.SelectTargets(graph, new EntityKind("faction"), 1, bias);
+        var result = TargetSelector.SelectTargets(graph, new EntityKind("faction"), 1, bias);
 
         Assert.Single(result.Existing);
         Assert.Equal(new EntityId("f1"), result.Existing[0].Id);
@@ -213,7 +206,6 @@ public class TargetSelectorTests
     [Fact]
     public void SelectTargets_PreferenceBoost_ForMatchingProminence()
     {
-        var selector = new TargetSelector();
         var graph = new GraphStore();
 
         // Recognized (2.5) and Forgotten (0.5)
@@ -229,7 +221,7 @@ public class TargetSelectorTests
             }
         };
 
-        var result = selector.SelectTargets(graph, new EntityKind("faction"), 1, bias);
+        var result = TargetSelector.SelectTargets(graph, new EntityKind("faction"), 1, bias);
 
         Assert.Single(result.Existing);
         Assert.Equal(new EntityId("f1"), result.Existing[0].Id);
@@ -238,7 +230,6 @@ public class TargetSelectorTests
     [Fact]
     public void SelectTargets_MaxTotalRelationships_HardCap()
     {
-        var selector = new TargetSelector();
         var graph = new GraphStore();
         graph.CreateEntity(CreateEntity("f1", "faction", "merchant"));
         graph.CreateEntity(CreateEntity("f2", "faction", "merchant"));
@@ -256,7 +247,7 @@ public class TargetSelectorTests
             Avoid = new SelectionAvoidance { MaxTotalRelationships = 3 }
         };
 
-        var result = selector.SelectTargets(graph, new EntityKind("faction"), 10, bias);
+        var result = TargetSelector.SelectTargets(graph, new EntityKind("faction"), 10, bias);
 
         // f1 has 3 relationships (>= cap of 3), so only f2 should be selected
         Assert.Single(result.Existing);
@@ -266,12 +257,11 @@ public class TargetSelectorTests
     [Fact]
     public void SelectTargets_Diagnostics_ReportsScoreStats()
     {
-        var selector = new TargetSelector();
         var graph = new GraphStore();
         graph.CreateEntity(CreateEntity("f1", "faction", "merchant"));
         graph.CreateEntity(CreateEntity("f2", "faction", "criminal"));
 
-        var result = selector.SelectTargets(graph, new EntityKind("faction"), 2);
+        var result = TargetSelector.SelectTargets(graph, new EntityKind("faction"), 2);
 
         Assert.Equal(2, result.Diagnostics.CandidatesEvaluated);
         Assert.True(result.Diagnostics.BestScore > 0);

@@ -143,8 +143,29 @@ public sealed record EraContext(string Id, string Name, string? Description = nu
 public sealed record NarrativeStyle(
     string Id,
     string Name,
+    string? Format = null,
+    string? Description = null,
+    IReadOnlyList<string>? Tags = null,
     string? ProseGuidance = null,
     string? CraftPosture = null);
+
+/// <summary>
+/// A world dynamic — higher-level narrative context statement about inter-group
+/// forces and behaviors.
+/// </summary>
+public sealed record WorldDynamic
+{
+    public required string Id { get; init; }
+    public required string Text { get; init; }
+    public IReadOnlyList<string>? Cultures { get; init; }
+    public IReadOnlyList<string>? Kinds { get; init; }
+    public IReadOnlyDictionary<string, WorldDynamicEraOverride>? EraOverrides { get; init; }
+}
+
+/// <summary>
+/// Era-specific override for a world dynamic.
+/// </summary>
+public sealed record WorldDynamicEraOverride(string Text, bool Replace);
 
 /// <summary>
 /// Full input to the perspective synthesizer.
@@ -164,6 +185,12 @@ public sealed record PerspectiveSynthesisInput
 
     /// <summary>Prose hints per entity kind (kind → guidance text).</summary>
     public IReadOnlyDictionary<string, string>? ProseHints { get; init; }
+
+    /// <summary>World dynamics — higher-level narrative context statements.</summary>
+    public IReadOnlyList<WorldDynamic>? WorldDynamics { get; init; }
+
+    /// <summary>Fact selection settings for perspective synthesis.</summary>
+    public FactSelectionConfig? FactSelection { get; init; }
 
     /// <summary>Optional free-text narrative direction — primary constraint when present.</summary>
     public string? NarrativeDirection { get; init; }
@@ -188,7 +215,15 @@ public sealed record PerspectiveSynthesisResult
     /// </summary>
     public required IReadOnlyList<string> FacetedFacts { get; init; }
 
+    /// <summary>World dynamics actually injected into the synthesis prompt (post-filter/override).</summary>
+    public required IReadOnlyList<ResolvedWorldDynamic> ResolvedWorldDynamics { get; init; }
+
     public required int InputTokens { get; init; }
     public required int OutputTokens { get; init; }
     public required decimal ActualCost { get; init; }
 }
+
+/// <summary>
+/// A resolved world dynamic after filtering and era overrides.
+/// </summary>
+public sealed record ResolvedWorldDynamic(string Id, string Text);

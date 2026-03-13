@@ -1,6 +1,6 @@
-namespace TheCanonry.Engine.Engine;
-
 using TheCanonry.Schema.Ids;
+
+namespace TheCanonry.Engine.Engine;
 
 // =============================================================================
 // ACTION CONTEXT

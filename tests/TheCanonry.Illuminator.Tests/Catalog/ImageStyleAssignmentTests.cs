@@ -1,5 +1,4 @@
 using TheCanonry.Illuminator.Catalog;
-using Xunit;
 
 namespace TheCanonry.Illuminator.Tests.Catalog;
 

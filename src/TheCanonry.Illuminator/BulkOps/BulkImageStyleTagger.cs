@@ -1,6 +1,6 @@
-namespace TheCanonry.Illuminator.BulkOps;
-
 using TheCanonry.Illuminator.Catalog;
+
+namespace TheCanonry.Illuminator.BulkOps;
 
 /// <summary>
 /// Bulk image style tagging helpers.

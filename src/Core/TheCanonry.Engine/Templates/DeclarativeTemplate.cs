@@ -1,6 +1,6 @@
-namespace TheCanonry.Engine.Templates;
-
 using TheCanonry.Engine.Rules.Types;
+
+namespace TheCanonry.Engine.Templates;
 
 // =============================================================================
 // RELATIONSHIP RULE

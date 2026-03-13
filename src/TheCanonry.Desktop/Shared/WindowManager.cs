@@ -1,8 +1,8 @@
-namespace TheCanonry.Desktop.Shared;
-
 using Avalonia.Controls;
 
-public class WindowManager
+namespace TheCanonry.Desktop.Shared;
+
+internal sealed class WindowManager
 {
     private readonly IServiceProvider _services;
     private readonly Dictionary<string, Window> _openWindows = [];

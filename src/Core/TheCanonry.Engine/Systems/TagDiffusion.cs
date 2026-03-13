@@ -1,11 +1,10 @@
-namespace TheCanonry.Engine.Systems;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
-using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Systems;
 
 /// <summary>
 /// Propagates/diverges tags based on entity connectivity.

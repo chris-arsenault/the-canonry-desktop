@@ -10,5 +10,10 @@ public class PressureMetric
     public double Target { get; set; }
     public double Deviation { get; set; }
     public double Trend { get; set; }
-    public List<double> History { get; } = [];
+    private readonly List<double> _history = [];
+
+    public IReadOnlyList<double> History => _history;
+
+    /// <summary>Internal mutable access to history for PopulationTracker.</summary>
+    internal List<double> MutableHistory => _history;
 }

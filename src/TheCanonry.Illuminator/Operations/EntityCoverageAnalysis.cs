@@ -8,9 +8,10 @@
  *   - EventCount        (narrative events where SubjectId matches)
  */
 
-namespace TheCanonry.Illuminator.Operations;
-
 using TheCanonry.Persistence.Entities;
+using ChronicleEntity = TheCanonry.Persistence.Entities.Chronicle;
+
+namespace TheCanonry.Illuminator.Operations;
 
 public static class EntityCoverageAnalysis
 {
@@ -39,7 +40,7 @@ public static class EntityCoverageAnalysis
     /// </summary>
     public static IReadOnlyList<EntityCoverage> Analyze(
         IReadOnlyList<PersistedEntity> entities,
-        IReadOnlyList<Chronicle> chronicles,
+        IReadOnlyList<ChronicleEntity> chronicles,
         IReadOnlyList<NarrativeEventEntity>? narrativeEvents = null)
     {
         // Build a lookup: entityId → chronicle backref count
@@ -107,7 +108,7 @@ public static class EntityCoverageAnalysis
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private static Dictionary<string, int> BuildBackrefCounts(IReadOnlyList<Chronicle> chronicles)
+    private static Dictionary<string, int> BuildBackrefCounts(IReadOnlyList<ChronicleEntity> chronicles)
     {
         var counts = new Dictionary<string, int>();
 
@@ -155,7 +156,7 @@ public static class EntityCoverageAnalysis
         {
             return System.Text.Json.JsonSerializer.Deserialize<List<string>>(json) ?? [];
         }
-        catch
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             return [];
         }

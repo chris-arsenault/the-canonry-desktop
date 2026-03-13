@@ -1,6 +1,6 @@
-namespace TheCanonry.Illuminator.Tests.BulkOps;
-
 using TheCanonry.Illuminator.BulkOps;
+
+namespace TheCanonry.Illuminator.Tests.BulkOps;
 
 // ─── BulkOperationRunner Tests ────────────────────────────────────────────────
 
@@ -103,12 +103,11 @@ public sealed class BulkOperationRunnerTests
             items,
             item => item.Id,
             item => item.Name,
-            (item, _) =>
+            async (item, _) =>
             {
                 processed.Add(item.Id);
                 if (processed.Count == 3)
-                    cts.Cancel();
-                return Task.CompletedTask;
+                    await cts.CancelAsync();
             },
             ct: cts.Token);
 

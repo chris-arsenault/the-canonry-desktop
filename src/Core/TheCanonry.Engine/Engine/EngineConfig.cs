@@ -1,10 +1,10 @@
-namespace TheCanonry.Engine.Engine;
-
 using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Statistics;
 using TheCanonry.Engine.Templates;
 using TheCanonry.Schema.Config;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Engine;
 
 // =============================================================================
 // NARRATIVE CONFIG

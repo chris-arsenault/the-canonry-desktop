@@ -13,24 +13,23 @@ public static class PromptSections
     /// </summary>
     public static string FormatEntityFull(EntityContext entity)
     {
-        var parts = new List<string>();
+        var kindLabel = entity.Subtype is not null
+            ? $"{entity.Kind}/{entity.Subtype}"
+            : entity.Kind;
 
-        var kindLine = entity.Subtype is not null
-            ? $"{entity.Name} ({entity.Kind}/{entity.Subtype}"
-            : $"{entity.Name} ({entity.Kind}";
+        var lines = new List<string>
+        {
+            $"Kind: {kindLabel}",
+            $"Prominence: {entity.Prominence}",
+        };
 
         if (entity.Culture is not null)
-            kindLine += $", {entity.Culture}";
+            lines.Add($"Culture: {entity.Culture}");
 
-        kindLine += $", {entity.Prominence}, {entity.Status})";
-        parts.Add(kindLine);
+        lines.Add("");
+        lines.Add(entity.Description ?? entity.Summary ?? "(no description available)");
 
-        if (entity.Description is not null)
-            parts.Add(entity.Description);
-        else if (entity.Summary is not null)
-            parts.Add(entity.Summary);
-
-        return string.Join("\n", parts);
+        return string.Join("\n", lines);
     }
 
     /// <summary>
@@ -38,8 +37,12 @@ public static class PromptSections
     /// </summary>
     public static string FormatEntityBrief(EntityContext entity)
     {
-        var culture = entity.Culture is not null ? $", {entity.Culture}" : "";
-        return $"{entity.Name} ({entity.Kind}{culture})";
+        var briefKindLabel = entity.Subtype is not null
+            ? $"{entity.Kind}/{entity.Subtype}"
+            : entity.Kind;
+        var cultureSuffix = entity.Culture is not null ? $", Culture: {entity.Culture}" : "";
+        var desc = entity.Description ?? entity.Summary ?? "(no description available)";
+        return $"### {entity.Name} ({briefKindLabel})\nProminence: {entity.Prominence}{cultureSuffix}\n{desc}";
     }
 
     /// <summary>
@@ -57,16 +60,11 @@ public static class PromptSections
             ctx.WorldDescription,
             "",
             "Canon Facts:",
+            "(Facts marked with [FACET: ...] include a lens specific to this chronicle. Prioritize the facet - it shows how the universal truth applies to these particular entities and circumstances. The base fact provides context; the facet is your guide.)",
         };
 
         foreach (var fact in ctx.CanonFacts)
             lines.Add($"- {fact}");
-
-        if (ctx.CanonFacts.Any(f => f.Contains("[FACET:")))
-        {
-            lines.Add("");
-            lines.Add("Note: Facts marked [FACET: ...] are interpretations specific to this constellation — use them as thematic lenses, not literal constraints.");
-        }
 
         return string.Join("\n", lines);
     }
@@ -80,11 +78,45 @@ public static class PromptSections
         if (relationships.Count == 0)
             return string.Empty;
 
+        var collapsed = CollapseBidirectionalRelationships(relationships);
         var lines = new List<string> { "# Relationships" };
-        foreach (var r in relationships)
-            lines.Add($"- {r.SourceName} --[{r.Kind}]--> {r.TargetName}");
+        foreach (var (rel, isMutual) in collapsed)
+        {
+            lines.Add(isMutual
+                ? $"- {rel.SourceName} <--[{rel.Kind}]--> {rel.TargetName} (mutual)"
+                : $"- {rel.SourceName} --[{rel.Kind}]--> {rel.TargetName}");
+        }
 
         return string.Join("\n", lines);
+    }
+
+    /// <summary>
+    /// Collapse bidirectional relationships (A→B and B→A of same kind) into single entries.
+    /// </summary>
+    private static IReadOnlyList<(RelationshipContext Rel, bool IsMutual)> CollapseBidirectionalRelationships(
+        IReadOnlyList<RelationshipContext> relationships)
+    {
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var result = new List<(RelationshipContext, bool)>();
+        var relSet = new HashSet<string>(
+            relationships.Select(r => $"{r.SourceId}|{r.TargetId}|{r.Kind}"),
+            StringComparer.Ordinal);
+
+        foreach (var r in relationships)
+        {
+            var key = string.Compare(r.SourceId, r.TargetId, StringComparison.Ordinal) <= 0
+                ? $"{r.SourceId}|{r.TargetId}|{r.Kind}"
+                : $"{r.TargetId}|{r.SourceId}|{r.Kind}";
+
+            if (!seen.Add(key))
+                continue;
+
+            var reverseKey = $"{r.TargetId}|{r.SourceId}|{r.Kind}";
+            var isMutual = relSet.Contains(reverseKey);
+            result.Add((r, isMutual));
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -125,15 +157,27 @@ public static class PromptSections
         if (nameBank is null || nameBank.Count == 0)
             return string.Empty;
 
+        var entityCultures = new HashSet<string>(
+            entities.Where(e => e.Culture is not null).Select(e => e.Culture!),
+            StringComparer.Ordinal);
+
         var lines = new List<string>
         {
             "# Name Bank",
             "Culture-appropriate names for invented characters:",
         };
 
+        // Entity-represented cultures first
+        foreach (var culture in entityCultures)
+        {
+            if (nameBank.TryGetValue(culture, out var names) && names.Count > 0)
+                lines.Add($"- {culture}: {string.Join(", ", names)}");
+        }
+
+        // Then remaining cultures
         foreach (var (culture, names) in nameBank)
         {
-            if (names.Count > 0)
+            if (!entityCultures.Contains(culture) && names.Count > 0)
                 lines.Add($"- {culture}: {string.Join(", ", names)}");
         }
 
@@ -190,13 +234,22 @@ public static class PromptSections
         if (lensEntity is null)
             return string.Empty;
 
+        var kindLabel = lensEntity.Subtype is not null
+            ? $"{lensEntity.Kind}/{lensEntity.Subtype}"
+            : lensEntity.Kind;
+        var lensCultureSuffix = lensEntity.Culture is not null ? $", Culture: {lensEntity.Culture}" : "";
+
         var lines = new List<string>
         {
             "# Narrative Lens",
             "This story exists in the shadow of:",
-            FormatEntityFull(lensEntity),
             "",
-            "Lens Guidance: This entity is not a character in the story. It is the weight everything else is measured against — the context that gives meaning to what happens. It should be felt, not described.",
+            $"## {lensEntity.Name} ({kindLabel})",
+            $"Prominence: {lensEntity.Prominence}{lensCultureSuffix}",
+            "",
+            lensEntity.Description ?? lensEntity.Summary ?? "(no description available)",
+            "",
+            "Lens Guidance: This entity is NOT a character in the story. It is the context — the constraint, the backdrop, the thing everyone knows but no one can change. It should be felt in characters' choices, in what is possible and impossible, in what goes unsaid. Reference it naturally, never explain it to the reader as if they don't know it.",
         };
 
         return string.Join("\n", lines);
@@ -214,7 +267,7 @@ public static class PromptSections
             # Narrative Direction
             This chronicle has a specific narrative purpose:
             "{narrativeDirection}"
-            Write to fulfill this direction. It takes precedence over any structural defaults.
+            Write to fulfill this direction. Every structural and tonal choice should serve it.
             """;
     }
 }

@@ -1,6 +1,6 @@
-namespace TheCanonry.Engine.Validation;
-
 using TheCanonry.Engine.Engine;
+
+namespace TheCanonry.Engine.Validation;
 
 /// <summary>
 /// Validates cross-reference contracts in the engine configuration:

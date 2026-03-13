@@ -1,12 +1,12 @@
-namespace TheCanonry.Engine.Systems;
-
 using TheCanonry.Engine.Engine;
-using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Engine.Systems;
 
 /// <summary>
 /// Clusters similar entities into meta-entities.

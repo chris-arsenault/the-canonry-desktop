@@ -1,7 +1,7 @@
-namespace TheCanonry.Persistence.Repositories;
-
 using Microsoft.EntityFrameworkCore;
 using TheCanonry.Persistence.Entities;
+
+namespace TheCanonry.Persistence.Repositories;
 
 public class PageLayoutRepository
 {

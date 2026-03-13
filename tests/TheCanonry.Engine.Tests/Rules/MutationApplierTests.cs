@@ -1,12 +1,12 @@
-namespace TheCanonry.Engine.Tests.Rules;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Rules;
 using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 
-using static TestHelpers;
+using static TheCanonry.Engine.Tests.Rules.TestHelpers;
+
+namespace TheCanonry.Engine.Tests.Rules;
 
 public class MutationApplierTests
 {

@@ -13,5 +13,13 @@ public class ImageRecord
     public string Type { get; set; } = "entity";
     public string FilePath { get; set; } = "";
     public string? HqFilePath { get; set; }
+
+    // Catalog metadata (populated by LLM classification or manual assignment)
+    public string? Title { get; set; }
+    public string? Tags { get; set; } // JSON array of strings
+    public string? ArtisticStyleId { get; set; }
+    public string? CompositionStyleId { get; set; }
+    public string? ColorPaletteId { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

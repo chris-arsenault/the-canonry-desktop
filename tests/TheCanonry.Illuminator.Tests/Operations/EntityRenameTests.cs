@@ -1,7 +1,8 @@
-namespace TheCanonry.Illuminator.Tests.Operations;
-
 using TheCanonry.Illuminator.Operations;
 using TheCanonry.Persistence.Entities;
+using ChronicleEntity = TheCanonry.Persistence.Entities.Chronicle;
+
+namespace TheCanonry.Illuminator.Tests.Operations;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -31,7 +32,7 @@ file static class RenameFactory
         UpdatedAtTick   = 1,
     };
 
-    public static Chronicle MakeChronicle(
+    public static ChronicleEntity MakeChronicle(
         long id,
         string content,
         string? title = null,

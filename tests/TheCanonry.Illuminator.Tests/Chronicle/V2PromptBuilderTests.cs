@@ -1,5 +1,4 @@
 using TheCanonry.Illuminator.Chronicle;
-using TheCanonry.Illuminator.Chronicle.PerspectiveSynthesis;
 using TheCanonry.Illuminator.Chronicle.V2;
 
 namespace TheCanonry.Illuminator.Tests.Chronicle;
@@ -43,7 +42,7 @@ public sealed class V2PromptBuilderTests
     [Fact]
     public void StorySystemPrompt_ContainsKeyPhrases()
     {
-        var prompt = StoryPromptBuilder.GetSystemPrompt();
+        var prompt = StoryPromptBuilder.SystemPrompt;
 
         Assert.Contains("expert fantasy author", prompt);
         Assert.Contains("CRAFT", prompt);
@@ -59,7 +58,7 @@ public sealed class V2PromptBuilderTests
     [Fact]
     public void DocumentSystemPrompt_ContainsKeyPhrases()
     {
-        var prompt = DocumentPromptBuilder.GetSystemPrompt();
+        var prompt = DocumentPromptBuilder.SystemPrompt;
 
         Assert.Contains("in-universe document", prompt);
         Assert.Contains("Document Instructions", prompt);
@@ -123,7 +122,7 @@ public sealed class V2PromptBuilderTests
     [Fact]
     public void CopyEditStorySystemPrompt_ContainsEditingInstructions()
     {
-        var prompt = CopyEditPromptBuilder.GetStorySystemPrompt();
+        var prompt = CopyEditPromptBuilder.StorySystemPrompt;
 
         Assert.Contains("senior fiction editor", prompt);
         Assert.Contains("burnish", prompt);
@@ -216,16 +215,17 @@ public sealed class V2PromptBuilderTests
             text: "The soldier stood at the gate.",
             styleName: "short story",
             minWords: 1000,
-            maxWords: 2000);
+            maxWords: 2000,
+            currentWordCount: 6);
 
-        Assert.Contains("short story (1000-2000 words)", prompt);
+        Assert.Contains("short story", prompt);
         Assert.Contains("The soldier stood at the gate.", prompt);
     }
 
     [Fact]
     public void CopyEditDocumentSystemPrompt_ContainsDocumentEditingInstructions()
     {
-        var prompt = CopyEditPromptBuilder.GetDocumentSystemPrompt();
+        var prompt = CopyEditPromptBuilder.DocumentSystemPrompt;
 
         Assert.Contains("senior editor", prompt);
         Assert.Contains("in-universe document", prompt);

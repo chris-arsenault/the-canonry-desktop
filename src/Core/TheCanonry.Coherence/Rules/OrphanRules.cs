@@ -1,7 +1,7 @@
-namespace TheCanonry.Coherence.Rules;
-
 using TheCanonry.Coherence.Types;
 using TheCanonry.Engine.Engine;
+
+namespace TheCanonry.Coherence.Rules;
 
 /// <summary>
 /// Rules that detect orphaned configuration elements -- templates and systems

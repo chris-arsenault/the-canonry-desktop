@@ -1,7 +1,7 @@
-namespace TheCanonry.Engine.Engine;
-
 using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Runtime;
+
+namespace TheCanonry.Engine.Engine;
 
 // =============================================================================
 // TICK RESULT
@@ -80,7 +80,11 @@ public sealed class SimulationTickRunner
                     _runtime.ModifyPressure(pressureId, delta);
                 }
             }
-            catch (Exception ex)
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex) when (ex is not OutOfMemoryException)
             {
                 _runtime.Log(LogLevel.Error,
                     $"System {system.Id} failed at tick {tickNumber}: {ex.Message}");

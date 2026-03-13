@@ -1,5 +1,3 @@
-namespace TheCanonry.Engine.Runtime;
-
 using TheCanonry.Engine.Coordinates;
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
@@ -10,6 +8,8 @@ using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
 
+namespace TheCanonry.Engine.Runtime;
+
 /// <summary>
 /// Runtime orchestration layer that combines graph data with selection,
 /// placement, pressure, and population tracking services. All template
@@ -19,7 +19,6 @@ using TheCanonry.Schema.World;
 public sealed class WorldRuntime
 {
     private readonly IGraph _graph;
-    private readonly TargetSelector _targetSelector;
     private readonly CoordinateContext _coordinateContext;
     private readonly PopulationTracker _populationTracker;
     private readonly EngineConfig _config;
@@ -34,7 +33,6 @@ public sealed class WorldRuntime
     {
         _config = config;
         _graph = graph ?? new GraphStore();
-        _targetSelector = new TargetSelector();
         _coordinateContext = new CoordinateContext(config.Schema);
         _populationTracker = new PopulationTracker(config.DistributionTargets);
         _random = randomSeed.HasValue ? new Random(randomSeed.Value) : new Random();
@@ -104,8 +102,8 @@ public sealed class WorldRuntime
         SetPressure(pressureId, current + delta);
     }
 
-    /// <summary>Get all current pressure values (read-only view).</summary>
-    public IReadOnlyDictionary<string, double> GetAllPressures() => _graph.Pressures;
+    /// <summary>All current pressure values (read-only view).</summary>
+    public IReadOnlyDictionary<string, double> AllPressures => _graph.Pressures;
 
     // =========================================================================
     // ENTITY READ OPERATIONS (delegates to IGraph)
@@ -199,7 +197,7 @@ public sealed class WorldRuntime
     /// This is the recommended way to select entities for connections.
     /// </summary>
     public SelectionResult SelectTargets(EntityKind kind, int count, SelectionBias? bias = null) =>
-        _targetSelector.SelectTargets(_graph, kind, count, bias);
+        TargetSelector.SelectTargets(_graph, kind, count, bias);
 
     // =========================================================================
     // COORDINATE PLACEMENT (delegates to CoordinateContext)
@@ -255,7 +253,7 @@ public sealed class WorldRuntime
     public void UpdatePopulationMetrics() => _populationTracker.Update(_graph);
 
     /// <summary>Get current population metrics snapshot.</summary>
-    public PopulationMetrics GetPopulationMetrics() => _populationTracker.GetMetrics();
+    public PopulationMetrics PopulationMetrics => _populationTracker.Metrics;
 
     /// <summary>Get population summary statistics.</summary>
     public PopulationSummary GetPopulationSummary() => _populationTracker.GetSummary();

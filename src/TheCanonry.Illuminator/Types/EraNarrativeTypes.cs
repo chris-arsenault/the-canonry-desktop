@@ -53,6 +53,87 @@ public sealed record EraNarrativeThread
     public string? Material { get; init; }
 }
 
+// =============================================================================
+// Era Narrative Image Refs
+// =============================================================================
+
+/// <summary>
+/// Display size hint for era narrative inline images.
+/// </summary>
+public enum EraNarrativeImageSize
+{
+    Small,
+    Medium,
+    Large,
+    FullWidth,
+}
+
+/// <summary>
+/// Base type for era narrative inline image references.
+/// Either a reference to an existing chronicle image or a new scene request.
+/// </summary>
+public abstract record EraNarrativeImageRef
+{
+    public required string RefId { get; init; }
+    public required string AnchorText { get; init; }
+    public int? AnchorIndex { get; init; }
+    public required EraNarrativeImageSize Size { get; init; }
+    public string? Justification { get; init; }
+    public string? Caption { get; init; }
+}
+
+/// <summary>
+/// Reference to an existing chronicle image (cover or scene image from a chronicle).
+/// </summary>
+public sealed record EraNarrativeChronicleImageRef : EraNarrativeImageRef
+{
+    public required string ChronicleId { get; init; }
+    public required string ChronicleTitle { get; init; }
+    public required string ImageSource { get; init; }
+    public string? ImageRefId { get; init; }
+    public required string ImageId { get; init; }
+}
+
+/// <summary>
+/// New scene image generated specifically for the era narrative.
+/// </summary>
+public sealed record EraNarrativePromptRequestRef : EraNarrativeImageRef
+{
+    public required string SceneDescription { get; init; }
+    public required string Status { get; init; }
+    public string? GeneratedImageId { get; init; }
+    public string? Error { get; init; }
+}
+
+/// <summary>
+/// Container for era narrative inline image refs with generation metadata.
+/// </summary>
+public sealed record EraNarrativeImageRefs(
+    IReadOnlyList<EraNarrativeImageRef> Refs,
+    long GeneratedAt,
+    string Model);
+
+// =============================================================================
+// Era Narrative Quotes & Strategic Dynamics
+// =============================================================================
+
+/// <summary>
+/// In-world text that exists as a cultural artifact — quotable as primary source.
+/// </summary>
+public sealed record EraNarrativeQuote(string Text, string Origin, string Context);
+
+/// <summary>
+/// Strategic interaction between cultures inferred by the historian.
+/// </summary>
+public sealed record EraNarrativeStrategicDynamic(
+    string Interaction,
+    IReadOnlyList<string> Actors,
+    string Dynamic);
+
+// =============================================================================
+// Thread Synthesis
+// =============================================================================
+
 /// <summary>
 /// Thread synthesis output — the structural plan for an era narrative.
 /// </summary>
@@ -61,6 +142,8 @@ public sealed record EraNarrativeThreadSynthesis
     public required IReadOnlyList<EraNarrativeThread> Threads { get; init; }
     public required string Thesis { get; init; }
     public string? Counterweight { get; init; }
+    public IReadOnlyList<EraNarrativeQuote>? Quotes { get; init; }
+    public IReadOnlyList<EraNarrativeStrategicDynamic>? StrategicDynamics { get; init; }
     public required long GeneratedAt { get; init; }
     public required string Model { get; init; }
     public required int InputTokens { get; init; }
@@ -85,6 +168,11 @@ public sealed class EraNarrative
     public string? Summary { get; set; }
     public string? CoverSceneDescription { get; set; }
     public string? CoverImageId { get; set; }
+
+    /// <summary>
+    /// Inline image refs (chronicle images + generated scenes).
+    /// </summary>
+    public EraNarrativeImageRefs? ImageRefs { get; set; }
 
     public int TotalInputTokens { get; set; }
     public int TotalOutputTokens { get; set; }

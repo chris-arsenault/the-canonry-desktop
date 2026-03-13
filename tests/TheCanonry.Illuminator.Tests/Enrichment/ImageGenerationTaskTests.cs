@@ -1,5 +1,4 @@
 using TheCanonry.ApiClients.Images;
-using TheCanonry.ApiClients.Llm;
 using TheCanonry.Illuminator.Enrichment;
 using TheCanonry.Illuminator.ImagePipeline;
 using TheCanonry.Illuminator.Types;

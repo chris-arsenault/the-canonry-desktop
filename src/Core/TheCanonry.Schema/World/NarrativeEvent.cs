@@ -1,6 +1,6 @@
-namespace TheCanonry.Schema.World;
-
 using TheCanonry.Schema.Ids;
+
+namespace TheCanonry.Schema.World;
 
 public class NarrativeEvent
 {

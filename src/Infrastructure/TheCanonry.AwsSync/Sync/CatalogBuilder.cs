@@ -1,9 +1,9 @@
-namespace TheCanonry.AwsSync.Sync;
-
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TheCanonry.AwsSync.S3;
 using TheCanonry.AwsSync.Types;
+
+namespace TheCanonry.AwsSync.Sync;
 
 public sealed class CatalogBuilder(IS3Operations s3, string basePrefix)
 {

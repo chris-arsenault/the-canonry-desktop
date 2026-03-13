@@ -1,7 +1,6 @@
 using TheCanonry.Illuminator.Chronicle;
 using TheCanonry.Illuminator.Chronicle.PerspectiveSynthesis;
 using TheCanonry.Illuminator.Tests.Enrichment;
-using TheCanonry.Illuminator.Types;
 
 namespace TheCanonry.Illuminator.Tests.Chronicle;
 

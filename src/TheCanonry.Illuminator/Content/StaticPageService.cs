@@ -5,11 +5,11 @@
  * Delegates persistence to StaticPageRepository.
  */
 
-namespace TheCanonry.Illuminator.Content;
-
 using System.Text.RegularExpressions;
 using TheCanonry.Persistence.Entities;
 using TheCanonry.Persistence.Repositories;
+
+namespace TheCanonry.Illuminator.Content;
 
 public class StaticPageService
 {

@@ -50,7 +50,7 @@ public sealed class ImagePromptFormatter
                 };
             }
         }
-        catch
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             // Fall through to return original prompt
         }

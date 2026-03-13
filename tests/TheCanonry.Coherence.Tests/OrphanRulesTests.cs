@@ -1,9 +1,8 @@
-namespace TheCanonry.Coherence.Tests;
-
 using TheCanonry.Coherence.Types;
 using TheCanonry.Engine.Engine;
-using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Schema.Ids;
+
+namespace TheCanonry.Coherence.Tests;
 
 /// <summary>
 /// Tests for orphan-generators, orphan-systems, and zero-weight-generators coherence rules.

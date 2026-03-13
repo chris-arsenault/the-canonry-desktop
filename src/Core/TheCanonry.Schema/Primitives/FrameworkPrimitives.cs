@@ -1,7 +1,7 @@
-namespace TheCanonry.Schema.Primitives;
-
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
+
+namespace TheCanonry.Schema.Primitives;
 
 public static class FrameworkPrimitives
 {

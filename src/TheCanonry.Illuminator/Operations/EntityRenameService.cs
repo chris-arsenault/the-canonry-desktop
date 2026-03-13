@@ -13,9 +13,10 @@
  *   - No metadata patching (roleAssignments, lens, directives) — text fields only
  */
 
-namespace TheCanonry.Illuminator.Operations;
-
 using TheCanonry.Persistence.Entities;
+using ChronicleEntity = TheCanonry.Persistence.Entities.Chronicle;
+
+namespace TheCanonry.Illuminator.Operations;
 
 public static class EntityRenameService
 {
@@ -69,7 +70,7 @@ public static class EntityRenameService
         string entityId,
         string oldName,
         IReadOnlyList<PersistedEntity> entities,
-        IReadOnlyList<Chronicle> chronicles,
+        IReadOnlyList<ChronicleEntity> chronicles,
         IReadOnlyList<NarrativeEventEntity>? narrativeEvents = null,
         IReadOnlyList<StaticPageEntity>? staticPages = null)
     {

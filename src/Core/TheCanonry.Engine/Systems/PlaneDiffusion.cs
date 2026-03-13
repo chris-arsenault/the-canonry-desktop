@@ -1,11 +1,9 @@
-namespace TheCanonry.Engine.Systems;
-
 using TheCanonry.Engine.Engine;
-using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Schema.Domain;
-using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Systems;
 
 /// <summary>
 /// Computes diffusion fields on semantic planes using a 100x100 grid.

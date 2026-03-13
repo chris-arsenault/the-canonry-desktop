@@ -1,7 +1,7 @@
-namespace TheCanonry.Schema.Domain;
-
 using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Primitives;
+
+namespace TheCanonry.Schema.Domain;
 
 public class DomainRegistry
 {

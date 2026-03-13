@@ -56,12 +56,14 @@ public sealed record ImageCatalogEntry
 /// <summary>
 /// The full exported catalog document: versioned, timestamped, with facets.
 /// </summary>
+#pragma warning disable CA1054, CA1056 // BaseUrl is used in string interpolation, not as a URI object
 public sealed record ImageCatalog(
     int Version,
     DateTime GeneratedAt,
     string BaseUrl,
     IReadOnlyList<ImageCatalogEntry> Images,
     CatalogFacets Facets);
+#pragma warning restore CA1054, CA1056
 
 /// <summary>
 /// Facet lists for catalog filtering UI.

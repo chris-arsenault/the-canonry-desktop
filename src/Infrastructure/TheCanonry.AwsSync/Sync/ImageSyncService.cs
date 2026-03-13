@@ -1,7 +1,7 @@
-namespace TheCanonry.AwsSync.Sync;
-
 using TheCanonry.AwsSync.S3;
 using TheCanonry.AwsSync.Types;
+
+namespace TheCanonry.AwsSync.Sync;
 
 public sealed class ImageSyncService
 {
@@ -228,7 +228,11 @@ public sealed class ImageSyncService
             await _s3.ListObjectsAsync(prefix, ct);
             return true;
         }
-        catch
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             return false;
         }

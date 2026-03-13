@@ -1,9 +1,8 @@
-namespace TheCanonry.Desktop;
-
-using System;
 using Avalonia;
 
-public static class Program
+namespace TheCanonry.Desktop;
+
+internal static class Program
 {
     [STAThread]
     public static void Main(string[] args) =>

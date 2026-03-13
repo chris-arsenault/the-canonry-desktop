@@ -1,9 +1,9 @@
-namespace TheCanonry.Illuminator.Config;
-
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using TheCanonry.Persistence;
 using TheCanonry.Persistence.Entities;
+
+namespace TheCanonry.Illuminator.Config;
 
 /// <summary>
 /// Manages persistence of all config types to DB using ConfigSlotEntity for per-type storage.

@@ -1,12 +1,11 @@
-namespace TheCanonry.Engine.Pressures;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Rules;
-using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Pressures;
 
 /// <summary>
 /// Converts DeclarativePressure configs into runtime Pressure objects
@@ -110,7 +109,7 @@ internal sealed class RuntimeGraphAdapter : IGraph
         {
             // Convert IReadOnlyDictionary to Dictionary for the interface
             var result = new Dictionary<string, double>();
-            foreach (var kvp in _runtime.GetAllPressures())
+            foreach (var kvp in _runtime.AllPressures)
                 result[kvp.Key] = kvp.Value;
             return result;
         }

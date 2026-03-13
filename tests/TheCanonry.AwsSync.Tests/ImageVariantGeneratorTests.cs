@@ -1,7 +1,7 @@
-namespace TheCanonry.AwsSync.Tests;
-
 using SkiaSharp;
 using TheCanonry.AwsSync.Sync;
+
+namespace TheCanonry.AwsSync.Tests;
 
 public class ImageVariantGeneratorTests
 {

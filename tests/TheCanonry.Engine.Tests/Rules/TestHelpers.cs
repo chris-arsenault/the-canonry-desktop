@@ -1,10 +1,11 @@
-namespace TheCanonry.Engine.Tests.Rules;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Rules;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Engine.Tests.Rules;
 
 /// <summary>
 /// Shared helper methods for Rules test classes.

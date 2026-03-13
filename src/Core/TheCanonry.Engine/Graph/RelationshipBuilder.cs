@@ -1,8 +1,9 @@
-namespace TheCanonry.Engine.Graph;
-
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Engine.Graph;
 
 /// <summary>
 /// Fluent builder for constructing batches of relationships.
@@ -36,7 +37,7 @@ public sealed class RelationshipBuilder
     }
 
     /// <summary>Return all built relationships and clear the internal list.</summary>
-    public List<Relationship> Build()
+    public IReadOnlyList<Relationship> Build()
     {
         var result = new List<Relationship>(_relationships);
         _relationships.Clear();

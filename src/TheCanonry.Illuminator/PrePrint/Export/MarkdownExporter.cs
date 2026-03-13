@@ -1,7 +1,7 @@
-namespace TheCanonry.Illuminator.PrePrint.Export;
-
 using System.IO.Compression;
 using System.Text;
+
+namespace TheCanonry.Illuminator.PrePrint.Export;
 
 /// <summary>
 /// Builds a ZIP archive from the flattened content tree.

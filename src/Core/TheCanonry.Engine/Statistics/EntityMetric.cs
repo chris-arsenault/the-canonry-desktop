@@ -17,6 +17,11 @@ public class EntityMetric
     /// <summary>Moving average of count deltas between consecutive history entries.</summary>
     public double Trend { get; set; }
 
+    private readonly List<int> _history = [];
+
     /// <summary>Last N tick counts (window size controlled by PopulationTracker).</summary>
-    public List<int> History { get; } = [];
+    public IReadOnlyList<int> History => _history;
+
+    /// <summary>Internal mutable access to history for PopulationTracker.</summary>
+    internal List<int> MutableHistory => _history;
 }

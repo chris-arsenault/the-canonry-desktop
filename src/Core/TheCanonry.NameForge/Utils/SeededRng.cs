@@ -83,7 +83,7 @@ public sealed class SeededRng
     /// <summary>
     /// Shuffle a list using Fisher-Yates algorithm, returning a new list.
     /// </summary>
-    public List<T> Shuffle<T>(IReadOnlyList<T> items)
+    public IReadOnlyList<T> Shuffle<T>(IReadOnlyList<T> items)
     {
         var result = new List<T>(items);
         for (var i = result.Count - 1; i > 0; i--)

@@ -1,7 +1,7 @@
-namespace TheCanonry.Engine.Engine;
-
 using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Schema.Ids;
+
+namespace TheCanonry.Engine.Engine;
 
 // =============================================================================
 // ERA TRANSITION EFFECTS

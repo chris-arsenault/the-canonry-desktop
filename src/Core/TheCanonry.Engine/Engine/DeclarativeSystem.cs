@@ -1,7 +1,5 @@
 namespace TheCanonry.Engine.Engine;
 
-using TheCanonry.Engine.Rules.Types;
-
 // =============================================================================
 // SYSTEM TYPE DISCRIMINATOR
 // =============================================================================

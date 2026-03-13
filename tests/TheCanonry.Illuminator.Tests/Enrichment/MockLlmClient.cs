@@ -6,7 +6,7 @@ namespace TheCanonry.Illuminator.Tests.Enrichment;
 /// A mock ILlmClient that returns configured responses in sequence.
 /// Each call to CompleteAsync returns the next queued response.
 /// </summary>
-public sealed class MockLlmClient : ILlmClient
+internal sealed class MockLlmClient : ILlmClient
 {
     private readonly Queue<LlmResponse> _responses = new();
     private readonly List<LlmRequest> _requests = [];

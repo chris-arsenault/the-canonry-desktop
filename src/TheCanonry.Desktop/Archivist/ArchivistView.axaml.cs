@@ -1,8 +1,8 @@
-namespace TheCanonry.Desktop.Archivist;
-
 using Avalonia.Controls;
 
-public partial class ArchivistView : UserControl
+namespace TheCanonry.Desktop.Archivist;
+
+internal sealed partial class ArchivistView : UserControl
 {
     public ArchivistView()
     {

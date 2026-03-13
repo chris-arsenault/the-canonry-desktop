@@ -1,8 +1,5 @@
-namespace TheCanonry.Engine.Tests.Validation;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
-using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Engine.Statistics;
 using TheCanonry.Engine.Templates;
@@ -12,6 +9,8 @@ using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Tests.Validation;
 
 // =============================================================================
 // TEST STUBS

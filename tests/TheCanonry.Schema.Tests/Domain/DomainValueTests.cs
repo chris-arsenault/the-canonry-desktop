@@ -1,6 +1,6 @@
-namespace TheCanonry.Schema.Tests.Domain;
-
 using TheCanonry.Schema.Domain;
+
+namespace TheCanonry.Schema.Tests.Domain;
 
 public class DomainValueTests
 {

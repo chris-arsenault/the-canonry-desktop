@@ -1,9 +1,9 @@
-namespace TheCanonry.Desktop.Shell;
-
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
-public partial class ShellWindow : Window
+namespace TheCanonry.Desktop.Shell;
+
+internal sealed partial class ShellWindow : Window
 {
     public ShellWindow()
     {

@@ -13,13 +13,6 @@ public sealed class PerspectiveSynthesizer
 {
     private readonly ILlmClient _llm;
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        ReadCommentHandling = JsonCommentHandling.Skip,
-        AllowTrailingCommas = true,
-    };
-
     public PerspectiveSynthesizer(ILlmClient llm)
     {
         _llm = llm;
@@ -40,17 +33,21 @@ public sealed class PerspectiveSynthesizer
         // Step 2: Assembled tone is the core tone fragment
         var assembledTone = input.ToneFragments.Core;
 
-        // Step 3: Build prompts
+        // Step 3: Resolve world dynamics (needed for result + prompt)
+        var resolvedWorldDynamics = PerspectivePrompts.ResolveWorldDynamics(input);
+
+        // Step 4: Build prompts
         var systemPrompt = PerspectivePrompts.SystemPrompt;
         var userPrompt = PerspectivePrompts.BuildUserPrompt(input);
 
-        // Step 4: Call LLM
+        // Step 5: Call LLM
         var request = new LlmRequest
         {
             SystemPrompt = systemPrompt,
             UserPrompt = userPrompt,
             Model = LlmModel.Sonnet46,
-            MaxTokens = 4096,
+            ThinkingBudget = 4096,
+            MaxTokens = 1024,
             Temperature = 0.7,
         };
 
@@ -59,16 +56,16 @@ public sealed class PerspectiveSynthesizer
         if (response.Error is not null)
             throw new InvalidOperationException($"Perspective synthesis LLM call failed: {response.Error}");
 
-        // Step 5: Parse JSON response
+        // Step 6: Parse JSON response
         var synthesis = ParseSynthesisResponse(response.Text);
 
-        // Step 6: Enforce required facts
+        // Step 7: Enforce required facts
         var enforcedSynthesis = EnforceFacetRequirements(synthesis, input);
 
-        // Step 7: Build faceted facts
+        // Step 8: Build faceted facts
         var facetedFacts = BuildFacetedFacts(enforcedSynthesis, input.FactsWithMetadata, generationConstraints);
 
-        // Step 8: Compute cost (input: $3/MTok, output: $15/MTok for Sonnet 3.5)
+        // Step 9: Compute cost (input: $3/MTok, output: $15/MTok for Sonnet 3.5)
         var actualCost = ComputeCost(response.Usage.InputTokens, response.Usage.OutputTokens);
 
         return new PerspectiveSynthesisResult
@@ -76,6 +73,7 @@ public sealed class PerspectiveSynthesizer
             Synthesis = enforcedSynthesis,
             AssembledTone = assembledTone,
             FacetedFacts = facetedFacts,
+            ResolvedWorldDynamics = resolvedWorldDynamics,
             InputTokens = response.Usage.InputTokens,
             OutputTokens = response.Usage.OutputTokens,
             ActualCost = actualCost,
@@ -242,9 +240,10 @@ public sealed class PerspectiveSynthesizer
     }
 
     // =========================================================================
-    // Raw JSON deserialization shapes
+    // Raw JSON deserialization shapes (instantiated by System.Text.Json)
     // =========================================================================
 
+#pragma warning disable CA1812 // These classes are instantiated by JsonSerializer.Deserialize<T>()
     private sealed class RawSynthesisResponse
     {
         [JsonPropertyName("brief")]
@@ -286,4 +285,5 @@ public sealed class PerspectiveSynthesizer
         [JsonPropertyName("directive")]
         public string? Directive { get; set; }
     }
+#pragma warning restore CA1812
 }

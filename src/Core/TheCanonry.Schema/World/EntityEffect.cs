@@ -1,7 +1,7 @@
-namespace TheCanonry.Schema.World;
-
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
+
+namespace TheCanonry.Schema.World;
 
 public abstract record EntityEffect(string Description, string SemanticKind);
 

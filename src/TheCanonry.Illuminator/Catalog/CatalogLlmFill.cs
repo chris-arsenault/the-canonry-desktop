@@ -23,6 +23,7 @@ public sealed class CatalogLlmFill
     private const int TextBatchSize = 20;
     private const int TitleBatchSize = 50;
     private const string ClassifyModel = "claude-haiku-4-5-20251001";
+    private const string TitleModel = LlmModel.Opus46;
 
     private readonly ILlmClient _llm;
 
@@ -154,7 +155,7 @@ public sealed class CatalogLlmFill
             {
                 throw;
             }
-            catch
+            catch (Exception ex) when (ex is not OutOfMemoryException and not OperationCanceledException)
             {
                 // Batch failure — continue with remaining batches
             }
@@ -234,8 +235,9 @@ public sealed class CatalogLlmFill
             {
                 SystemPrompt = systemPrompt,
                 UserPrompt = userPrompt.ToString().TrimEnd(),
-                Model = ClassifyModel,
-                MaxTokens = 2048,
+                Model = TitleModel,
+                ThinkingBudget = 4096,
+                MaxTokens = 4096,
                 Temperature = 1.0,
                 DisableStreaming = true,
             };
@@ -270,7 +272,7 @@ public sealed class CatalogLlmFill
             {
                 throw;
             }
-            catch
+            catch (Exception ex) when (ex is not OutOfMemoryException and not OperationCanceledException)
             {
                 // Batch failure — continue
             }
@@ -302,7 +304,7 @@ public sealed class CatalogLlmFill
         sb.AppendLine(string.Join(", ", styles));
         sb.AppendLine();
         sb.AppendLine("COMPOSITION STYLES (pick one):");
-        sb.AppendLine("(same list as artistic styles)");
+        sb.AppendLine(string.Join(", ", styles));
         sb.AppendLine();
         sb.AppendLine("COLOR PALETTES (pick one):");
         sb.Append(string.Join(", ", palettes));
@@ -365,7 +367,7 @@ public sealed class CatalogLlmFill
             }
             return result;
         }
-        catch
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             return new();
         }

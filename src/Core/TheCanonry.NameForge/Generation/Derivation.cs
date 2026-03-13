@@ -250,7 +250,7 @@ public static class Derivation
 
     private static string MatchCase(string source, string result)
     {
-        if (source == source.ToUpperInvariant())
+        if (string.Equals(source, source.ToUpperInvariant(), StringComparison.Ordinal))
             return result.ToUpperInvariant();
         if (char.IsUpper(source[0]))
             return char.ToUpperInvariant(result[0]) + result[1..];

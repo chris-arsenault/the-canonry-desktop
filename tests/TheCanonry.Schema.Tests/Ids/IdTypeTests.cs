@@ -1,6 +1,6 @@
-namespace TheCanonry.Schema.Tests.Ids;
-
 using TheCanonry.Schema.Ids;
+
+namespace TheCanonry.Schema.Tests.Ids;
 
 public class IdTypeTests
 {

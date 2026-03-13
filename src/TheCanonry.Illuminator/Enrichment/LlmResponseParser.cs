@@ -31,7 +31,7 @@ public static partial class LlmResponseParser
             result = ExtractJson<T>(response);
             return true;
         }
-        catch
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             return false;
         }

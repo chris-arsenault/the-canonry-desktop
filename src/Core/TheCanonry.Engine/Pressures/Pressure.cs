@@ -1,6 +1,6 @@
-namespace TheCanonry.Engine.Pressures;
-
 using TheCanonry.Engine.Runtime;
+
+namespace TheCanonry.Engine.Pressures;
 
 /// <summary>
 /// Runtime pressure object with executable growth function.

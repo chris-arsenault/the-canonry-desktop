@@ -1,8 +1,8 @@
-namespace TheCanonry.Coherence;
-
 using TheCanonry.Coherence.Rules;
 using TheCanonry.Coherence.Types;
 using TheCanonry.Engine.Engine;
+
+namespace TheCanonry.Coherence;
 
 /// <summary>
 /// Main entry point for coherence validation.

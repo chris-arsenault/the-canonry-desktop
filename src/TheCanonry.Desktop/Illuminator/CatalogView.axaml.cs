@@ -1,8 +1,8 @@
-namespace TheCanonry.Desktop.Illuminator;
-
 using Avalonia.Controls;
 
-public partial class CatalogView : UserControl
+namespace TheCanonry.Desktop.Illuminator;
+
+internal sealed partial class CatalogView : UserControl
 {
     public CatalogView()
     {

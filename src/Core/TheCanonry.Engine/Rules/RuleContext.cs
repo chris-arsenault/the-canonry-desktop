@@ -1,7 +1,7 @@
-namespace TheCanonry.Engine.Rules;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Rules;
 
 /// <summary>
 /// Unified context for all rule evaluation: conditions, metrics, mutations,

@@ -1,7 +1,7 @@
-namespace TheCanonry.Engine.Coordinates;
-
 using TheCanonry.Schema.Config;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Coordinates;
 
 /// <summary>
 /// Result of a culture-aware placement operation.

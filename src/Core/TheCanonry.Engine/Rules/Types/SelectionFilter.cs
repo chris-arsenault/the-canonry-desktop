@@ -1,6 +1,6 @@
-namespace TheCanonry.Engine.Rules.Types;
-
 using TheCanonry.Engine.Graph;
+
+namespace TheCanonry.Engine.Rules.Types;
 
 /// <summary>
 /// Abstract base for all selection filters. Filters determine whether

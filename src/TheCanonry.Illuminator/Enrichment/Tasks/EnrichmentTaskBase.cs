@@ -27,7 +27,7 @@ public abstract class EnrichmentTaskBase : IEnrichmentTaskExecutor
     protected async Task<LlmResponse> CallLlmAsync(
         LlmCallType callType, string systemPrompt, string userPrompt, CancellationToken ct)
     {
-        var request = Context.BuildRequest(callType, systemPrompt, userPrompt);
+        var request = TaskContext.BuildRequest(callType, systemPrompt, userPrompt);
         return await Context.LlmClient.CompleteAsync(request, ct);
     }
 }

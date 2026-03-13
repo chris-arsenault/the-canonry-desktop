@@ -1,12 +1,12 @@
-namespace TheCanonry.Desktop.AwsSync;
-
 using System.Windows.Input;
 using TheCanonry.AwsSync.S3;
 using TheCanonry.AwsSync.Sync;
 using TheCanonry.AwsSync.Types;
 using TheCanonry.Desktop.Shared;
 
-public class AwsSyncViewModel : ViewModelBase
+namespace TheCanonry.Desktop.AwsSync;
+
+internal sealed class AwsSyncViewModel : ViewModelBase
 {
     private string _bucketName = "";
     private string _prefix = "";
@@ -124,7 +124,7 @@ public class AwsSyncViewModel : ViewModelBase
             ConnectionStatus = ok ? "Connected" : "Connection failed";
             AppendLog(ok ? "S3 connection successful." : "S3 connection failed — check bucket name and credentials.");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             ConnectionStatus = "Error";
             AppendLog($"ERROR testing connection: {ex.Message}");
@@ -175,7 +175,7 @@ public class AwsSyncViewModel : ViewModelBase
             AppendLog($"Sync complete — {manifest.Entries.Count} images in manifest.");
             SyncProgress = 100;
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             AppendLog($"ERROR during sync: {ex.Message}");
         }
@@ -229,7 +229,7 @@ public class AwsSyncViewModel : ViewModelBase
             await catalogBuilder.BuildAndUploadAsync(manifest, CancellationToken.None);
             AppendLog($"Catalog uploaded with {manifest.Entries.Count} entries.");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             AppendLog($"ERROR uploading catalog: {ex.Message}");
         }

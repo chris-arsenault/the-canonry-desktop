@@ -1,11 +1,11 @@
-namespace TheCanonry.Engine.Engine;
-
 using System.Diagnostics;
 using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Engine.Selection;
 using TheCanonry.Engine.Systems;
 using TheCanonry.Engine.Validation;
+
+namespace TheCanonry.Engine.Engine;
 
 // =============================================================================
 // WORLD RESULT

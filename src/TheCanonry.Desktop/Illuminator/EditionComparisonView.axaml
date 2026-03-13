@@ -1,0 +1,118 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:illum="using:TheCanonry.Desktop.Illuminator"
+             x:Class="TheCanonry.Desktop.Illuminator.EditionComparisonView"
+             x:DataType="illum:EditionComparisonViewModel">
+    <DockPanel>
+        <!-- Action Bar -->
+        <Border DockPanel.Dock="Top" Padding="12,8"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="Load Entities" Command="{Binding RefreshCommand}" />
+                <ProgressBar IsIndeterminate="{Binding IsLoading}" IsVisible="{Binding IsLoading}"
+                             Width="100" Height="4" VerticalAlignment="Center" Margin="12,0,0,0" />
+            </StackPanel>
+        </Border>
+
+        <Grid ColumnDefinitions="280,*">
+            <!-- Entity List -->
+            <Border Grid.Column="0"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="0,0,1,0">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="Entities with Editions" FontWeight="SemiBold"
+                               Padding="12,8" FontSize="14" />
+                    <ListBox ItemsSource="{Binding Entities}" SelectedItem="{Binding SelectedEntity}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="illum:EntityEditionItem">
+                                <DockPanel Margin="4,2">
+                                    <TextBlock DockPanel.Dock="Right" Opacity="0.5" FontSize="11"
+                                               VerticalAlignment="Center" Margin="8,0">
+                                        <Run Text="{Binding EditionCount}" />
+                                        <Run Text=" ed." />
+                                    </TextBlock>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding Kind}" FontSize="11" Opacity="0.5" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+
+            <!-- Comparison Panel -->
+            <DockPanel Grid.Column="1">
+                <!-- Edition Selector -->
+                <Border DockPanel.Dock="Top" Padding="12,8"
+                        Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                        BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        BorderThickness="0,0,0,1">
+                    <StackPanel Orientation="Horizontal" Spacing="16">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Left:" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding Editions}" SelectedItem="{Binding LeftEdition}"
+                                      Width="200" DisplayMemberBinding="{Binding Label}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Right:" VerticalAlignment="Center" FontWeight="SemiBold" />
+                            <ComboBox ItemsSource="{Binding Editions}" SelectedItem="{Binding RightEdition}"
+                                      Width="200" DisplayMemberBinding="{Binding Label}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Side-by-Side Content -->
+                <Grid ColumnDefinitions="*,*">
+                    <!-- Left -->
+                    <Border Grid.Column="0" Padding="16"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="0,0,1,0">
+                        <DockPanel DataContext="{Binding LeftEdition}"
+                                   IsVisible="{Binding $parent[DockPanel].((illum:EditionComparisonViewModel)DataContext).LeftEdition, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                                <TextBlock Text="{Binding Label}" FontSize="16" FontWeight="Bold" />
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <TextBlock FontSize="11" Opacity="0.5">
+                                        <Run Text="{Binding WordCount}" />
+                                        <Run Text=" words" />
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding GeneratedAt}" FontSize="11" Opacity="0.5" />
+                                </StackPanel>
+                            </StackPanel>
+                            <ScrollViewer>
+                                <TextBlock Text="{Binding Content}" TextWrapping="Wrap"
+                                           FontSize="13" LineHeight="20" />
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- Right -->
+                    <Border Grid.Column="1" Padding="16">
+                        <DockPanel DataContext="{Binding RightEdition}"
+                                   IsVisible="{Binding $parent[DockPanel].((illum:EditionComparisonViewModel)DataContext).RightEdition, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                                <TextBlock Text="{Binding Label}" FontSize="16" FontWeight="Bold" />
+                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <TextBlock FontSize="11" Opacity="0.5">
+                                        <Run Text="{Binding WordCount}" />
+                                        <Run Text=" words" />
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding GeneratedAt}" FontSize="11" Opacity="0.5" />
+                                </StackPanel>
+                            </StackPanel>
+                            <ScrollViewer>
+                                <TextBlock Text="{Binding Content}" TextWrapping="Wrap"
+                                           FontSize="13" LineHeight="20" />
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+            </DockPanel>
+        </Grid>
+    </DockPanel>
+</UserControl>

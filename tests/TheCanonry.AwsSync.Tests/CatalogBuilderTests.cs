@@ -1,8 +1,8 @@
-namespace TheCanonry.AwsSync.Tests;
-
 using System.Text.Json;
 using TheCanonry.AwsSync.Sync;
 using TheCanonry.AwsSync.Types;
+
+namespace TheCanonry.AwsSync.Tests;
 
 public class CatalogBuilderTests
 {

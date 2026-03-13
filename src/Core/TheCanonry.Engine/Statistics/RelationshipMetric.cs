@@ -10,5 +10,10 @@ public class RelationshipMetric
     public int Target { get; set; }
     public double Deviation { get; set; }
     public double Trend { get; set; }
-    public List<int> History { get; } = [];
+    private readonly List<int> _history = [];
+
+    public IReadOnlyList<int> History => _history;
+
+    /// <summary>Internal mutable access to history for PopulationTracker.</summary>
+    internal List<int> MutableHistory => _history;
 }

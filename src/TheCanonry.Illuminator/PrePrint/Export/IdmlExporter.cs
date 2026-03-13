@@ -1,7 +1,7 @@
-namespace TheCanonry.Illuminator.PrePrint.Export;
-
 using System.IO.Compression;
 using System.Text;
+
+namespace TheCanonry.Illuminator.PrePrint.Export;
 
 /// <summary>
 /// Generates IDML (InDesign Markup Language) — a complete document package.
@@ -92,7 +92,6 @@ public static class IdmlExporter
 
     private sealed record StoryFile(string Filename, string Xml, string StoryId);
     private sealed record SpreadFile(string Filename, string Xml, string SpreadId, string StoryId);
-    private sealed record MasterSpreadFile(string Filename, string Xml, string SpreadId, string StoryId);
 
     private static List<StoryFile> BuildStories(
         IReadOnlyList<FlattenedNode> flatNodes,

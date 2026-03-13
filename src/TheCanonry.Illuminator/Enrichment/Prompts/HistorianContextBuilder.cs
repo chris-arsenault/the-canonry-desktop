@@ -1,3 +1,4 @@
+using TheCanonry.Illuminator.Chronicle.PerspectiveSynthesis;
 using TheCanonry.Illuminator.Types;
 
 namespace TheCanonry.Illuminator.Enrichment.Prompts;
@@ -39,14 +40,53 @@ public sealed record HistorianReviewContext(
     string RelationshipSummary,
     string CanonFactsSummary,
     string? WorldDynamics,
-    string PreviousNotesSummary);
+    string PreviousNotesSummary)
+{
+    // Entity-mode fields
+    public string? EntityId { get; init; }
+    public string? EntityName { get; init; }
+    public string? EntityKind { get; init; }
+    public string? EntitySubtype { get; init; }
+    public string? EntityCulture { get; init; }
+    public string? EntityProminence { get; init; }
+    public string? Summary { get; init; }
+    public IReadOnlyList<NeighborSummary>? NeighborSummaries { get; init; }
+    public CorpusVoiceDigest? VoiceDigest { get; init; }
+
+    // Chronicle-mode fields
+    public string? ChronicleId { get; init; }
+    public string? ChronicleTitle { get; init; }
+    public string? ChronicleFormat { get; init; }
+    public string? NarrativeStyleId { get; init; }
+    public IReadOnlyList<CastEntry>? Cast { get; init; }
+    public IReadOnlyList<NeighborSummary>? CastSummaries { get; init; }
+    public string? TemporalNarrative { get; init; }
+    public FocalEraInfo? FocalEra { get; init; }
+    public string? TemporalCheckReport { get; init; }
+    public IReadOnlyList<FactGuidanceTarget>? FactCoverageGuidance { get; init; }
+}
+
+public sealed record NeighborSummary(string Name, string Kind, string Summary);
+
+public sealed record CastEntry(string EntityName, string Role, string Kind);
+
+public sealed record FocalEraInfo(string Name, string? Description);
+
+public sealed record FactGuidanceTarget(string FactId, string Action, string? Evidence, string? FactText);
 
 public sealed record CorpusVoiceDigest(
+    int TotalNotes,
+    CorpusLengthHistogram LengthHistogram,
+    IReadOnlyList<string> SuperlativeClaims,
     IReadOnlyList<string> OverusedOpenings,
-    IReadOnlyList<string> OverusedSuperlatives,
-    int AverageLength,
-    int MinLength,
-    int MaxLength);
+    int TangentCount,
+    int TargetCount);
+
+public sealed record CorpusLengthHistogram(
+    int Short,
+    int Medium,
+    int Long,
+    int Total);
 
 /// <summary>
 /// Assembles context objects for historian tasks.
@@ -127,7 +167,7 @@ public static class HistorianContextBuilder
         IReadOnlyList<RelationshipSnapshot> relationships,
         IReadOnlyList<EntitySnapshot> neighbors,
         IReadOnlyList<string> canonFacts,
-        string? worldDynamics,
+        IReadOnlyList<WorldDynamic>? worldDynamics,
         IReadOnlyList<string> previousNotes)
     {
         var relLines = relationships.Select(r =>
@@ -140,30 +180,51 @@ public static class HistorianContextBuilder
         var noteLines = previousNotes.Select(n => $"  {n}");
         var previousNotesSummary = string.Join("\n", noteLines);
 
+        // Flatten structured dynamics to "- text" per line, matching TS historian prompt format
+        var worldDynamicsText = worldDynamics is { Count: > 0 }
+            ? string.Join("\n", worldDynamics.Select(d => $"- {d.Text}"))
+            : null;
+
         return new HistorianReviewContext(
             SourceText: sourceText,
             Tone: "weary",
             NoteType: "entity",
             RelationshipSummary: relationshipSummary,
             CanonFactsSummary: canonFactsSummary,
-            WorldDynamics: worldDynamics,
+            WorldDynamics: worldDynamicsText,
             PreviousNotesSummary: previousNotesSummary);
     }
 
     /// <summary>
     /// Build corpus voice digest — tracks superlatives, overused openings, length distribution.
+    /// Matches TS <c>buildCorpusVoiceDigest</c> from historianContextBuilders.ts.
     /// </summary>
-    public static CorpusVoiceDigest BuildCorpusVoiceDigest(IReadOnlyList<string> existingAnnotations)
+    public static CorpusVoiceDigest BuildCorpusVoiceDigest(
+        IReadOnlyList<string> existingAnnotations,
+        IReadOnlyList<string>? noteTypes = null,
+        int targetCount = 0)
     {
-        if (existingAnnotations.Count == 0)
+        var totalNotes = existingAnnotations.Count;
+        if (totalNotes == 0)
         {
             return new CorpusVoiceDigest(
+                TotalNotes: 0,
+                LengthHistogram: new CorpusLengthHistogram(0, 0, 0, 0),
+                SuperlativeClaims: [],
                 OverusedOpenings: [],
-                OverusedSuperlatives: [],
-                AverageLength: 0,
-                MinLength: 0,
-                MaxLength: 0);
+                TangentCount: 0,
+                TargetCount: targetCount);
         }
+
+        // Word count stats — categorize into short/medium/long buckets
+        var wordCounts = existingAnnotations
+            .Select(a => a.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length)
+            .ToList();
+
+        var shortCount = wordCounts.Count(w => w <= 35);
+        var mediumCount = wordCounts.Count(w => w > 35 && w <= 70);
+        var longCount = wordCounts.Count(w => w > 70);
+        var histogram = new CorpusLengthHistogram(shortCount, mediumCount, longCount, totalNotes);
 
         // Find overused openings (4-word prefix appearing 3+ times)
         var openingCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -182,11 +243,12 @@ public static class HistorianContextBuilder
             .Select(kvp => $"\"{kvp.Key}...\" (x{kvp.Value})")
             .ToList();
 
-        // Find overused superlatives
+        // Find superlative claims
         var superlativePattern = new System.Text.RegularExpressions.Regex(
             @"\bthe (most|only|finest|best|worst|first|last|greatest|single) [^.,;:!?()\[\]""\u2014\n]+",
             System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
+        var superlativeClaims = new List<string>();
         var superlativeCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         foreach (var annotation in existingAnnotations)
         {
@@ -198,27 +260,21 @@ public static class HistorianContextBuilder
             }
         }
 
-        var overusedSuperlatives = superlativeCounts
-            .Where(kvp => kvp.Value >= 2)
-            .OrderByDescending(kvp => kvp.Value)
-            .Take(6)
-            .Select(kvp => $"\"{kvp.Key}\"")
-            .ToList();
+        foreach (var kvp in superlativeCounts.OrderByDescending(k => k.Value))
+        {
+            var prefix = kvp.Value >= 2 ? "[repeated] " : "";
+            superlativeClaims.Add($"{prefix}\"{kvp.Key}\"");
+        }
 
-        // Word count stats
-        var wordCounts = existingAnnotations
-            .Select(a => a.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length)
-            .ToList();
-
-        var avgLength = (int)Math.Round(wordCounts.Average());
-        var minLength = wordCounts.Min();
-        var maxLength = wordCounts.Max();
+        // Count tangent-type notes
+        var tangentCount = noteTypes?.Count(t => string.Equals(t, "tangent", StringComparison.OrdinalIgnoreCase)) ?? 0;
 
         return new CorpusVoiceDigest(
+            TotalNotes: totalNotes,
+            LengthHistogram: histogram,
+            SuperlativeClaims: superlativeClaims,
             OverusedOpenings: overusedOpenings,
-            OverusedSuperlatives: overusedSuperlatives,
-            AverageLength: avgLength,
-            MinLength: minLength,
-            MaxLength: maxLength);
+            TangentCount: tangentCount,
+            TargetCount: targetCount);
     }
 }

@@ -1,7 +1,5 @@
 namespace TheCanonry.Engine.Rules.Types;
 
-using TheCanonry.Engine.Graph;
-
 // =============================================================================
 // GRAPH PATH ASSERTION
 // =============================================================================

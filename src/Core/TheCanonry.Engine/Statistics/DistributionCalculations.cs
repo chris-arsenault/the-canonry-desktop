@@ -1,7 +1,7 @@
-namespace TheCanonry.Engine.Statistics;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Statistics;
 
 /// <summary>
 /// Pure functions for calculating distribution statistics from graph data.

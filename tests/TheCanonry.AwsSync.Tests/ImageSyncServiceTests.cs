@@ -1,10 +1,10 @@
-namespace TheCanonry.AwsSync.Tests;
-
 using SkiaSharp;
 using TheCanonry.AwsSync.Sync;
 using TheCanonry.AwsSync.Types;
 
-public class ImageSyncServiceTests : IDisposable
+namespace TheCanonry.AwsSync.Tests;
+
+public sealed class ImageSyncServiceTests : IDisposable
 {
     private readonly InMemoryS3 _s3 = new();
     private readonly string _tempDir;
@@ -29,6 +29,7 @@ public class ImageSyncServiceTests : IDisposable
     {
         if (Directory.Exists(_tempDir))
             Directory.Delete(_tempDir, recursive: true);
+        GC.SuppressFinalize(this);
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────
@@ -144,7 +145,7 @@ public class ImageSyncServiceTests : IDisposable
         WriteTestImageInSubDir("proj-1", "img-001.png", width: 512, height: 512);
         // HQ file: {projectDir}/{imageId}.hq.png
         var hqDir = Path.Combine(_tempDir, "proj-1");
-        File.WriteAllBytes(Path.Combine(hqDir, "img-001.hq.png"), CreateTestPng(2048, 2048));
+        await File.WriteAllBytesAsync(Path.Combine(hqDir, "img-001.hq.png"), CreateTestPng(2048, 2048));
 
         var service = new ImageSyncService(_s3, _config);
         await service.SyncAsync(_tempDir, "proj-1", ct: CancellationToken.None);
@@ -173,7 +174,7 @@ public class ImageSyncServiceTests : IDisposable
         WriteTestImageInSubDir("proj-1", "img-001.png");
 
         using var cts = new CancellationTokenSource();
-        cts.Cancel(); // Cancel immediately
+        await cts.CancelAsync(); // Cancel immediately
 
         var service = new ImageSyncService(_s3, _config);
 
@@ -251,13 +252,13 @@ public class ImageSyncServiceTests : IDisposable
         Directory.CreateDirectory(projDir);
         var localPath = Path.Combine(projDir, "img-exist.png");
         var localContent = new byte[] { 0xDE, 0xAD }; // Sentinel value
-        File.WriteAllBytes(localPath, localContent);
+        await File.WriteAllBytesAsync(localPath, localContent);
 
         var service = new ImageSyncService(_s3, _config);
         await service.PullAsync(pullDir, projectId: "proj-1", ct: CancellationToken.None);
 
         // Local file should not be overwritten
-        var afterPull = File.ReadAllBytes(localPath);
+        var afterPull = await File.ReadAllBytesAsync(localPath);
         Assert.Equal(localContent, afterPull);
     }
 }

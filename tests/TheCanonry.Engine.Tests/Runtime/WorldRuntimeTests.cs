@@ -1,18 +1,15 @@
-namespace TheCanonry.Engine.Tests.Runtime;
-
-using TheCanonry.Engine.Coordinates;
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
-using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Runtime;
-using TheCanonry.Engine.Selection;
 using TheCanonry.Engine.Statistics;
-using TheCanonry.Engine.Templates;
 using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Engine.Tests.Runtime;
 
 // =============================================================================
 // TEST STUBS
@@ -306,7 +303,7 @@ public class WorldRuntimeTests
         Assert.Equal(35.0, runtime.GetPressure("conflict"));
 
         // Get all pressures
-        var all = runtime.GetAllPressures();
+        var all = runtime.AllPressures;
         Assert.Single(all);
         Assert.Equal(35.0, all["conflict"]);
     }
@@ -416,7 +413,7 @@ public class WorldRuntimeTests
         runtime.CreateEntity(CreateTestEntity("f3", kind: "faction", subtype: "merchant"));
 
         runtime.UpdatePopulationMetrics();
-        var metrics = runtime.GetPopulationMetrics();
+        var metrics = runtime.PopulationMetrics;
 
         Assert.True(metrics.Entities.ContainsKey("faction:merchant"));
         Assert.Equal(3, metrics.Entities["faction:merchant"].Count);

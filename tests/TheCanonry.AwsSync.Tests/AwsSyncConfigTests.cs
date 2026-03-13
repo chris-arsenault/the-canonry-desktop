@@ -1,6 +1,6 @@
-namespace TheCanonry.AwsSync.Tests;
-
 using TheCanonry.AwsSync.Types;
+
+namespace TheCanonry.AwsSync.Tests;
 
 public class AwsSyncConfigTests
 {

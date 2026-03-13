@@ -105,11 +105,11 @@ public static class ForbiddenCombinations
     // Pre-expanded forbidden pairs
     // -------------------------------------------------------------------------
 
-    private static readonly HashSet<(string Artistic, string Composition)> ForbiddenSet;
+    private static readonly HashSet<(string Artistic, string Composition)> ForbiddenSet = BuildForbiddenSet();
 
-    static ForbiddenCombinations()
+    private static HashSet<(string Artistic, string Composition)> BuildForbiddenSet()
     {
-        ForbiddenSet = new HashSet<(string, string)>();
+        var set = new HashSet<(string, string)>();
 
         // Rule 1: document styles × (character | pair | pose | place | landscape | concept |
         //         group-scene | action-battle | formation | council-chamber |
@@ -122,15 +122,15 @@ public static class ForbiddenCombinations
         rule1Comps.UnionWith(PlaceCompositions);
         rule1Comps.UnionWith(LandscapeCompositions);
         rule1Comps.UnionWith(ConceptCompositions);
-        rule1Comps.UnionWith(new[]
-        {
+        rule1Comps.UnionWith(
+        [
             "group-scene", "action-battle", "formation", "council-chamber",
             "chronicle-panorama", "chronicle-overview", "chronicle-intimate",
             "chronicle-symbolic", "chronicle-tableau", "chronicle-folk",
-        });
+        ]);
         foreach (var a in DocumentStyles)
             foreach (var c in rule1Comps)
-                ForbiddenSet.Add((a, c));
+                set.Add((a, c));
 
         // Rule 2: (painting | camera | experimental) × (logo-mark | badge-crest)
         var rule2Arts = new HashSet<string>(StringComparer.Ordinal);
@@ -140,7 +140,7 @@ public static class ForbiddenCombinations
         var rule2Comps = new[] { "logo-mark", "badge-crest" };
         foreach (var a in rule2Arts)
             foreach (var c in rule2Comps)
-                ForbiddenSet.Add((a, c));
+                set.Add((a, c));
 
         // Rule 3: tilt-shift × (character | pair | pose | object | concept)
         var rule3Comps = new HashSet<string>(StringComparer.Ordinal);
@@ -150,18 +150,18 @@ public static class ForbiddenCombinations
         rule3Comps.UnionWith(ObjectCompositions);
         rule3Comps.UnionWith(ConceptCompositions);
         foreach (var c in rule3Comps)
-            ForbiddenSet.Add(("tilt-shift", c));
+            set.Add(("tilt-shift", c));
 
         // Rule 4: (painting | experimental | hdr-nature-photography | cinematic-still |
         //          daguerreotype | double-exposure) × (scientific-drawing | schematic | artifact-diagram)
         var rule4Arts = new HashSet<string>(StringComparer.Ordinal);
         rule4Arts.UnionWith(PaintingStyles);
         rule4Arts.UnionWith(ExperimentalStyles);
-        rule4Arts.UnionWith(new[] { "hdr-nature-photography", "cinematic-still", "daguerreotype", "double-exposure" });
+        rule4Arts.UnionWith(["hdr-nature-photography", "cinematic-still", "daguerreotype", "double-exposure"]);
         var rule4Comps = new[] { "scientific-drawing", "schematic", "artifact-diagram" };
         foreach (var a in rule4Arts)
             foreach (var c in rule4Comps)
-                ForbiddenSet.Add((a, c));
+                set.Add((a, c));
 
         // Rule 5: eldritch-biomechanical × (logo-mark | badge-crest | scientific-drawing |
         //          schematic | display-case | field-study)
@@ -171,7 +171,7 @@ public static class ForbiddenCombinations
             "schematic", "display-case", "field-study",
         };
         foreach (var c in rule5Comps)
-            ForbiddenSet.Add(("eldritch-biomechanical", c));
+            set.Add(("eldritch-biomechanical", c));
 
         // Rule 6: cosmic-chrome × (logo-mark | badge-crest | scientific-drawing | schematic |
         //          artifact-diagram | display-case | map-view | chronicle-document | chronicle-vignette)
@@ -182,7 +182,9 @@ public static class ForbiddenCombinations
             "chronicle-document", "chronicle-vignette",
         };
         foreach (var c in rule6Comps)
-            ForbiddenSet.Add(("cosmic-chrome", c));
+            set.Add(("cosmic-chrome", c));
+
+        return set;
     }
 
     /// <summary>

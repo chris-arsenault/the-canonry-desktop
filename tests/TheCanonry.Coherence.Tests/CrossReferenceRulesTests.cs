@@ -1,12 +1,8 @@
-namespace TheCanonry.Coherence.Tests;
-
 using TheCanonry.Coherence.Types;
-using TheCanonry.Engine.Graph;
-using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Engine.Templates;
 using TheCanonry.Schema.Config;
-using TheCanonry.Schema.Domain;
-using TheCanonry.Schema.Ids;
+
+namespace TheCanonry.Coherence.Tests;
 
 /// <summary>
 /// Tests for invalid-subtype-references, invalid-status-references,

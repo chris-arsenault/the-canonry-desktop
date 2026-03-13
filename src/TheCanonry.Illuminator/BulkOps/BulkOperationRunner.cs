@@ -54,7 +54,7 @@ public static class BulkOperationRunner
                 // Honour cancellation — stop processing
                 break;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OutOfMemoryException)
             {
                 failed++;
                 failures.Add(new BulkFailure(id, name, ex.Message));

@@ -1,8 +1,7 @@
-namespace TheCanonry.Coherence.Rules;
-
 using TheCanonry.Coherence.Types;
 using TheCanonry.Engine.Engine;
-using TheCanonry.Schema.Config;
+
+namespace TheCanonry.Coherence.Rules;
 
 /// <summary>
 /// Rules that validate numeric values are within acceptable ranges.

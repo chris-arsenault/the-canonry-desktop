@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace TheCanonry.Illuminator.Enrichment.Prompts;
 
 /// <summary>
@@ -7,6 +9,36 @@ namespace TheCanonry.Illuminator.Enrichment.Prompts;
 /// </summary>
 public static class BackportPrompts
 {
+    // =========================================================================
+    // Entity context for backport prompt
+    // =========================================================================
+
+    /// <summary>
+    /// Entity context for the backport user prompt.
+    /// Matches TS <c>RevisionEntityContext</c>.
+    /// </summary>
+    public sealed record BackportEntityContext
+    {
+        public required string Id { get; init; }
+        public required string Name { get; init; }
+        public required string Kind { get; init; }
+        public string? Subtype { get; init; }
+        public string? Culture { get; init; }
+        public string? Status { get; init; }
+        public string Prominence { get; init; } = "recognized";
+        public required string Summary { get; init; }
+        public string? Description { get; init; }
+        public string? ChronicleName { get; init; }
+        public IReadOnlyList<string>? Aliases { get; init; }
+        public bool IsPrimary { get; init; }
+        public bool IsLens { get; init; }
+        public string? KindFocus { get; init; }
+        public string? VisualThesis { get; init; }
+        public IReadOnlyList<BackportRelationship> Relationships { get; init; } = [];
+        public IReadOnlyList<string>? ExistingAnchorPhrases { get; init; }
+    }
+
+    public sealed record BackportRelationship(string Kind, string TargetName, string TargetKind);
     // =========================================================================
     // System prompt
     // =========================================================================
@@ -121,40 +153,276 @@ public static class BackportPrompts
     public static string BuildSystemPrompt() => SystemPromptText;
 
     // =========================================================================
+    // Perspective synthesis formatting
+    // =========================================================================
+
+    private static (IReadOnlyList<string> Sections, string ChronicleFormat) FormatPerspectiveSynthesis(
+        string perspectiveSynthesisJson)
+    {
+        var sections = new List<string>();
+        var chronicleFormat = "";
+
+        try
+        {
+            using var doc = JsonDocument.Parse(perspectiveSynthesisJson);
+            var root = doc.RootElement;
+            var synthParts = new List<string>();
+
+            if (root.TryGetProperty("chronicleFormat", out var cfProp))
+                chronicleFormat = cfProp.GetString() ?? "";
+
+            if (root.TryGetProperty("brief", out var briefProp) && briefProp.GetString() is { Length: > 0 } brief)
+                synthParts.Add($"Brief: {brief}");
+
+            if (root.TryGetProperty("facets", out var facetsProp) && facetsProp.ValueKind == JsonValueKind.Array)
+            {
+                var facetLines = new List<string>();
+                foreach (var f in facetsProp.EnumerateArray())
+                {
+                    var factId = f.TryGetProperty("factId", out var fid) ? fid.GetString() ?? "" : "";
+                    var interp = f.TryGetProperty("interpretation", out var ip) ? ip.GetString() ?? "" : "";
+                    facetLines.Add($"  - [{factId}] {interp}");
+                }
+                if (facetLines.Count > 0)
+                    synthParts.Add($"Faceted Facts:\n{string.Join("\n", facetLines)}");
+            }
+
+            if (root.TryGetProperty("narrativeVoice", out var voiceProp) && voiceProp.ValueKind == JsonValueKind.Object)
+            {
+                var voiceLines = new List<string>();
+                foreach (var kv in voiceProp.EnumerateObject())
+                    voiceLines.Add($"  {kv.Name}: {kv.Value.GetString() ?? ""}");
+                if (voiceLines.Count > 0)
+                    synthParts.Add($"Narrative Voice:\n{string.Join("\n", voiceLines)}");
+            }
+
+            if (root.TryGetProperty("entityDirectives", out var dirProp) && dirProp.ValueKind == JsonValueKind.Array)
+            {
+                var dirLines = new List<string>();
+                foreach (var d in dirProp.EnumerateArray())
+                {
+                    var name = d.TryGetProperty("entityName", out var np) ? np.GetString() ?? "" : "";
+                    var dir = d.TryGetProperty("directive", out var dp) ? dp.GetString() ?? "" : "";
+                    dirLines.Add($"  - {name}: {dir}");
+                }
+                if (dirLines.Count > 0)
+                    synthParts.Add($"Entity Directives:\n{string.Join("\n", dirLines)}");
+            }
+
+            if (root.TryGetProperty("suggestedMotifs", out var motifProp) && motifProp.ValueKind == JsonValueKind.Array)
+            {
+                var motifs = new List<string>();
+                foreach (var m in motifProp.EnumerateArray())
+                    if (m.GetString() is { Length: > 0 } s) motifs.Add(s);
+                if (motifs.Count > 0)
+                    synthParts.Add($"Motifs: {string.Join(", ", motifs)}");
+            }
+
+            if (synthParts.Count > 0)
+                sections.Add($"=== PERSPECTIVE SYNTHESIS ===\n{string.Join("\n\n", synthParts)}");
+
+            if (root.TryGetProperty("narrativeDirection", out var ndProp) && ndProp.GetString() is { Length: > 0 } nd)
+            {
+                sections.Add(
+                    $"=== NARRATIVE DIRECTION ===\n" +
+                    $"This chronicle was written with a specific narrative direction: \"{nd}\"\n" +
+                    "Consider this when evaluating which details are chronicle-specific framing vs. durable lore worth backporting.");
+            }
+        }
+        catch (JsonException)
+        {
+            // Fallback: pass raw JSON when parsing fails
+            sections.Add($"=== PERSPECTIVE SYNTHESIS ===\n{perspectiveSynthesisJson}");
+        }
+
+        return (sections, chronicleFormat);
+    }
+
+    // =========================================================================
+    // Entity formatting
+    // =========================================================================
+
+    private static string FormatEntityBlock(BackportEntityContext e)
+    {
+        var parts = new List<string>();
+        var displayName = e.ChronicleName ?? e.Name;
+        var lensTag = e.IsLens ? " [NARRATIVE LENS]" : "";
+        var primaryTag = e.IsPrimary ? " [PRIMARY]" : "";
+        var entityKindLabel = !string.IsNullOrEmpty(e.Subtype) ? $"{e.Kind} / {e.Subtype}" : e.Kind;
+        parts.Add($"### {displayName} ({entityKindLabel}){lensTag}{primaryTag}");
+
+        if (e.ChronicleName is not null && e.ChronicleName != e.Name)
+            parts.Add($"Canonical name: {e.Name}");
+
+        if (e.Aliases is { Count: > 0 })
+            parts.Add($"Also known as: {string.Join(", ", e.Aliases)}");
+
+        parts.Add($"ID: {e.Id}");
+
+        var chronicleRole = e.IsPrimary ? "primary" : "supporting";
+        parts.Add(
+            $"Prominence: {e.Prominence} | Chronicle Role: {chronicleRole} | " +
+            $"Culture: {e.Culture ?? "unknown"} | Status: {e.Status ?? "unknown"}");
+
+        if (!string.IsNullOrEmpty(e.KindFocus))
+            parts.Add($"Description Focus ({e.Kind}): {e.KindFocus}");
+
+        if (!string.IsNullOrEmpty(e.VisualThesis))
+            parts.Add($"Visual Thesis (DO NOT CONTRADICT): {e.VisualThesis}");
+
+        if (e.Relationships.Count > 0)
+        {
+            var relLines = e.Relationships.Select(r => $"  - {r.Kind} \u2192 {r.TargetName} ({r.TargetKind})");
+            parts.Add($"Relationships:\n{string.Join("\n", relLines)}");
+        }
+
+        parts.Add($"Summary: {e.Summary}");
+
+        // Format description with numbered paragraphs
+        var descParagraphs = (e.Description ?? "")
+            .Split("\n\n", StringSplitOptions.RemoveEmptyEntries)
+            .Where(p => !string.IsNullOrWhiteSpace(p))
+            .ToList();
+
+        if (descParagraphs.Count > 1)
+        {
+            parts.Add($"Description ({descParagraphs.Count} paragraphs):");
+            for (var i = 0; i < descParagraphs.Count; i++)
+                parts.Add($"  [{i + 1}] {descParagraphs[i].Trim()}");
+        }
+        else
+        {
+            parts.Add($"Description: {e.Description}");
+        }
+
+        if (e.ExistingAnchorPhrases is { Count: > 0 })
+        {
+            var anchorLines = e.ExistingAnchorPhrases.Select(a => $"  - \"{a}\"");
+            parts.Add($"Existing Anchor Phrases (PRESERVE in description):\n{string.Join("\n", anchorLines)}");
+        }
+
+        return string.Join("\n", parts);
+    }
+
+    private static string BuildEntityTaskBlock(BackportEntityContext e, string criticalNote)
+    {
+        if (e.IsLens)
+        {
+            return $"--- UPDATE: {e.Name} ({e.Kind}) [NARRATIVE LENS] ---\n" +
+                "This entity was the narrative lens \u2014 contextual framing, not a cast member. It was referenced or invoked but did not act as a character. Apply a HIGH BAR for changes.\n\n" +
+                $"For {e.Name}, ask:\n" +
+                $"1. Does the chronicle reveal a genuinely new fact about {e.Name} itself \u2014 a consequence, a new aspect, a status change, or a previously unknown property?\n" +
+                "2. Merely being referenced, invoked, or serving as backdrop is NOT new lore. Skip those.\n" +
+                "3. If there IS new lore: compress into 1 sentence. Most lens entities need NO update.\n" +
+                $"4. Final check: would this change make sense without knowing this chronicle used {e.Name} as a lens?{criticalNote}";
+        }
+
+        return $"--- UPDATE: {e.Name} ({e.Kind}) ---\n" +
+            $"You are writing the standalone wiki article for {e.Name}. A reader may arrive at this page knowing nothing about this chronicle. Every sentence must be about {e.Name}. Every reference to another entity, event, or artifact must be introduced with a brief identifying clause or omitted.\n\n" +
+            $"For {e.Name}, follow the thinking steps:\n" +
+            $"1. What genuinely new facts does the chronicle reveal about {e.Name} specifically?\n" +
+            "2. Does each new fact already appear in the existing description? If so, skip it.\n" +
+            "3. For each new fact: is it a detail refinement (edit existing sentence) or a new fact (add content)?\n" +
+            "4. Compress: 1-2 sentences per new fact. No atmospheric verbs, no scene reconstruction. Scale length to prominence and chronicle role\u2014low-prominence primary entities may warrant more; high-prominence or supporting entities need less.\n" +
+            "5. Match the existing description's tense. Use past tense for chronicle actions, present tense for lasting consequences. Never use \"currently,\" \"now,\" or \"remains\" for chronicle-sourced states.\n" +
+            "6. Avoid resolution language \u2014 no adverbs or phrases that signal arc completion, personal growth, or thematic conclusions.\n" +
+            $"7. Final check: would every sentence make sense to someone who has never read this chronicle?{criticalNote}";
+    }
+
+    // =========================================================================
     // User prompt
     // =========================================================================
 
     /// <summary>
-    /// Builds the user prompt with chronicle text and entity cast for lore backport.
+    /// Builds the user prompt with chronicle text, entity cast, perspective synthesis,
+    /// and per-entity task blocks for lore backport.
+    /// Matches TS <c>buildUserPrompt</c> from chronicleLoreBackportTask.ts.
     /// </summary>
     public static string BuildUserPrompt(
+        IReadOnlyList<BackportEntityContext> entities,
         string chronicleText,
-        string? perspectiveSynthesis = null,
+        string? perspectiveSynthesisJson = null,
         string? customInstructions = null)
     {
         var sections = new List<string>();
 
         sections.Add($"=== CHRONICLE TEXT ===\n{chronicleText}");
 
-        if (!string.IsNullOrEmpty(perspectiveSynthesis))
-            sections.Add($"=== PERSPECTIVE SYNTHESIS ===\n{perspectiveSynthesis}");
+        // Parse perspective synthesis into structured sections
+        var chronicleFormat = "";
+        if (!string.IsNullOrEmpty(perspectiveSynthesisJson))
+        {
+            var synthResult = FormatPerspectiveSynthesis(perspectiveSynthesisJson);
+            sections.AddRange(synthResult.Sections);
+            chronicleFormat = synthResult.ChronicleFormat;
+        }
 
-        var criticalSection = !string.IsNullOrEmpty(customInstructions)
-            ? $"\n\n## CRITICAL — User Instructions\n\nThe following user-provided instructions override default behavior. Apply them to EVERY entity update:\n\n{customInstructions}\n"
+        // Separate cast and lens entities
+        var castEntities = entities.Where(e => !e.IsLens).ToList();
+        var lensEntities = entities.Where(e => e.IsLens).ToList();
+
+        // Cast entities section
+        var castLines = castEntities.Select(e => FormatEntityBlock(e));
+        sections.Add(
+            $"=== CAST ({castEntities.Count} entities) ===\n\n{string.Join("\n\n---\n\n", castLines)}");
+
+        // Lens entities section
+        if (lensEntities.Count > 0)
+        {
+            var lensLines = lensEntities.Select(e => FormatEntityBlock(e));
+            var entityWord = lensEntities.Count == 1 ? "entity" : "entities";
+            sections.Add(
+                $"=== NARRATIVE LENS ({lensEntities.Count} {entityWord}) ===\n" +
+                "These entities provided contextual framing for the chronicle \u2014 they are not cast members. " +
+                "Apply a higher bar: only update if the chronicle reveals genuinely new facts about the entity itself.\n\n" +
+                string.Join("\n\n---\n\n", lensLines));
+        }
+
+        // Document format note
+        var documentFormatNote = chronicleFormat == "document"
+            ? "\nThis chronicle is written in document format \u2014 it reports events and outcomes factually. " +
+              "Extract institutional outcomes, status changes, and territorial shifts. Attribute each fact to the entity that owns it."
             : "";
 
-        var documentFormatNote = "";
+        // Per-entity task blocks
+        var criticalNote = !string.IsNullOrEmpty(customInstructions)
+            ? $"\nCRITICAL \u2014 USER INSTRUCTIONS: {customInstructions}"
+            : "";
+
+        var entityTaskBlocks = string.Join("\n\n",
+            entities.Select(e => BuildEntityTaskBlock(e, criticalNote)));
+
+        var criticalSection = !string.IsNullOrEmpty(customInstructions)
+            ? $"\n\n## CRITICAL \u2014 User Instructions\n\nThe following user-provided instructions override " +
+              $"default behavior. Apply them to EVERY entity update:\n\n{customInstructions}\n"
+            : "";
 
         sections.Add(
             $"=== YOUR TASK ==={criticalSection}\n" +
-            $"Process each entity below independently. For each one, reset your focus — you are writing that entity's wiki article, not summarizing the chronicle.{documentFormatNote}\n\n" +
+            $"Process each entity below independently. For each one, reset your focus \u2014 you are writing " +
+            $"that entity's wiki article, not summarizing the chronicle.{documentFormatNote}\n\n" +
             "General rules:\n" +
             "- Summary: append 0-1 sentences. Most entities need no summary change.\n" +
             "- Description: output as an array of paragraph strings. Integrate detail refinements into existing sentences. Add new lore as new content. Preserve all existing information.\n" +
             "- Zero overlap: never restate a fact already in the description.\n" +
             "- Cross-entity overlap: each fact belongs to one entity. Do not duplicate facts across entities.\n" +
-            "- Preserve visual thesis.");
+            $"- Preserve visual thesis.\n\n{entityTaskBlocks}");
 
         return string.Join("\n\n", sections);
+    }
+
+    /// <summary>
+    /// Backwards-compatible overload for callers that don't have entity data yet.
+    /// </summary>
+    public static string BuildUserPrompt(
+        string chronicleText,
+        string? perspectiveSynthesisJson = null,
+        string? customInstructions = null)
+    {
+        return BuildUserPrompt(
+            Array.Empty<BackportEntityContext>(),
+            chronicleText,
+            perspectiveSynthesisJson,
+            customInstructions);
     }
 }

@@ -1,8 +1,8 @@
-namespace TheCanonry.Schema.Json;
-
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TheCanonry.Schema.Config;
+
+namespace TheCanonry.Schema.Json;
 
 /// <summary>
 /// Deserializes region bounds from the domain JSON format where circles use

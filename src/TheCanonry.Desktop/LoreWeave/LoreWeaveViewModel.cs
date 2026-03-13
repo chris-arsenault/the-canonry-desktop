@@ -1,5 +1,3 @@
-namespace TheCanonry.Desktop.Forge;
-
 using System.Windows.Input;
 using TheCanonry.Desktop.Shared;
 using TheCanonry.Engine.Config;
@@ -12,7 +10,12 @@ using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
 
-public class ForgeViewModel : ViewModelBase
+namespace TheCanonry.Desktop.LoreWeave;
+
+// CA1001: _cts is created and disposed within RunSimulationAsync; the ViewModel doesn't own a long-lived disposable.
+#pragma warning disable CA1001
+internal sealed class LoreWeaveViewModel : ViewModelBase
+#pragma warning restore CA1001
 {
     private bool _isRunning;
     private int _currentTick;
@@ -35,7 +38,7 @@ public class ForgeViewModel : ViewModelBase
     private IReadOnlyList<DeclarativePressure>? _loadedPressures;
     private bool _configLoaded;
 
-    public ForgeViewModel()
+    public LoreWeaveViewModel()
     {
         RunSimulationCommand = new AsyncRelayCommand(RunSimulationAsync, () => !IsRunning);
         StopSimulationCommand = new RelayCommand(StopSimulation, () => IsRunning);
@@ -176,9 +179,6 @@ public class ForgeViewModel : ViewModelBase
             var result = await engine.RunAsync(_cts.Token);
             var elapsed = DateTime.Now - startTime;
 
-            // TODO: Persist results to SQLite via repositories once DI is wired up.
-            // Repositories: EntityRepository, RelationshipRepository, NarrativeEventRepository
-
             var summary =
                 $"Done — {result.TotalEntities} entities, {result.TotalRelationships} relationships, " +
                 $"{result.TotalTicks} ticks in {elapsed.TotalSeconds:F1}s";
@@ -190,7 +190,7 @@ public class ForgeViewModel : ViewModelBase
             StatusMessage = "Simulation cancelled";
             AppendLog("Simulation cancelled by user.");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             StatusMessage = $"Error: {ex.Message}";
             AppendLog($"ERROR: {ex.Message}");
@@ -253,7 +253,7 @@ public class ForgeViewModel : ViewModelBase
             StatusMessage = msg;
             AppendLog(msg);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             _configLoaded = false;
             StatusMessage = $"Load failed: {ex.Message}";
@@ -268,14 +268,6 @@ public class ForgeViewModel : ViewModelBase
         LogOutput += $"[{DateTime.Now:HH:mm:ss}] {message}\n";
     }
 
-    // =========================================================================
-    // INNER STUBS
-    // =========================================================================
-
-    /// <summary>
-    /// Stub name service that returns placeholder names.
-    /// Replace with the real NameForge service once DI is wired up.
-    /// </summary>
     private sealed class StubNameService : INameGenerationService
     {
         private int _counter;
@@ -294,9 +286,6 @@ public class ForgeViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Emitter that forwards log messages to the ForgeViewModel log output.
-    /// </summary>
     private sealed class LoggingEmitter(Action<string> appendLog) : ISimulationEmitter
     {
         public void Progress(ProgressPayload payload) { }

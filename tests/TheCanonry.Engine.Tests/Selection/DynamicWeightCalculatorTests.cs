@@ -1,7 +1,7 @@
-namespace TheCanonry.Engine.Tests.Selection;
-
 using TheCanonry.Engine.Selection;
 using TheCanonry.Engine.Statistics;
+
+namespace TheCanonry.Engine.Tests.Selection;
 
 public class DynamicWeightCalculatorTests
 {

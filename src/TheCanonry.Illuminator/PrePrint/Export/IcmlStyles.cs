@@ -1,6 +1,6 @@
-namespace TheCanonry.Illuminator.PrePrint.Export;
-
 using System.Text;
+
+namespace TheCanonry.Illuminator.PrePrint.Export;
 
 /// <summary>
 /// InDesign paragraph and character style definitions.

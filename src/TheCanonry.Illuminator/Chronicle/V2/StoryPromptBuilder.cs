@@ -19,6 +19,7 @@ public sealed record StoryPromptContext
     public string? EventInstructions { get; init; }
     public string? ProseInstructions { get; init; }
     public string? CraftPosture { get; init; }
+    public string? StyleName { get; init; }
     public int MinWords { get; init; } = 2000;
     public int MaxWords { get; init; } = 4000;
     public int MinScenes { get; init; } = 3;
@@ -36,7 +37,7 @@ public static class StoryPromptBuilder
     /// <summary>
     /// Returns the system prompt for story-format chronicle generation.
     /// </summary>
-    public static string GetSystemPrompt() =>
+    public static string SystemPrompt =>
         """
         You are an expert fantasy author writing engaging fiction. Your readers expect vivid characters, emotional truth, and prose that lands.
 
@@ -82,7 +83,7 @@ public static class StoryPromptBuilder
             sections.Add($"# Narrative Structure\n{ctx.NarrativeInstructions}");
 
         if (ctx.EventInstructions is not null)
-            sections.Add($"# Event Usage\n{ctx.EventInstructions}");
+            sections.Add($"# How to Use Events\n{ctx.EventInstructions}");
 
         var narrativeVoice = PromptSections.BuildNarrativeVoiceSection(ctx.NarrativeVoice);
         if (!string.IsNullOrEmpty(narrativeVoice))
@@ -92,18 +93,42 @@ public static class StoryPromptBuilder
         if (!string.IsNullOrEmpty(entityDirectives))
             sections.Add(entityDirectives);
 
-        if (ctx.ProseInstructions is not null || ctx.CraftPosture is not null)
         {
+            var tone = ctx.GenerationContext.Tone;
+            var hasContent = false;
             var styleLines = new List<string> { "# Writing Style" };
+
+            if (!string.IsNullOrEmpty(tone))
+            {
+                styleLines.Add("");
+                styleLines.Add(tone);
+                hasContent = true;
+            }
+
             if (ctx.ProseInstructions is not null)
+            {
+                if (hasContent) styleLines.Add("");
+                var header = ctx.StyleName is not null ? $"## Prose: {ctx.StyleName}" : "## Prose";
+                styleLines.Add(header);
                 styleLines.Add(ctx.ProseInstructions);
+                hasContent = true;
+            }
+
             if (ctx.CraftPosture is not null)
-                styleLines.Add($"\nCraft Posture: {ctx.CraftPosture}");
-            sections.Add(string.Join("\n", styleLines));
+            {
+                if (hasContent) styleLines.Add("");
+                styleLines.Add("## Craft Posture");
+                styleLines.Add("How to relate to the material — density, withholding, and elaboration:");
+                styleLines.Add(ctx.CraftPosture);
+                hasContent = true;
+            }
+
+            if (hasContent)
+                sections.Add(string.Join("\n", styleLines));
         }
 
         // WORLD DATA
-        var castSection = BuildCastSection(ctx.PrimaryEntities, ctx.SupportingEntities);
+        var castSection = BuildCastSection(ctx);
         if (!string.IsNullOrEmpty(castSection))
             sections.Add(castSection);
 
@@ -137,36 +162,50 @@ public static class StoryPromptBuilder
         Your goal: A story that readers remember — with characters they care about, moments that land, and prose that moves. The world exists through what characters notice and feel, not through explanation.
 
         Requirements:
+        - Assign the provided characters to the narrative roles defined below
         - Follow the plot structure and scene progression
         - Incorporate the listed events as lived moments, not reported history
+        - Use the research notes as inspiration for how characters relate
         - Write directly with no section headers or meta-commentary
         """;
 
-    private static string BuildCastSection(
-        IReadOnlyList<EntityContext> primary,
-        IReadOnlyList<EntityContext> supporting)
+    private static string BuildCastSection(StoryPromptContext ctx)
     {
+        var primary = ctx.PrimaryEntities;
+        var supporting = ctx.SupportingEntities;
+
         if (primary.Count == 0 && supporting.Count == 0)
             return string.Empty;
 
-        var lines = new List<string> { "# Cast" };
+        var total = primary.Count + supporting.Count;
+        var lines = new List<string> { $"# Cast ({total} characters)" };
+        lines.Add("");
+        lines.Add(
+            "**Temporal context**: Entity descriptions reflect their CURRENT state — who they became, how they ended up. " +
+            "This chronicle depicts PAST EVENTS when characters who are now dead/changed were alive and active. " +
+            "Write them as they WERE during the story, not as they ARE now.");
 
         if (primary.Count > 0)
         {
-            lines.Add("Primary characters:");
+            lines.Add("");
+            lines.Add("## Primary Characters");
             foreach (var e in primary)
             {
                 lines.Add("");
+                lines.Add($"### {e.Name}");
                 lines.Add(PromptSections.FormatEntityFull(e));
             }
         }
 
         if (supporting.Count > 0)
         {
-            if (primary.Count > 0) lines.Add("");
-            lines.Add("Supporting characters:");
+            lines.Add("");
+            lines.Add("## Supporting Characters");
             foreach (var e in supporting)
-                lines.Add($"- {PromptSections.FormatEntityBrief(e)}");
+            {
+                lines.Add("");
+                lines.Add(PromptSections.FormatEntityBrief(e));
+            }
         }
 
         return string.Join("\n", lines);

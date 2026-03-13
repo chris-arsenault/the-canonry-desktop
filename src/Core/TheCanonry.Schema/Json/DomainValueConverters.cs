@@ -1,9 +1,9 @@
-namespace TheCanonry.Schema.Json;
-
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
+
+namespace TheCanonry.Schema.Json;
 
 public class EntityKindConverter : JsonConverter<EntityKind>
 {

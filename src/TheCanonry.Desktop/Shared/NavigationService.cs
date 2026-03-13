@@ -1,8 +1,8 @@
-namespace TheCanonry.Desktop.Shared;
-
 using System.Collections.ObjectModel;
 
-public class NavigationService : ViewModelBase
+namespace TheCanonry.Desktop.Shared;
+
+internal sealed class NavigationService : ViewModelBase
 {
     private readonly IServiceProvider _services;
     private ViewModelBase? _currentView;

@@ -1,5 +1,3 @@
-namespace TheCanonry.Engine.Config;
-
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TheCanonry.Engine.Engine;
@@ -8,6 +6,8 @@ using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Engine.Templates;
 using TheCanonry.Schema.Json;
+
+namespace TheCanonry.Engine.Config;
 
 /// <summary>
 /// Loads engine configuration files (eras, generators, systems, pressures) from a

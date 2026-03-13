@@ -1,5 +1,3 @@
-namespace TheCanonry.Engine.Tests.Engine;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Pressures;
@@ -14,6 +12,8 @@ using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Tests.Engine;
 
 // =============================================================================
 // TEST STUBS
@@ -342,7 +342,7 @@ public class WorldEngineTests
 
         // Cancel immediately — the engine should stop after the first epoch completes
         using var cts = new CancellationTokenSource();
-        cts.Cancel();
+        await cts.CancelAsync();
 
         var result = await engine.RunAsync(cts.Token);
 

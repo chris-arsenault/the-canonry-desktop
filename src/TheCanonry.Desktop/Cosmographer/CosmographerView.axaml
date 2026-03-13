@@ -1,0 +1,453 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cosmo="using:TheCanonry.Desktop.Cosmographer"
+             x:Class="TheCanonry.Desktop.Cosmographer.CosmographerView"
+             x:DataType="cosmo:CosmographerViewModel">
+    <DockPanel>
+
+        <!-- Section Navigation Bar -->
+        <Border DockPanel.Dock="Top" Padding="12,8"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Right" Text="{Binding StatusMessage}"
+                           VerticalAlignment="Center" Opacity="0.6" FontSize="12"
+                           Margin="16,0,0,0" />
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <Button Content="Axis Registry" Command="{Binding GoToAxesCommand}"
+                            Classes.accent="{Binding IsAxesActive}" />
+                    <Button Content="Semantic Planes" Command="{Binding GoToPlanesCommand}"
+                            Classes.accent="{Binding IsPlanesActive}" />
+                    <Button Content="Culture Biases" Command="{Binding GoToCulturesCommand}"
+                            Classes.accent="{Binding IsCulturesActive}" />
+                    <Button Content="Entities" Command="{Binding GoToEntitiesCommand}"
+                            Classes.accent="{Binding IsEntitiesActive}" />
+                    <Button Content="Relationships" Command="{Binding GoToRelationshipsCommand}"
+                            Classes.accent="{Binding IsRelationshipsActive}" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!--  Section 1: Axis Registry                      -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <Grid ColumnDefinitions="250,*" IsVisible="{Binding IsAxesActive}">
+            <!-- Axis List -->
+            <DockPanel Grid.Column="0">
+                <Border DockPanel.Dock="Top" Padding="8">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Button Content="+ Add" Command="{Binding AddAxisCommand}" />
+                        <Button Content="- Remove" Command="{Binding RemoveAxisCommand}" />
+                    </StackPanel>
+                </Border>
+                <Border DockPanel.Dock="Bottom" Padding="8">
+                    <Button Content="Save Axes" Command="{Binding SaveAxesCommand}"
+                            HorizontalAlignment="Stretch" Classes="accent" />
+                </Border>
+                <ListBox ItemsSource="{Binding Axes}" SelectedItem="{Binding SelectedAxis}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="cosmo:EditableAxis">
+                            <StackPanel Margin="4,2">
+                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding Id}" FontSize="11" Opacity="0.5" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+
+            <!-- Axis Detail -->
+            <Border Grid.Column="1"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1,0,0,0"
+                    Padding="16"
+                    IsVisible="{Binding SelectedAxis, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <ScrollViewer>
+                    <StackPanel Spacing="8" DataContext="{Binding SelectedAxis}" MaxWidth="500">
+                        <TextBlock Text="Edit Axis" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
+
+                        <TextBlock Text="Name" FontSize="11" Opacity="0.6" />
+                        <TextBox Text="{Binding Name}" />
+
+                        <TextBlock Text="Id (auto-generated)" FontSize="11" Opacity="0.6" />
+                        <TextBox Text="{Binding Id}" IsReadOnly="True" Opacity="0.7" />
+
+                        <TextBlock Text="Description" FontSize="11" Opacity="0.6" />
+                        <TextBox Text="{Binding Description}" AcceptsReturn="True" MinHeight="60" />
+
+                        <TextBlock Text="Low Tag" FontSize="11" Opacity="0.6" />
+                        <TextBox Text="{Binding LowTag}" />
+
+                        <TextBlock Text="High Tag" FontSize="11" Opacity="0.6" />
+                        <TextBox Text="{Binding HighTag}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!--  Section 2: Semantic Planes (read-only)        -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <Grid ColumnDefinitions="250,*" IsVisible="{Binding IsPlanesActive}">
+            <!-- Entity Kind List -->
+            <DockPanel Grid.Column="0">
+                <TextBlock DockPanel.Dock="Top" Text="Entity Kinds with Planes"
+                           FontWeight="SemiBold" Margin="8" FontSize="12" Opacity="0.6" />
+                <ListBox ItemsSource="{Binding Planes}" SelectedItem="{Binding SelectedPlane}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="cosmo:SemanticPlaneDisplay">
+                            <TextBlock Text="{Binding EntityKindValue}" FontWeight="SemiBold" Margin="4,4" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+
+            <!-- Plane Detail -->
+            <Border Grid.Column="1"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1,0,0,0"
+                    Padding="16"
+                    IsVisible="{Binding SelectedPlane, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <ScrollViewer>
+                    <StackPanel Spacing="12" DataContext="{Binding SelectedPlane}">
+                        <TextBlock FontSize="16" FontWeight="SemiBold">
+                            <Run Text="Semantic Plane: " />
+                            <Run Text="{Binding EntityKindValue}" FontWeight="Bold" />
+                        </TextBlock>
+
+                        <!-- Axis Assignments -->
+                        <Border Padding="12" CornerRadius="4"
+                                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,0">
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="X Axis:" FontWeight="SemiBold"
+                                           Margin="0,2,12,2" />
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding AxisXId}" />
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Y Axis:" FontWeight="SemiBold"
+                                           Margin="0,2,12,2" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding AxisYId}" />
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Z Axis:" FontWeight="SemiBold"
+                                           Margin="0,2,12,2" />
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding AxisZId}" />
+                            </Grid>
+                        </Border>
+
+                        <!-- Regions -->
+                        <TextBlock Text="Regions" FontWeight="SemiBold" FontSize="14" Margin="0,8,0,4" />
+                        <ItemsControl ItemsSource="{Binding Regions}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="cosmo:RegionDisplay">
+                                    <Border Margin="0,2" Padding="8,6" CornerRadius="4"
+                                            Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+                                        <DockPanel>
+                                            <Border DockPanel.Dock="Left" Width="14" Height="14"
+                                                    CornerRadius="2" Margin="0,0,8,0"
+                                                    Background="{Binding Color}" />
+                                            <StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <TextBlock Text="{Binding Label}" FontWeight="SemiBold" />
+                                                    <TextBlock Text="{Binding Id}" FontSize="11" Opacity="0.5" />
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="12">
+                                                    <TextBlock FontSize="11" Opacity="0.6">
+                                                        <Run Text="Culture: " />
+                                                        <Run Text="{Binding Culture}" />
+                                                    </TextBlock>
+                                                    <TextBlock Text="{Binding Tags}" FontSize="11" Opacity="0.5" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!--  Section 3: Culture Biases                     -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <DockPanel IsVisible="{Binding IsCulturesActive}">
+            <Border DockPanel.Dock="Bottom" Padding="12,8"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="0,1,0,0">
+                <Button Content="Save Culture Biases" Command="{Binding SaveCultureBiasesCommand}"
+                        HorizontalAlignment="Right" Classes="accent" />
+            </Border>
+            <ScrollViewer>
+                <ItemsControl ItemsSource="{Binding CultureBiasGroups}" Margin="12">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="cosmo:CultureBiasGroup">
+                            <Border Margin="0,0,0,8" Padding="12" CornerRadius="4"
+                                    Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+                                <StackPanel>
+                                    <!-- Culture Header (click to expand) -->
+                                    <DockPanel>
+                                        <ToggleButton DockPanel.Dock="Left"
+                                                      IsChecked="{Binding IsExpanded}"
+                                                      Content="{Binding CultureName}"
+                                                      FontWeight="SemiBold" FontSize="14"
+                                                      HorizontalAlignment="Left" />
+                                        <TextBlock DockPanel.Dock="Right"
+                                                   Text="{Binding CultureId}" Opacity="0.5"
+                                                   FontSize="11" VerticalAlignment="Center"
+                                                   HorizontalAlignment="Right" />
+                                    </DockPanel>
+
+                                    <!-- Bias Sliders (visible when expanded) -->
+                                    <ItemsControl ItemsSource="{Binding Biases}"
+                                                  IsVisible="{Binding IsExpanded}"
+                                                  Margin="0,8,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="cosmo:EditableCultureBias">
+                                                <Border Margin="0,4" Padding="8,4">
+                                                    <StackPanel Spacing="4">
+                                                        <TextBlock Text="{Binding EntityKind}"
+                                                                   FontWeight="SemiBold" FontSize="12" />
+                                                        <Grid ColumnDefinitions="40,*,60" RowDefinitions="Auto,Auto,Auto">
+                                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="X:"
+                                                                       VerticalAlignment="Center" FontSize="12" />
+                                                            <Slider Grid.Row="0" Grid.Column="1"
+                                                                    Value="{Binding X}"
+                                                                    Minimum="0" Maximum="100" />
+                                                            <TextBlock Grid.Row="0" Grid.Column="2"
+                                                                       Text="{Binding X, StringFormat='{}{0:F1}'}"
+                                                                       VerticalAlignment="Center" FontSize="11"
+                                                                       HorizontalAlignment="Right" />
+
+                                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Y:"
+                                                                       VerticalAlignment="Center" FontSize="12" />
+                                                            <Slider Grid.Row="1" Grid.Column="1"
+                                                                    Value="{Binding Y}"
+                                                                    Minimum="0" Maximum="100" />
+                                                            <TextBlock Grid.Row="1" Grid.Column="2"
+                                                                       Text="{Binding Y, StringFormat='{}{0:F1}'}"
+                                                                       VerticalAlignment="Center" FontSize="11"
+                                                                       HorizontalAlignment="Right" />
+
+                                                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Z:"
+                                                                       VerticalAlignment="Center" FontSize="12" />
+                                                            <Slider Grid.Row="2" Grid.Column="1"
+                                                                    Value="{Binding Z}"
+                                                                    Minimum="0" Maximum="100" />
+                                                            <TextBlock Grid.Row="2" Grid.Column="2"
+                                                                       Text="{Binding Z, StringFormat='{}{0:F1}'}"
+                                                                       VerticalAlignment="Center" FontSize="11"
+                                                                       HorizontalAlignment="Right" />
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </DockPanel>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!--  Section 4: Seed Entities                      -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <Grid ColumnDefinitions="280,*" IsVisible="{Binding IsEntitiesActive}">
+            <!-- Entity List -->
+            <DockPanel Grid.Column="0">
+                <Border DockPanel.Dock="Top" Padding="8">
+                    <StackPanel Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Button Content="+ Add" Command="{Binding AddEntityCommand}" />
+                            <Button Content="- Remove" Command="{Binding RemoveEntityCommand}" />
+                        </StackPanel>
+                        <ComboBox ItemsSource="{Binding EntityKindFilterOptions}"
+                                  SelectedItem="{Binding EntityKindFilter}"
+                                  PlaceholderText="Filter by kind..."
+                                  HorizontalAlignment="Stretch" />
+                    </StackPanel>
+                </Border>
+                <Border DockPanel.Dock="Bottom" Padding="8">
+                    <Button Content="Save Entities" Command="{Binding SaveEntitiesCommand}"
+                            HorizontalAlignment="Stretch" Classes="accent" />
+                </Border>
+                <ListBox ItemsSource="{Binding Entities}" SelectedItem="{Binding SelectedEntity}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="cosmo:EditableSeedEntity">
+                            <DockPanel Margin="4,2">
+                                <TextBlock DockPanel.Dock="Right" Text="{Binding Kind}"
+                                           Opacity="0.5" FontSize="11" VerticalAlignment="Center"
+                                           Margin="8,0" />
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding Id}" FontSize="11" Opacity="0.5" />
+                                </StackPanel>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+
+            <!-- Entity Detail -->
+            <Border Grid.Column="1"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1,0,0,0"
+                    Padding="16"
+                    IsVisible="{Binding SelectedEntity, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <ScrollViewer>
+                    <StackPanel Spacing="8" DataContext="{Binding SelectedEntity}" MaxWidth="600">
+                        <TextBlock Text="Edit Entity" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
+
+                        <TextBlock Text="Id" FontSize="11" Opacity="0.6" />
+                        <TextBox Text="{Binding Id}" />
+
+                        <TextBlock Text="Name" FontSize="11" Opacity="0.6" />
+                        <TextBox Text="{Binding Name}" />
+
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
+                            <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,8,0">
+                                <TextBlock Text="Kind" FontSize="11" Opacity="0.6" />
+                                <ComboBox ItemsSource="{Binding $parent[UserControl].((cosmo:CosmographerViewModel)DataContext).AvailableEntityKindValues}"
+                                          SelectedItem="{Binding Kind}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="0" Grid.Column="1">
+                                <TextBlock Text="Subtype" FontSize="11" Opacity="0.6" />
+                                <ComboBox ItemsSource="{Binding $parent[UserControl].((cosmo:CosmographerViewModel)DataContext).AvailableSubtypes}"
+                                          SelectedItem="{Binding Subtype}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto" Margin="0,4,0,0">
+                            <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                <TextBlock Text="Status" FontSize="11" Opacity="0.6" />
+                                <ComboBox ItemsSource="{Binding $parent[UserControl].((cosmo:CosmographerViewModel)DataContext).AvailableStatuses}"
+                                          SelectedItem="{Binding Status}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Culture" FontSize="11" Opacity="0.6" />
+                                <ComboBox ItemsSource="{Binding $parent[UserControl].((cosmo:CosmographerViewModel)DataContext).AvailableCultureNames}"
+                                          SelectedItem="{Binding Culture}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="Prominence" FontSize="11" Opacity="0.6" />
+                        <ComboBox ItemsSource="{Binding $parent[UserControl].((cosmo:CosmographerViewModel)DataContext).ProminenceOptions}"
+                                  SelectedItem="{Binding $parent[UserControl].((cosmo:CosmographerViewModel)DataContext).SelectedProminenceOption}"
+                                  HorizontalAlignment="Stretch">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="cosmo:ProminenceOption">
+                                    <TextBlock Text="{Binding Label}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <TextBlock Text="Summary" FontSize="11" Opacity="0.6" />
+                        <TextBox Text="{Binding Summary}" AcceptsReturn="True" MinHeight="60" />
+
+                        <TextBlock Text="Tags (comma-separated)" FontSize="11" Opacity="0.6" />
+                        <TextBox Text="{Binding TagsText}" />
+
+                        <!-- Coordinates -->
+                        <TextBlock Text="Coordinates" FontSize="14" FontWeight="SemiBold" Margin="0,8,0,4" />
+                        <Grid ColumnDefinitions="40,*,60" RowDefinitions="Auto,Auto,Auto">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="X:" VerticalAlignment="Center" />
+                            <Slider Grid.Row="0" Grid.Column="1" Value="{Binding CoordX}"
+                                    Minimum="0" Maximum="100" />
+                            <TextBlock Grid.Row="0" Grid.Column="2"
+                                       Text="{Binding CoordX, StringFormat='{}{0:F1}'}"
+                                       VerticalAlignment="Center" FontSize="11" HorizontalAlignment="Right" />
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Y:" VerticalAlignment="Center" />
+                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding CoordY}"
+                                    Minimum="0" Maximum="100" />
+                            <TextBlock Grid.Row="1" Grid.Column="2"
+                                       Text="{Binding CoordY, StringFormat='{}{0:F1}'}"
+                                       VerticalAlignment="Center" FontSize="11" HorizontalAlignment="Right" />
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Z:" VerticalAlignment="Center" />
+                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding CoordZ}"
+                                    Minimum="0" Maximum="100" />
+                            <TextBlock Grid.Row="2" Grid.Column="2"
+                                       Text="{Binding CoordZ, StringFormat='{}{0:F1}'}"
+                                       VerticalAlignment="Center" FontSize="11" HorizontalAlignment="Right" />
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!--  Section 5: Seed Relationships                 -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <DockPanel IsVisible="{Binding IsRelationshipsActive}">
+            <!-- Bottom: Add Form + Save -->
+            <Border DockPanel.Dock="Bottom" Padding="12,8"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="0,1,0,0">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Save Relationships"
+                            Command="{Binding SaveRelationshipsCommand}"
+                            Classes="accent" Margin="8,0,0,0" />
+                    <Button DockPanel.Dock="Right" Content="- Remove"
+                            Command="{Binding RemoveRelationshipCommand}" Margin="4,0,0,0" />
+                    <Button DockPanel.Dock="Right" Content="+ Add"
+                            Command="{Binding AddRelationshipCommand}" Margin="4,0,0,0" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <ComboBox ItemsSource="{Binding AvailableRelationshipKindValues}"
+                                  SelectedItem="{Binding NewRelKind}"
+                                  PlaceholderText="Kind..." Width="140" />
+                        <ComboBox ItemsSource="{Binding AvailableSourceEntities}"
+                                  SelectedItem="{Binding NewRelSrc}"
+                                  PlaceholderText="Source..." Width="160" />
+                        <ComboBox ItemsSource="{Binding AvailableDestinationEntities}"
+                                  SelectedItem="{Binding NewRelDst}"
+                                  PlaceholderText="Dest..." Width="160" />
+                        <NumericUpDown Value="{Binding NewRelStrength}"
+                                       Minimum="0" Maximum="1" Increment="0.05"
+                                       FormatString="F2" Width="100" />
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- Top: Filter -->
+            <Border DockPanel.Dock="Top" Padding="12,8"
+                    Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="0,0,0,1">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Filter by kind:" VerticalAlignment="Center" Opacity="0.6" />
+                    <ComboBox ItemsSource="{Binding RelationshipKindFilterOptions}"
+                              SelectedItem="{Binding RelationshipKindFilter}"
+                              PlaceholderText="All kinds" Width="200" />
+                </StackPanel>
+            </Border>
+
+            <!-- Relationship List -->
+            <ListBox ItemsSource="{Binding Relationships}" SelectedItem="{Binding SelectedRelationship}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="cosmo:EditableSeedRelationship">
+                        <DockPanel Margin="4,4">
+                            <TextBlock DockPanel.Dock="Right"
+                                       Text="{Binding Strength, StringFormat='S:{0:F2}'}"
+                                       Opacity="0.5" FontSize="11" VerticalAlignment="Center"
+                                       Margin="12,0" />
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="{Binding Src}" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding Kind}" Opacity="0.6" FontStyle="Italic" />
+                                    <TextBlock Text="{Binding Dst}" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </StackPanel>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+
+    </DockPanel>
+</UserControl>

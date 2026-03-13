@@ -6,6 +6,9 @@
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- CA1812: Avalonia Views, ViewModels, and services are instantiated via XAML/DI/navigation
+         which the analyzer cannot track. This rule has no value in a desktop application. -->
+    <NoWarn>CA1812</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

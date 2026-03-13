@@ -1,6 +1,6 @@
-namespace TheCanonry.Engine.Rules.Types;
-
 using TheCanonry.Engine.Graph;
+
+namespace TheCanonry.Engine.Rules.Types;
 
 // =============================================================================
 // SELECTION PICK STRATEGY

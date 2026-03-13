@@ -1,9 +1,8 @@
-namespace TheCanonry.Coherence.Tests;
-
 using TheCanonry.Coherence.Types;
-using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Engine.Templates;
+
+namespace TheCanonry.Coherence.Tests;
 
 /// <summary>
 /// Tests for pressure-without-sources and pressure-without-sinks coherence rules.

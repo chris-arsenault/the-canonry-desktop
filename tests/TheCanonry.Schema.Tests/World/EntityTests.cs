@@ -1,9 +1,10 @@
-namespace TheCanonry.Schema.Tests.World;
-
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Schema.Tests.World;
 
 public class EntityTests
 {

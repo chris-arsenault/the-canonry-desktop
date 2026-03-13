@@ -1,11 +1,12 @@
-namespace TheCanonry.Engine.Tests.Coordinates;
-
 using TheCanonry.Engine.Coordinates;
 using TheCanonry.Engine.Graph;
 using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Engine.Tests.Coordinates;
 
 public class CoordinateContextTests
 {
@@ -442,7 +443,7 @@ public class CoordinateContextTests
         graph.CreateEntity(mid);
         graph.CreateEntity(far);
 
-        var result = ctx.FindNearestEntities(graph, reference, new EntityKind("npc"), 3);
+        var result = CoordinateContext.FindNearestEntities(graph, reference, new EntityKind("npc"), 3);
 
         Assert.Equal(3, result.Count);
         Assert.Equal("near", result[0].Entity.Id.Value);
@@ -466,7 +467,7 @@ public class CoordinateContextTests
             graph.CreateEntity(CreateEntityAt($"e{i}", 50 + i, 50, 50));
         }
 
-        var result = ctx.FindNearestEntities(graph, reference, new EntityKind("npc"), 3);
+        var result = CoordinateContext.FindNearestEntities(graph, reference, new EntityKind("npc"), 3);
 
         Assert.Equal(3, result.Count);
     }

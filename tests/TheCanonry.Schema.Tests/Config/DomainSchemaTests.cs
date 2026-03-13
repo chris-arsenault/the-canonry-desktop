@@ -1,7 +1,7 @@
-namespace TheCanonry.Schema.Tests.Config;
-
 using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Domain;
+
+namespace TheCanonry.Schema.Tests.Config;
 
 public class DomainSchemaTests
 {

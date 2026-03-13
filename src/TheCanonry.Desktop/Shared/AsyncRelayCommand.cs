@@ -1,8 +1,8 @@
-namespace TheCanonry.Desktop.Shared;
-
 using System.Windows.Input;
 
-public class AsyncRelayCommand : ViewModelBase, ICommand
+namespace TheCanonry.Desktop.Shared;
+
+internal sealed class AsyncRelayCommand : ViewModelBase, ICommand
 {
     private readonly Func<Task> _execute;
     private readonly Func<bool>? _canExecute;
@@ -45,7 +45,7 @@ public class AsyncRelayCommand : ViewModelBase, ICommand
     public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 }
 
-public class AsyncRelayCommand<T> : ViewModelBase, ICommand
+internal sealed class AsyncRelayCommand<T> : ViewModelBase, ICommand
 {
     private readonly Func<T?, Task> _execute;
     private readonly Func<T?, bool>? _canExecute;

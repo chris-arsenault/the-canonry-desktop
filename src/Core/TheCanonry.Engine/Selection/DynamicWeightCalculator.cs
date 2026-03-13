@@ -1,6 +1,6 @@
-namespace TheCanonry.Engine.Selection;
-
 using TheCanonry.Engine.Statistics;
+
+namespace TheCanonry.Engine.Selection;
 
 /// <summary>
 /// Adjusts template weights based on population deviation from targets.

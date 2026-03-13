@@ -1,13 +1,12 @@
-namespace TheCanonry.Engine.Systems;
-
 using TheCanonry.Engine.Engine;
-using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Runtime;
 using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Systems;
 
 /// <summary>
 /// Handles decay, reinforcement, and culling of relationships.

@@ -31,7 +31,7 @@ public static class DocumentPromptBuilder
     /// <summary>
     /// Returns the system prompt for document-format chronicle generation.
     /// </summary>
-    public static string GetSystemPrompt() =>
+    public static string SystemPrompt =>
         """
         You are crafting an in-universe document that feels authentic and alive. Your prompt contains:
 
@@ -77,7 +77,7 @@ public static class DocumentPromptBuilder
             sections.Add($"# Document Instructions\n{ctx.DocumentInstructions}");
 
         if (ctx.EventInstructions is not null)
-            sections.Add($"# Event Usage\n{ctx.EventInstructions}");
+            sections.Add($"# How to Use Events\n{ctx.EventInstructions}");
 
         var narrativeVoice = PromptSections.BuildNarrativeVoiceSection(ctx.NarrativeVoice);
         if (!string.IsNullOrEmpty(narrativeVoice))
@@ -87,8 +87,13 @@ public static class DocumentPromptBuilder
         if (!string.IsNullOrEmpty(entityDirectives))
             sections.Add(entityDirectives);
 
+        // Perspective section from world tone (document format uses this instead of Writing Style)
+        var tone = ctx.GenerationContext.Tone;
+        if (!string.IsNullOrEmpty(tone))
+            sections.Add($"# Perspective\n{tone}");
+
         if (ctx.CraftPosture is not null)
-            sections.Add($"# Craft Posture\n{ctx.CraftPosture}");
+            sections.Add($"# Craft Posture\nHow to relate to the material — density, withholding, and elaboration:\n{ctx.CraftPosture}");
 
         // WORLD DATA
         var castSection = BuildCastSection(ctx.PrimaryEntities, ctx.SupportingEntities);
@@ -123,8 +128,10 @@ public static class DocumentPromptBuilder
         Write a {ctx.MinWords}-{ctx.MaxWords} word {ctx.StyleName}.
 
         Requirements:
+        - Assign the provided characters to the narrative roles defined below
         - Follow the document structure and voice guidance below
         - Incorporate the listed events naturally as context or content
+        - Use the research notes as inspiration for how characters relate
         - Ground the document in the historical era and timeline provided
         - Make the document feel authentic - as if it exists within the world
         - Write the document directly with no meta-commentary
@@ -137,24 +144,35 @@ public static class DocumentPromptBuilder
         if (primary.Count == 0 && supporting.Count == 0)
             return string.Empty;
 
-        var lines = new List<string> { "# Cast" };
+        var total = primary.Count + supporting.Count;
+        var lines = new List<string> { $"# Cast ({total} characters)" };
+        lines.Add("");
+        lines.Add(
+            "**Temporal context**: Entity descriptions reflect their CURRENT state — who they became, how they ended up. " +
+            "This chronicle depicts PAST EVENTS when characters who are now dead/changed were alive and active. " +
+            "Write them as they WERE during the story, not as they ARE now.");
 
         if (primary.Count > 0)
         {
-            lines.Add("Primary characters:");
+            lines.Add("");
+            lines.Add("## Primary Characters");
             foreach (var e in primary)
             {
                 lines.Add("");
+                lines.Add($"### {e.Name}");
                 lines.Add(PromptSections.FormatEntityFull(e));
             }
         }
 
         if (supporting.Count > 0)
         {
-            if (primary.Count > 0) lines.Add("");
-            lines.Add("Supporting characters:");
+            lines.Add("");
+            lines.Add("## Supporting Characters");
             foreach (var e in supporting)
-                lines.Add($"- {PromptSections.FormatEntityBrief(e)}");
+            {
+                lines.Add("");
+                lines.Add(PromptSections.FormatEntityBrief(e));
+            }
         }
 
         return string.Join("\n", lines);

@@ -1,10 +1,11 @@
-namespace TheCanonry.Engine.Tests.Statistics;
-
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Statistics;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Engine.Tests.Statistics;
 
 public class PopulationTrackerTests
 {
@@ -69,7 +70,7 @@ public class PopulationTrackerTests
 
         tracker.Update(CreateEmptyGraph());
 
-        var metrics = tracker.GetMetrics();
+        var metrics = tracker.Metrics;
         Assert.Equal(0, metrics.Entities["faction:merchant"].Count);
         Assert.Equal(0, metrics.Entities["npc:warrior"].Count);
     }
@@ -86,7 +87,7 @@ public class PopulationTrackerTests
 
         tracker.Update(graph);
 
-        var metrics = tracker.GetMetrics();
+        var metrics = tracker.Metrics;
         Assert.Equal(3, metrics.Entities["faction:merchant"].Count);
         Assert.Equal(5, metrics.Entities["faction:merchant"].Target);
     }
@@ -103,7 +104,7 @@ public class PopulationTrackerTests
 
         tracker.Update(graph);
 
-        var metric = tracker.GetMetrics().Entities["faction:merchant"];
+        var metric = tracker.Metrics.Entities["faction:merchant"];
         Assert.Equal(0.6, metric.Deviation, precision: 5);
     }
 
@@ -119,7 +120,7 @@ public class PopulationTrackerTests
 
         tracker.Update(graph);
 
-        var metric = tracker.GetMetrics().Entities["faction:merchant"];
+        var metric = tracker.Metrics.Entities["faction:merchant"];
         Assert.Equal(-0.7, metric.Deviation, precision: 5);
     }
 
@@ -147,7 +148,7 @@ public class PopulationTrackerTests
         tracker.Update(graph);
 
         // History: [2, 5, 7]. Deltas: 3, 2. Trend = (3+2)/2 = 2.5
-        var metric = tracker.GetMetrics().Entities["faction:merchant"];
+        var metric = tracker.Metrics.Entities["faction:merchant"];
         Assert.Equal(2.5, metric.Trend, precision: 5);
     }
 
@@ -167,7 +168,7 @@ public class PopulationTrackerTests
         }
 
         // With window=3, history should contain only last 3 entries: [3, 4, 5]
-        var metric = tracker.GetMetrics().Entities["faction:merchant"];
+        var metric = tracker.Metrics.Entities["faction:merchant"];
         Assert.Equal(3, metric.History.Count);
         Assert.Equal(3, metric.History[0]);
         Assert.Equal(4, metric.History[1]);
@@ -291,7 +292,7 @@ public class PopulationTrackerTests
         graph.CreateEntity(CreateEntity("r2", "region", "forest"));
         tracker.Update(graph);
 
-        var metrics = tracker.GetMetrics();
+        var metrics = tracker.Metrics;
         Assert.True(metrics.Entities.ContainsKey("region:forest"));
         Assert.Equal(2, metrics.Entities["region:forest"].Count);
     }
@@ -306,7 +307,7 @@ public class PopulationTrackerTests
 
         tracker.Update(graph);
 
-        var metrics = tracker.GetMetrics();
+        var metrics = tracker.Metrics;
         Assert.True(metrics.Pressures.ContainsKey("conflict"));
         Assert.Equal(60, metrics.Pressures["conflict"].Value);
         // Target for conflict = 40, deviation = (60-40)/40 = 0.5
@@ -326,7 +327,7 @@ public class PopulationTrackerTests
 
         tracker.Update(graph);
 
-        var metrics = tracker.GetMetrics();
+        var metrics = tracker.Metrics;
         Assert.Equal(1, metrics.Relationships["allied_with"].Count);
         Assert.Equal(1, metrics.Relationships["rival_of"].Count);
     }

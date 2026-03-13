@@ -1,11 +1,10 @@
-namespace TheCanonry.Persistence.Tests.Repositories;
-
 using Microsoft.EntityFrameworkCore;
-using TheCanonry.Persistence;
 using TheCanonry.Persistence.Entities;
 using TheCanonry.Persistence.Repositories;
 
-public class NewRepositoryTests : IDisposable
+namespace TheCanonry.Persistence.Tests.Repositories;
+
+public sealed class NewRepositoryTests : IDisposable
 {
     private readonly CanonryDbContext _db;
 
@@ -1099,5 +1098,9 @@ public class NewRepositoryTests : IDisposable
         Assert.Empty(await repo.GetBySimulation("run-1"));
     }
 
-    public void Dispose() => _db.Dispose();
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _db.Dispose();
+    }
 }

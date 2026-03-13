@@ -18,7 +18,7 @@ public sealed record TaskContext
     /// Build an LlmRequest from a call type's default metadata,
     /// applying the system prompt and user prompt.
     /// </summary>
-    public LlmRequest BuildRequest(LlmCallType callType, string systemPrompt, string userPrompt)
+    public static LlmRequest BuildRequest(LlmCallType callType, string systemPrompt, string userPrompt)
     {
         var meta = LlmCallDefaults.GetMetadata(callType);
         return new LlmRequest

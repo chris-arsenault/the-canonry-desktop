@@ -1,5 +1,3 @@
-namespace TheCanonry.Engine.Systems;
-
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
 using TheCanonry.Engine.Rules;
@@ -8,6 +6,8 @@ using TheCanonry.Engine.Runtime;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Systems;
 
 /// <summary>
 /// Detects conditions and sets tags/pressures for templates.
@@ -431,7 +431,7 @@ file sealed class RuntimeGraphAdapter : IGraph
         get
         {
             var dict = new Dictionary<string, double>();
-            foreach (var kvp in _runtime.GetAllPressures())
+            foreach (var kvp in _runtime.AllPressures)
                 dict[kvp.Key] = kvp.Value;
             return dict;
         }

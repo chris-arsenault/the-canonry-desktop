@@ -1,13 +1,12 @@
-namespace TheCanonry.Desktop.Illuminator;
-
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using TheCanonry.Desktop.Shared;
 using TheCanonry.Persistence;
-using TheCanonry.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 
-public class EnrichmentJobItem : ViewModelBase
+namespace TheCanonry.Desktop.Illuminator;
+
+internal sealed class EnrichmentJobItem : ViewModelBase
 {
     private string _status = "";
     private string? _progressMessage;
@@ -39,7 +38,7 @@ public class EnrichmentJobItem : ViewModelBase
     }
 }
 
-public class IlluminatorViewModel : ViewModelBase
+internal sealed class IlluminatorViewModel : ViewModelBase
 {
     private readonly IDbContextFactory<CanonryDbContext> _dbFactory;
     private EnrichmentJobItem? _selectedJob;
@@ -56,6 +55,8 @@ public class IlluminatorViewModel : ViewModelBase
         CancelJobCommand = new RelayCommand<EnrichmentJobItem>(CancelJob);
         RetryJobCommand = new RelayCommand<EnrichmentJobItem>(RetryJob);
         ClearCompletedCommand = new AsyncRelayCommand(ClearCompletedAsync);
+
+        _ = RefreshAsync();
     }
 
     public ObservableCollection<EnrichmentJobItem> EnrichmentJobs { get; }

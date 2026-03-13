@@ -1,10 +1,10 @@
-namespace TheCanonry.Coherence.Tests;
-
 using TheCanonry.Coherence.Types;
 using TheCanonry.Engine.Engine;
 using TheCanonry.Schema.Config;
 using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
+
+namespace TheCanonry.Coherence.Tests;
 
 /// <summary>
 /// Tests for numeric-range-issues and relationship-compatibility coherence rules.

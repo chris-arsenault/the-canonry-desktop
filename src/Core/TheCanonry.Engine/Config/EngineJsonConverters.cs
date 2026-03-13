@@ -1,12 +1,11 @@
-namespace TheCanonry.Engine.Config;
-
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TheCanonry.Engine.Engine;
 using TheCanonry.Engine.Graph;
-using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Engine.Templates;
+
+namespace TheCanonry.Engine.Config;
 
 // =============================================================================
 // CONDITION CONVERTER

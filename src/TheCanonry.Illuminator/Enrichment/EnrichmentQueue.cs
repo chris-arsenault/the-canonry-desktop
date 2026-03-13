@@ -8,7 +8,9 @@ namespace TheCanonry.Illuminator.Enrichment;
 /// Jobs are enqueued as IDs; the queue reads them, dispatches to the appropriate
 /// executor, and manages job lifecycle transitions.
 /// </summary>
+#pragma warning disable CA1711 // This class is semantically a queue — backed by System.Threading.Channels
 public sealed class EnrichmentQueue
+#pragma warning restore CA1711
 {
     private readonly Channel<long> _channel = Channel.CreateUnbounded<long>(
         new UnboundedChannelOptions { SingleReader = false });
@@ -144,7 +146,7 @@ public sealed class EnrichmentQueue
             job.MarkCancelled();
             JobCancelled?.Invoke(job);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         {
             job.MarkFailed(ex);
             JobFailed?.Invoke(job);

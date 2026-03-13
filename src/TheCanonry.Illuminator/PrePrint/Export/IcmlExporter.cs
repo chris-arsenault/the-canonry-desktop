@@ -1,7 +1,7 @@
-namespace TheCanonry.Illuminator.PrePrint.Export;
-
 using System.Text;
 using System.Text.RegularExpressions;
+
+namespace TheCanonry.Illuminator.PrePrint.Export;
 
 /// <summary>
 /// Generates ICML (InCopy Markup Language) — a single story XML file.

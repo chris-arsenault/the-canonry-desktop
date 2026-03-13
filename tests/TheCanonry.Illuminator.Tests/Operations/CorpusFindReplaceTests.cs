@@ -1,7 +1,8 @@
-namespace TheCanonry.Illuminator.Tests.Operations;
-
 using TheCanonry.Illuminator.Operations;
 using TheCanonry.Persistence.Entities;
+using ChronicleEntity = TheCanonry.Persistence.Entities.Chronicle;
+
+namespace TheCanonry.Illuminator.Tests.Operations;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -33,7 +34,7 @@ file static class CorpusFactory
         UpdatedAtTick   = 1,
     };
 
-    public static Chronicle MakeChronicle(
+    public static ChronicleEntity MakeChronicle(
         string content,
         string? title   = null,
         string? summary = null) => new()
@@ -383,7 +384,7 @@ public sealed class EntityCoverageAnalysisTests
 
         var chronicles = new[]
         {
-            new Chronicle
+            new ChronicleEntity
             {
                 Id              = 1,
                 SimulationRunId = "sim-1",
@@ -391,7 +392,7 @@ public sealed class EntityCoverageAnalysisTests
                 Format          = "narrative",
                 Content         = "Content one.",
             },
-            new Chronicle
+            new ChronicleEntity
             {
                 Id              = 2,
                 SimulationRunId = "sim-1",

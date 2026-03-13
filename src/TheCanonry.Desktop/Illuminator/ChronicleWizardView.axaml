@@ -1,0 +1,183 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:illum="using:TheCanonry.Desktop.Illuminator"
+             x:Class="TheCanonry.Desktop.Illuminator.ChronicleWizardView"
+             x:DataType="illum:ChronicleWizardViewModel">
+    <DockPanel>
+        <!-- Header with step indicator -->
+        <Border DockPanel.Dock="Top" Padding="16,12"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8">
+                    <Button Content="Back" Command="{Binding BackCommand}" />
+                    <Button Content="Next" Command="{Binding NextCommand}" />
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="Chronicle Wizard" FontSize="18" FontWeight="Bold" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{Binding StepTitle}" FontSize="13" Opacity="0.7" />
+                        <ProgressBar Value="{Binding StepIndex}" Maximum="5" Width="100" Height="6"
+                                     VerticalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <ProgressBar DockPanel.Dock="Top" IsIndeterminate="{Binding IsLoading}"
+                     IsVisible="{Binding IsLoading}" Height="4" />
+
+        <!-- Step Content -->
+        <ScrollViewer Padding="20">
+            <StackPanel Spacing="16" MaxWidth="800">
+
+                <!-- Step 1: Style Selection -->
+                <StackPanel Spacing="12" IsVisible="{Binding IsStyleStep}">
+                    <TextBlock Text="Select a narrative style for this chronicle." FontSize="14" Opacity="0.7" />
+                    <ListBox ItemsSource="{Binding Styles}" SelectedItem="{Binding SelectedStyle}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="illum:StyleListItem">
+                                <DockPanel Margin="4,6">
+                                    <TextBlock DockPanel.Dock="Right" Text="{Binding Format}"
+                                               Opacity="0.5" FontSize="11" VerticalAlignment="Top" Margin="12,0" />
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding Description}" FontSize="12" Opacity="0.6"
+                                                   TextWrapping="Wrap" MaxLines="3" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <!-- Step 2: Entry Point Selection -->
+                <StackPanel Spacing="12" IsVisible="{Binding IsEntryPointStep}">
+                    <TextBlock Text="Choose the primary entity for this chronicle." FontSize="14" Opacity="0.7" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBox Text="{Binding EntitySearchText}" Watermark="Search entities..." Width="250" />
+                        <TextBox Text="{Binding EntityKindFilter}" Watermark="Kind filter..." Width="150" />
+                    </StackPanel>
+                    <ListBox ItemsSource="{Binding FilteredEntities}" SelectedItem="{Binding SelectedEntryPoint}"
+                             MaxHeight="400">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="illum:WizardEntityItem">
+                                <DockPanel Margin="4,2">
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8" Margin="12,0">
+                                        <TextBlock Text="{Binding Culture}" FontSize="11" Opacity="0.5" />
+                                        <TextBlock Text="{Binding Prominence, StringFormat='{}{0:F1}'}"
+                                                   FontSize="11" Opacity="0.5" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                        <TextBlock FontSize="11" Opacity="0.5">
+                                            <Run Text="{Binding Kind}" />
+                                            <Run Text=" / " />
+                                            <Run Text="{Binding Subtype}" />
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <!-- Step 3: Role Assignment -->
+                <StackPanel Spacing="12" IsVisible="{Binding IsRoleAssignmentStep}">
+                    <TextBlock Text="Assign entities to narrative roles defined by the selected style."
+                               FontSize="14" Opacity="0.7" />
+
+                    <ItemsControl ItemsSource="{Binding RoleSlots}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="illum:RoleSlotItem">
+                                <Border Padding="12" Margin="0,4"
+                                        Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                                        CornerRadius="4">
+                                    <StackPanel Spacing="4">
+                                        <DockPanel>
+                                            <TextBlock DockPanel.Dock="Right" FontSize="11" Opacity="0.5">
+                                                <Run Text="{Binding MinCount}" />
+                                                <Run Text="-" />
+                                                <Run Text="{Binding MaxCount}" />
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding Role}" FontWeight="Bold" />
+                                        </DockPanel>
+                                        <TextBlock Text="{Binding Description}" FontSize="12" Opacity="0.6"
+                                                   TextWrapping="Wrap" />
+                                        <TextBlock Text="{Binding AssignedEntity.Name,
+                                                   FallbackValue='(not assigned)'}"
+                                                   FontSize="13" Opacity="0.8" Margin="0,4,0,0" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="Select entities from the list to assign them to roles." FontSize="12" Opacity="0.5" />
+                    <ListBox ItemsSource="{Binding FilteredEntities}" MaxHeight="300">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="illum:WizardEntityItem">
+                                <DockPanel Margin="4,2">
+                                    <TextBlock DockPanel.Dock="Right" Text="{Binding AssignedRole}"
+                                               FontSize="11" Opacity="0.6" Margin="8,0"
+                                               IsVisible="{Binding AssignedRole, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                    <TextBlock Text="{Binding Name}" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <!-- Step 4: Narrative Direction -->
+                <StackPanel Spacing="12" IsVisible="{Binding IsDirectionStep}">
+                    <TextBlock Text="Provide optional narrative direction or thematic guidance."
+                               FontSize="14" Opacity="0.7" />
+                    <TextBox Text="{Binding NarrativeDirection}"
+                             Watermark="e.g., Focus on the political tensions between..."
+                             AcceptsReturn="True" TextWrapping="Wrap"
+                             MinHeight="150" MaxHeight="400" />
+                </StackPanel>
+
+                <!-- Step 5: Review -->
+                <StackPanel Spacing="12" IsVisible="{Binding IsReviewStep}">
+                    <TextBlock Text="Review your chronicle configuration before creating."
+                               FontSize="14" Opacity="0.7" />
+
+                    <Border Padding="16"
+                            Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                            CornerRadius="4">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Narrative Style" FontSize="11" Opacity="0.6" />
+                            <TextBlock Text="{Binding SelectedStyle.Name, FallbackValue='(none)'}"
+                                       FontWeight="SemiBold" FontSize="14" />
+
+                            <TextBlock Text="Entry Point" FontSize="11" Opacity="0.6" Margin="0,8,0,0" />
+                            <TextBlock Text="{Binding SelectedEntryPoint.Name, FallbackValue='(none)'}"
+                                       FontWeight="SemiBold" FontSize="14" />
+
+                            <TextBlock Text="Role Assignments" FontSize="11" Opacity="0.6" Margin="0,8,0,0" />
+                            <ItemsControl ItemsSource="{Binding RoleSlots}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="illum:RoleSlotItem">
+                                        <TextBlock FontSize="13" Margin="0,2">
+                                            <Run Text="{Binding Role}" FontWeight="SemiBold" />
+                                            <Run Text=": " />
+                                            <Run Text="{Binding AssignedEntity.Name, FallbackValue='(unassigned)'}" />
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <TextBlock Text="Direction" FontSize="11" Opacity="0.6" Margin="0,8,0,0"
+                                       IsVisible="{Binding NarrativeDirection, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                            <TextBlock Text="{Binding NarrativeDirection}" TextWrapping="Wrap" FontSize="13"
+                                       IsVisible="{Binding NarrativeDirection, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

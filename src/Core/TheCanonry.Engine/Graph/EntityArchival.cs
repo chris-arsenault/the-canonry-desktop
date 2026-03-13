@@ -1,9 +1,9 @@
-namespace TheCanonry.Engine.Graph;
-
-using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;
+using ExecutionContext = TheCanonry.Schema.World.ExecutionContext;
+
+namespace TheCanonry.Engine.Graph;
 
 /// <summary>
 /// Static helper methods for archiving entities and transferring relationships.

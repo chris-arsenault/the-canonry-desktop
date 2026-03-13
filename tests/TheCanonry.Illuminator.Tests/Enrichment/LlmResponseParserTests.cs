@@ -5,7 +5,9 @@ namespace TheCanonry.Illuminator.Tests.Enrichment;
 
 public sealed class LlmResponseParserTests
 {
+#pragma warning disable CA1812 // Instantiated by JsonSerializer.Deserialize<T>()
     private sealed record TestPayload
+#pragma warning restore CA1812
     {
         public string Name { get; init; } = "";
         public int Value { get; init; }

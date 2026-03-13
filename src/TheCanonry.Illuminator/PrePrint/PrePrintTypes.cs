@@ -12,7 +12,11 @@ public sealed class ContentTreeNode
     public required string Name { get; set; }
     public required ContentNodeType Type { get; init; }
     public string? ContentId { get; init; }
-    public List<ContentTreeNode>? Children { get; set; }
+
+    // CA2227: Setter required — callers use `node.Children ??= new List<>()` to lazily initialize.
+#pragma warning disable CA2227
+    public IList<ContentTreeNode>? Children { get; set; }
+#pragma warning restore CA2227
 }
 
 public sealed record FlattenedNode(string Id, string Name, ContentNodeType Type, string? ContentId, string Path, int Depth);

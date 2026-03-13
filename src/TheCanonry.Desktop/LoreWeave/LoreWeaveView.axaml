@@ -1,8 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:forge="using:TheCanonry.Desktop.Forge"
-             x:Class="TheCanonry.Desktop.Forge.ForgeView"
-             x:DataType="forge:ForgeViewModel">
+             xmlns:lw="using:TheCanonry.Desktop.LoreWeave"
+             x:Class="TheCanonry.Desktop.LoreWeave.LoreWeaveView"
+             x:DataType="lw:LoreWeaveViewModel">
     <Grid ColumnDefinitions="280,*" RowDefinitions="*,200">
         <!-- Config Panel (Left) -->
         <Border Grid.Column="0" Grid.RowSpan="2"
@@ -39,7 +39,7 @@
         <!-- Progress Area (Center) -->
         <Border Grid.Column="1" Grid.Row="0" Padding="16">
             <StackPanel Spacing="16" VerticalAlignment="Center" MaxWidth="600">
-                <TextBlock Text="Forge - Simulation Runner" FontSize="20" FontWeight="SemiBold"
+                <TextBlock Text="Lore Weave" FontSize="20" FontWeight="SemiBold"
                            HorizontalAlignment="Center" />
 
                 <TextBlock Text="{Binding StatusMessage}" HorizontalAlignment="Center" FontSize="14" Opacity="0.8" />

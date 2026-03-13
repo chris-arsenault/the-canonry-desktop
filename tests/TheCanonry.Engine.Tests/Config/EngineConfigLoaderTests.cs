@@ -1,10 +1,9 @@
-namespace TheCanonry.Engine.Tests.Config;
-
 using TheCanonry.Engine.Config;
 using TheCanonry.Engine.Engine;
-using TheCanonry.Engine.Pressures;
 using TheCanonry.Engine.Rules.Types;
 using TheCanonry.Engine.Templates;
+
+namespace TheCanonry.Engine.Tests.Config;
 
 public class EngineConfigLoaderTests
 {

@@ -154,11 +154,10 @@ public sealed class TaskPromptTests
 
         var prompt = BackportPrompts.BuildUserPrompt(
             chronicleText,
-            perspectiveSynthesis: "Brief: A story of loss.");
+            perspectiveSynthesisJson: """{"brief":"A story of loss."}""");
 
         Assert.Contains("=== CHRONICLE TEXT ===", prompt);
         Assert.Contains(chronicleText, prompt);
-        Assert.Contains("=== PERSPECTIVE SYNTHESIS ===", prompt);
     }
 
     [Fact]
@@ -170,6 +169,92 @@ public sealed class TaskPromptTests
 
         Assert.Contains("CRITICAL", prompt, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("Focus only on status changes.", prompt);
+    }
+
+    [Fact]
+    public void BackportPrompts_UserPrompt_WithEntities_SeparatesCastAndLens()
+    {
+        var entities = new List<BackportPrompts.BackportEntityContext>
+        {
+            new()
+            {
+                Id = "e1", Name = "Iron Warden", Kind = "npc", Summary = "A legendary warrior.",
+                Prominence = "renowned", IsPrimary = true, IsLens = false,
+            },
+            new()
+            {
+                Id = "e2", Name = "The Northern Council", Kind = "faction", Summary = "A governing body.",
+                Prominence = "recognized", IsPrimary = false, IsLens = true,
+            },
+        };
+
+        var prompt = BackportPrompts.BuildUserPrompt(
+            entities,
+            "The chronicle text.",
+            perspectiveSynthesisJson: null);
+
+        Assert.Contains("=== CAST (1 entities) ===", prompt);
+        Assert.Contains("=== NARRATIVE LENS (1 entity) ===", prompt);
+        Assert.Contains("Iron Warden", prompt);
+        Assert.Contains("The Northern Council", prompt);
+        Assert.Contains("higher bar", prompt);
+    }
+
+    [Fact]
+    public void BackportPrompts_UserPrompt_WithEntities_FormatsEntityBlocks()
+    {
+        var entities = new List<BackportPrompts.BackportEntityContext>
+        {
+            new()
+            {
+                Id = "e1", Name = "Iron Warden", Kind = "npc", Subtype = "warrior",
+                Culture = "northern", Status = "active", Prominence = "renowned",
+                Summary = "A legendary warrior of the north.",
+                Description = "Paragraph one.\n\nParagraph two.",
+                VisualThesis = "A hulking figure clad in frost-scarred iron plate.",
+                Relationships = [new BackportPrompts.BackportRelationship("allied_with", "Kara", "npc")],
+                IsPrimary = true, IsLens = false,
+            },
+        };
+
+        var prompt = BackportPrompts.BuildUserPrompt(entities, "The chronicle text.");
+
+        Assert.Contains("npc / warrior", prompt);
+        Assert.Contains("Culture: northern", prompt);
+        Assert.Contains("Prominence: renowned", prompt);
+        Assert.Contains("Visual Thesis (DO NOT CONTRADICT)", prompt);
+        Assert.Contains("frost-scarred iron plate", prompt);
+        Assert.Contains("allied_with → Kara (npc)", prompt);
+        // Numbered paragraph descriptions
+        Assert.Contains("[1]", prompt);
+        Assert.Contains("Paragraph one.", prompt);
+    }
+
+    [Fact]
+    public void BackportPrompts_UserPrompt_WithEntities_PerEntityTaskBlocks()
+    {
+        var entities = new List<BackportPrompts.BackportEntityContext>
+        {
+            new()
+            {
+                Id = "e1", Name = "Iron Warden", Kind = "npc", Summary = "A warrior.",
+                Prominence = "renowned", IsPrimary = true, IsLens = false,
+            },
+            new()
+            {
+                Id = "e2", Name = "Northern Council", Kind = "faction", Summary = "A council.",
+                Prominence = "recognized", IsPrimary = false, IsLens = true,
+            },
+        };
+
+        var prompt = BackportPrompts.BuildUserPrompt(entities, "Chronicle text.");
+
+        Assert.Contains("=== YOUR TASK ===", prompt);
+        Assert.Contains("Process each entity below independently", prompt);
+        Assert.Contains("Preserve visual thesis", prompt);
+        // Both entities should have task blocks
+        Assert.Contains("e1", prompt);
+        Assert.Contains("e2", prompt);
     }
 
     // =========================================================================

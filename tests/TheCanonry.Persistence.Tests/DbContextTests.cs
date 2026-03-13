@@ -1,10 +1,9 @@
-namespace TheCanonry.Persistence.Tests;
-
 using Microsoft.EntityFrameworkCore;
-using TheCanonry.Persistence;
 using TheCanonry.Persistence.Entities;
 
-public class DbContextTests : IDisposable
+namespace TheCanonry.Persistence.Tests;
+
+public sealed class DbContextTests : IDisposable
 {
     private readonly CanonryDbContext _db;
 
@@ -58,5 +57,9 @@ public class DbContextTests : IDisposable
         Assert.Equal("Queued", loaded.Status);
     }
 
-    public void Dispose() => _db.Dispose();
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _db.Dispose();
+    }
 }

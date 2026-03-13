@@ -1,7 +1,7 @@
-namespace TheCanonry.Engine.Templates;
-
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.World;
+
+namespace TheCanonry.Engine.Templates;
 
 // =============================================================================
 // PLACEMENT DEBUG

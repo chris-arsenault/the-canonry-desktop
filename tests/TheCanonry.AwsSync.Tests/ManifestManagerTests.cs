@@ -1,11 +1,12 @@
-namespace TheCanonry.AwsSync.Tests;
-
 using System.Text.Json;
 using TheCanonry.AwsSync.Sync;
 using TheCanonry.AwsSync.Types;
 
+namespace TheCanonry.AwsSync.Tests;
+
 public class ManifestManagerTests
 {
+    private static readonly JsonSerializerOptions IndentedOptions = new() { WriteIndented = true };
     private readonly InMemoryS3 _s3 = new();
 
     // ── LoadAsync ───────────────────────────────────────────────────────
@@ -48,7 +49,7 @@ public class ManifestManagerTests
             }
         };
 
-        var json = JsonSerializer.SerializeToUtf8Bytes(existing, new JsonSerializerOptions { WriteIndented = true });
+        var json = JsonSerializer.SerializeToUtf8Bytes(existing, IndentedOptions);
         await _s3.PutObjectAsync("images/image-manifest.json", json, "application/json", ct: CancellationToken.None);
 
         var manager = new ManifestManager(_s3, "images");

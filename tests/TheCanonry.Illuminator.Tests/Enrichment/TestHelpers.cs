@@ -2,7 +2,6 @@ using TheCanonry.Illuminator.Enrichment;
 using TheCanonry.Illuminator.Enrichment.Tasks;
 using TheCanonry.Illuminator.Types;
 using TheCanonry.Schema.Config;
-using TheCanonry.Schema.Domain;
 using TheCanonry.Schema.Ids;
 using TheCanonry.Schema.Primitives;
 using TheCanonry.Schema.World;

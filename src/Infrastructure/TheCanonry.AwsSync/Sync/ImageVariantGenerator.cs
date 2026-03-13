@@ -1,6 +1,6 @@
-namespace TheCanonry.AwsSync.Sync;
-
 using SkiaSharp;
+
+namespace TheCanonry.AwsSync.Sync;
 
 public static class ImageVariantGenerator
 {

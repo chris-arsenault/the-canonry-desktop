@@ -1,6 +1,7 @@
-namespace TheCanonry.Schema.Config;
-
+using System.Text.Json;
 using TheCanonry.Schema.Ids;
+
+namespace TheCanonry.Schema.Config;
 
 public class AxisBias
 {
@@ -23,4 +24,10 @@ public class CultureDefinition
     public Dictionary<string, string> DefaultCompositionStyles { get; init; } = [];
     public IReadOnlyList<string> StyleKeywords { get; init; } = [];
     public Dictionary<string, string> VisualIdentity { get; init; } = [];
+
+    /// <summary>
+    /// Embedded naming configuration for this culture (loaded from cultures.json).
+    /// Stored as raw JSON so the NameForge module can deserialize into its own types.
+    /// </summary>
+    public JsonElement? Naming { get; init; }
 }

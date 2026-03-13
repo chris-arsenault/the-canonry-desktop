@@ -1,7 +1,7 @@
-namespace TheCanonry.Persistence;
-
 using Microsoft.EntityFrameworkCore;
 using TheCanonry.Persistence.Entities;
+
+namespace TheCanonry.Persistence;
 
 public class CanonryDbContext : DbContext
 {

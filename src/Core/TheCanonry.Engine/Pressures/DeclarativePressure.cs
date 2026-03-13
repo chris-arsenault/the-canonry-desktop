@@ -1,6 +1,6 @@
-namespace TheCanonry.Engine.Pressures;
-
 using TheCanonry.Engine.Rules.Types;
+
+namespace TheCanonry.Engine.Pressures;
 
 // =============================================================================
 // PRESSURE CONTRACT
