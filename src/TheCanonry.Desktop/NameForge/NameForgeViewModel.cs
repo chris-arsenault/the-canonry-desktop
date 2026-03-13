@@ -504,9 +504,9 @@ internal sealed class NameForgeViewModel : ViewModelBase, ISectionedViewModel
                         item.ProfileCount = data.Profiles.Length;
                     }
                 }
-                catch
+                catch (Exception ex) when (ex is IOException or JsonException)
                 {
-                    // Malformed file — show as unconfigured
+                    // Malformed or unreadable file — show as unconfigured
                 }
             }
 
@@ -1148,7 +1148,7 @@ internal sealed class NameForgeViewModel : ViewModelBase, ISectionedViewModel
             var json = File.ReadAllText(path);
             return JsonSerializer.Deserialize<Culture>(json, NamingJsonOptions);
         }
-        catch
+        catch (Exception ex) when (ex is IOException or JsonException)
         {
             return null;
         }
