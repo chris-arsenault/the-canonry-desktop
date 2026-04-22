@@ -424,11 +424,7 @@ internal sealed class CosmographerViewModel : ViewModelBase, ISectionedViewModel
         RemoveRelationshipCommand = new RelayCommand(RemoveRelationship, () => SelectedRelationship is not null);
         SaveRelationshipsCommand = new RelayCommand(SaveRelationships);
 
-        _projectService.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName == nameof(ProjectService.IsLoaded))
-                Refresh();
-        };
+        _projectService.SchemaChanged += Refresh;
 
         if (_projectService.IsLoaded)
             Refresh();

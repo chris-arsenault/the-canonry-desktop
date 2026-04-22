@@ -1,0 +1,100 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:en="using:TheCanonry.Desktop.Enumerist"
+             x:Class="TheCanonry.Desktop.Enumerist.EntityKindEditorView"
+             x:DataType="en:EditableEntityKind">
+    <ScrollViewer Padding="12,8">
+        <StackPanel Spacing="12" MaxWidth="700">
+
+            <!-- Properties form -->
+            <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                <Grid.Styles>
+                    <Style Selector="TextBlock.label">
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Opacity" Value="0.7" />
+                        <Setter Property="FontSize" Value="12" />
+                        <Setter Property="Margin" Value="0,0,12,0" />
+                    </Style>
+                    <Style Selector="TextBox">
+                        <Setter Property="Margin" Value="0,2" />
+                    </Style>
+                </Grid.Styles>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Kind ID" Classes="label" />
+                <TextBox Grid.Row="0" Grid.Column="1"
+                         Text="{Binding KindValue}" IsReadOnly="{Binding IsFramework}" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Display Name" Classes="label" />
+                <TextBox Grid.Row="1" Grid.Column="1"
+                         Text="{Binding DisplayName}" IsReadOnly="{Binding IsFramework}" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Category" Classes="label" />
+                <TextBox Grid.Row="2" Grid.Column="1" Margin="0,2"
+                         Text="{Binding Category}" IsReadOnly="{Binding IsFramework}" />
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Description" Classes="label"
+                           VerticalAlignment="Top" Margin="0,6,12,0" />
+                <TextBox Grid.Row="3" Grid.Column="1"
+                         Text="{Binding Description}" AcceptsReturn="True" MinHeight="48"
+                         IsReadOnly="{Binding IsFramework}" />
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="Color" Classes="label" />
+                <TextBox Grid.Row="4" Grid.Column="1"
+                         Text="{Binding Color}" IsReadOnly="{Binding IsFramework}" />
+
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="Shape" Classes="label" />
+                <TextBox Grid.Row="5" Grid.Column="1"
+                         Text="{Binding Shape}" IsReadOnly="{Binding IsFramework}" />
+
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="Default Status" Classes="label" />
+                <TextBox Grid.Row="6" Grid.Column="1"
+                         Text="{Binding DefaultStatusId}" IsReadOnly="{Binding IsFramework}" />
+
+                <TextBlock Grid.Row="7" Grid.Column="0" Text="Framework" Classes="label" />
+                <CheckBox Grid.Row="7" Grid.Column="1" Margin="0,2"
+                          IsChecked="{Binding IsFramework}" IsEnabled="False" />
+            </Grid>
+
+            <!-- Subtypes -->
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Subtypes" FontSize="13" FontWeight="SemiBold"
+                           Margin="0,0,0,4" />
+                <DataGrid ItemsSource="{Binding Subtypes}"
+                          AutoGenerateColumns="False"
+                          CanUserReorderColumns="False"
+                          CanUserSortColumns="False"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal"
+                          MinHeight="100" MaxHeight="240">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+                        <DataGridCheckBoxColumn Header="Authority" Binding="{Binding IsAuthority}" Width="80" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+
+            <!-- Statuses -->
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Statuses" FontSize="13" FontWeight="SemiBold"
+                           Margin="0,0,0,4" />
+                <DataGrid ItemsSource="{Binding Statuses}"
+                          AutoGenerateColumns="False"
+                          CanUserReorderColumns="False"
+                          CanUserSortColumns="False"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal"
+                          MinHeight="100" MaxHeight="240">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+                        <DataGridCheckBoxColumn Header="Terminal" Binding="{Binding IsTerminal}" Width="70" />
+                        <DataGridTextColumn Header="Polarity" Binding="{Binding Polarity}" Width="80" />
+                        <DataGridTextColumn Header="Verb" Binding="{Binding TransitionVerb}" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

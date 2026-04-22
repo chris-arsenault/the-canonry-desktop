@@ -9,7 +9,8 @@
         <!-- Menu Bar -->
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open Project..." />
+                <MenuItem Header="_New Project..." Click="NewProject_Click" />
+                <MenuItem Header="_Open Project..." Click="OpenProject_Click" />
                 <Separator />
                 <MenuItem Header="E_xit" Click="Exit_Click" InputGesture="Alt+F4" />
             </MenuItem>
@@ -50,6 +51,9 @@
             <MenuItem Header="_Tools">
                 <MenuItem Header="_Archivist" Command="{Binding NavigateToArchivistCommand}" />
                 <MenuItem Header="A_WS Sync" Command="{Binding NavigateToAwsSyncCommand}" />
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="_Debug Log" Click="DebugLog_Click" />
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_About" />

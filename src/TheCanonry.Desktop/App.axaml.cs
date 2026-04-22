@@ -42,9 +42,11 @@ internal sealed partial class App : Application
             options.UseSqlite($"Data Source={dbPath}"));
 
         // Shared services
+        services.AddSingleton(DebugLog.Static);
         services.AddSingleton<NavigationService>();
         services.AddSingleton<WindowManager>();
         services.AddSingleton<ProjectService>();
+        services.AddSingleton<SelectionService>();
 
         // Shell
         services.AddSingleton<ShellViewModel>();
@@ -97,27 +99,12 @@ internal sealed partial class App : Application
             vm.DatabaseStatus = $"DB: {dbPath}";
             vm.StatusText = "Ready";
 
-            // Auto-load domain config if default project exists
-            var defaultProject = Path.Combine(
-                AppContext.BaseDirectory, "domain", "default-project");
-            if (!Directory.Exists(defaultProject))
-            {
-                // Try relative path for dev environment
-                defaultProject = Path.GetFullPath(
-                    Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "domain", "default-project"));
-            }
-            if (Directory.Exists(defaultProject))
-            {
-                var projectService = _serviceProvider.GetRequiredService<ProjectService>();
-                projectService.Load(defaultProject);
-                vm.StatusText = projectService.StatusMessage;
-            }
-
             vm.NavigateToDefault();
 
             desktop.MainWindow = new ShellWindow { DataContext = vm };
             desktop.ShutdownRequested += (_, _) =>
             {
+                _serviceProvider.GetRequiredService<ProjectService>().Cleanup();
                 _serviceProvider.GetRequiredService<WindowManager>().CloseAll();
                 _serviceProvider?.Dispose();
             };

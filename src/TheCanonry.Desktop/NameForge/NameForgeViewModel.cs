@@ -175,6 +175,7 @@ internal sealed class NameForgeViewModel : ViewModelBase, ISectionedViewModel
         CoverageColumns = new ObservableCollection<CoverageColumn>();
         AvailableProfiles = new ObservableCollection<Profile>();
         AvailableSubtypes = new ObservableCollection<string>();
+        ProminenceOptions = ["", "Forgotten", "Marginal", "Recognized", "Renowned", "Mythic"];
 
         SwitchToWorkshopCommand = new RelayCommand(() => ActiveSection = "workshop");
         SwitchToGenerateCommand = new RelayCommand(() => ActiveSection = "generate");
@@ -199,11 +200,7 @@ internal sealed class NameForgeViewModel : ViewModelBase, ISectionedViewModel
 
         GenerateCommand = new RelayCommand(RunGenerate, () => !string.IsNullOrEmpty(_generateCultureId));
 
-        _project.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(ProjectService.IsLoaded))
-                RefreshCultureList();
-        };
+        _project.SchemaChanged += RefreshCultureList;
 
         RefreshCultureList();
     }
@@ -300,6 +297,7 @@ internal sealed class NameForgeViewModel : ViewModelBase, ISectionedViewModel
     public ObservableCollection<CoverageColumn> CoverageColumns { get; }
     public ObservableCollection<Profile> AvailableProfiles { get; }
     public ObservableCollection<string> AvailableSubtypes { get; }
+    public ObservableCollection<string> ProminenceOptions { get; }
 
     // ========================================================================
     // Culture selection

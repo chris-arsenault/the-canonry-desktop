@@ -80,19 +80,37 @@ internal sealed class EditableEntityKind : ViewModelBase
     private string _displayName = "";
     private string _defaultStatusId = "";
 
-    public string KindValue { get => _kindValue; set => SetProperty(ref _kindValue, value); }
+    public string KindValue
+    {
+        get => _kindValue;
+        set { if (SetProperty(ref _kindValue, value)) OnPropertyChanged(nameof(Label)); }
+    }
     public string Description { get => _description; set => SetProperty(ref _description, value); }
     public bool IsFramework { get => _isFramework; set => SetProperty(ref _isFramework, value); }
     public EntityCategory Category { get => _category; set => SetProperty(ref _category, value); }
     public string Color { get => _color; set => SetProperty(ref _color, value); }
     public string Shape { get => _shape; set => SetProperty(ref _shape, value); }
-    public string DisplayName { get => _displayName; set => SetProperty(ref _displayName, value); }
+    public string DisplayName
+    {
+        get => _displayName;
+        set { if (SetProperty(ref _displayName, value)) OnPropertyChanged(nameof(Label)); }
+    }
     public string DefaultStatusId { get => _defaultStatusId; set => SetProperty(ref _defaultStatusId, value); }
     public ObservableCollection<EditableSubtype> Subtypes { get; } = [];
     public ObservableCollection<EditableStatus> Statuses { get; } = [];
 
     /// <summary>Label for the list — shows DisplayName if set, otherwise the kind ID.</summary>
     public string Label => string.IsNullOrWhiteSpace(DisplayName) ? KindValue : DisplayName;
+
+    /// <summary>Children for the Schema Explorer tree view.</summary>
+    public IEnumerable<object> TreeChildren
+    {
+        get
+        {
+            foreach (var s in Subtypes) yield return s;
+            foreach (var s in Statuses) yield return s;
+        }
+    }
 
     public EntityKindDefinition ToDefinition() => new()
     {
@@ -428,6 +446,7 @@ internal sealed class EnumeristViewModel : ViewModelBase, ISectionedViewModel
     private EditableEntityKind? _selectedEntityKind;
     private EditableSubtype? _selectedSubtype;
     private EditableStatus? _selectedStatus;
+    private object? _treeSelectedItem;
 
     // Relationships
     private EditableRelationshipKind? _selectedRelationshipKind;
@@ -438,9 +457,26 @@ internal sealed class EnumeristViewModel : ViewModelBase, ISectionedViewModel
     // Tags
     private EditableTag? _selectedTag;
 
-    public EnumeristViewModel(ProjectService projectService)
+    // Open document tabs
+    private EditableEntityKind? _activeDocument;
+
+    public SelectionService SelectionService { get; }
+    public ObservableCollection<EditableEntityKind> OpenDocuments { get; } = [];
+
+    public EditableEntityKind? ActiveDocument
+    {
+        get => _activeDocument;
+        set
+        {
+            if (SetProperty(ref _activeDocument, value) && value is not null)
+                SelectionService.Select(value);
+        }
+    }
+
+    public EnumeristViewModel(ProjectService projectService, SelectionService selectionService)
     {
         _projectService = projectService;
+        SelectionService = selectionService;
 
         // Section navigation commands
         GoToEntityKindsCommand = new RelayCommand(() => ActiveSection = "entityKinds");
@@ -450,31 +486,43 @@ internal sealed class EnumeristViewModel : ViewModelBase, ISectionedViewModel
         GoToTagsCommand = new RelayCommand(() => ActiveSection = "tags");
 
         // Entity Kind commands
-        AddEntityKindCommand = new RelayCommand(AddEntityKind, () => _projectService.IsLoaded);
+        AddEntityKindCommand = new RelayCommand(AddEntityKind, () => _projectService.IsLoaded)
+            .ObservesProperty(_projectService, nameof(ProjectService.IsLoaded));
         RemoveEntityKindCommand = new RelayCommand(RemoveEntityKind, () => SelectedEntityKind is { IsFramework: false });
-        SaveEntityKindsCommand = new RelayCommand(SaveEntityKinds, () => _projectService.IsLoaded);
+        SaveEntityKindsCommand = new RelayCommand(SaveEntityKinds, () => _projectService.IsLoaded)
+            .ObservesProperty(_projectService, nameof(ProjectService.IsLoaded));
         AddSubtypeCommand = new RelayCommand(AddSubtype, () => SelectedEntityKind is { IsFramework: false });
         RemoveSubtypeCommand = new RelayCommand(RemoveSubtype, () => SelectedSubtype is not null && SelectedEntityKind is { IsFramework: false });
         AddStatusCommand = new RelayCommand(AddStatus, () => SelectedEntityKind is { IsFramework: false });
         RemoveStatusCommand = new RelayCommand(RemoveStatus, () => SelectedStatus is not null && SelectedEntityKind is { IsFramework: false });
 
         // Relationship commands
-        AddRelationshipKindCommand = new RelayCommand(AddRelationshipKind, () => _projectService.IsLoaded);
+        AddRelationshipKindCommand = new RelayCommand(AddRelationshipKind, () => _projectService.IsLoaded)
+            .ObservesProperty(_projectService, nameof(ProjectService.IsLoaded));
         RemoveRelationshipKindCommand = new RelayCommand(RemoveRelationshipKind, () => SelectedRelationshipKind is { IsFramework: false });
-        SaveRelationshipKindsCommand = new RelayCommand(SaveRelationshipKinds, () => _projectService.IsLoaded);
+        SaveRelationshipKindsCommand = new RelayCommand(SaveRelationshipKinds, () => _projectService.IsLoaded)
+            .ObservesProperty(_projectService, nameof(ProjectService.IsLoaded));
 
         // Culture commands
-        AddCultureCommand = new RelayCommand(AddCulture, () => _projectService.IsLoaded);
+        AddCultureCommand = new RelayCommand(AddCulture, () => _projectService.IsLoaded)
+            .ObservesProperty(_projectService, nameof(ProjectService.IsLoaded));
         RemoveCultureCommand = new RelayCommand(RemoveCulture, () => SelectedCulture is { IsFramework: false });
-        SaveCulturesCommand = new RelayCommand(SaveCultures, () => _projectService.IsLoaded);
+        SaveCulturesCommand = new RelayCommand(SaveCultures, () => _projectService.IsLoaded)
+            .ObservesProperty(_projectService, nameof(ProjectService.IsLoaded));
 
         // Tag commands
-        AddTagCommand = new RelayCommand(AddTag, () => _projectService.IsLoaded);
+        AddTagCommand = new RelayCommand(AddTag, () => _projectService.IsLoaded)
+            .ObservesProperty(_projectService, nameof(ProjectService.IsLoaded));
         RemoveTagCommand = new RelayCommand(RemoveTag, () => SelectedTag is { IsFramework: false });
-        SaveTagsCommand = new RelayCommand(SaveTags, () => _projectService.IsLoaded);
+        SaveTagsCommand = new RelayCommand(SaveTags, () => _projectService.IsLoaded)
+            .ObservesProperty(_projectService, nameof(ProjectService.IsLoaded));
 
         // Refresh command
-        RefreshCommand = new RelayCommand(Refresh, () => _projectService.IsLoaded);
+        RefreshCommand = new RelayCommand(Refresh, () => _projectService.IsLoaded)
+            .ObservesProperty(_projectService, nameof(ProjectService.IsLoaded));
+
+        // Reload data when schema changes (any save from any VM, project load/create)
+        _projectService.SchemaChanged += Refresh;
 
         // Load initial data
         Refresh();
@@ -534,7 +582,31 @@ internal sealed class EnumeristViewModel : ViewModelBase, ISectionedViewModel
                 RaiseEntityKindCommandStates();
                 SelectedSubtype = null;
                 SelectedStatus = null;
+                if (value is not null)
+                {
+                    // Open as document tab if not already open
+                    if (!OpenDocuments.Contains(value))
+                        OpenDocuments.Add(value);
+                    ActiveDocument = value;
+                }
             }
+        }
+    }
+
+    /// <summary>
+    /// Bound to the Schema Explorer TreeView. Discriminates selection by type:
+    /// entity kinds open document tabs, subtypes/statuses push to SelectionService.
+    /// </summary>
+    public object? TreeSelectedItem
+    {
+        get => _treeSelectedItem;
+        set
+        {
+            if (!SetProperty(ref _treeSelectedItem, value)) return;
+            if (value is EditableEntityKind ek)
+                SelectedEntityKind = ek;
+            else
+                SelectionService.Select(value);
         }
     }
 
@@ -662,8 +734,13 @@ internal sealed class EnumeristViewModel : ViewModelBase, ISectionedViewModel
     {
         EntityKindItems.Clear();
         SelectedEntityKind = null;
+        var count = 0;
         foreach (var ek in _projectService.EntityKinds)
+        {
             EntityKindItems.Add(EditableEntityKind.From(ek));
+            count++;
+        }
+        DebugLog.Static.Write("Enumerist", $"RefreshEntityKinds: loaded {count} entity kinds into collection");
     }
 
     private void RefreshRelationshipKinds()

@@ -4,521 +4,484 @@
              x:Class="TheCanonry.Desktop.Enumerist.EnumeristView"
              x:DataType="en:EnumeristViewModel"
              x:Name="Root">
-    <DockPanel>
+    <Panel>
 
-        <!-- ═══ Toolbar ═══ -->
-        <Border DockPanel.Dock="Top" Padding="8,6"
-                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
-                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
-                BorderThickness="0,0,0,1">
-            <DockPanel>
-                <TextBlock DockPanel.Dock="Right" Text="{Binding StatusMessage}" Opacity="0.6"
-                           VerticalAlignment="Center" Margin="12,0,4,0" FontSize="12" />
+        <!-- ─── ENTITY KINDS: Three-pane layout ─── -->
+        <Grid ColumnDefinitions="220,Auto,*,Auto,260"
+              IsVisible="{Binding IsEntityKindsActive}">
+
+            <!-- Left: Entity Kinds tree -->
+            <en:SchemaExplorerView Grid.Column="0" DataContext="{Binding}" />
+
+            <GridSplitter Grid.Column="1" Width="4"
+                          Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
+
+            <!-- Center: Document well (tabbed editors) -->
+            <TabControl Grid.Column="2"
+                        ItemsSource="{Binding OpenDocuments}"
+                        SelectedItem="{Binding ActiveDocument}">
+                <TabControl.ItemTemplate>
+                    <DataTemplate x:DataType="en:EditableEntityKind">
+                        <TextBlock Text="{Binding Label}" />
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate x:DataType="en:EditableEntityKind">
+                        <en:EntityKindEditorView />
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+
+            <GridSplitter Grid.Column="3" Width="4"
+                          Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
+
+            <!-- Right: Properties panel -->
+            <en:PropertiesPanelView Grid.Column="4" DataContext="{Binding}" />
+        </Grid>
+
+        <!-- ─── RELATIONSHIPS SECTION ─── -->
+        <DockPanel IsVisible="{Binding IsRelationshipsActive}">
+
+            <!-- Toolbar -->
+            <Border DockPanel.Dock="Top" Padding="4,2"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="0,0,0,1">
                 <StackPanel Orientation="Horizontal" Spacing="2">
-                    <Button Content="Entity Kinds" Command="{Binding GoToEntityKindsCommand}"
-                            Padding="10,4" FontSize="12" />
-                    <Button Content="Relationships" Command="{Binding GoToRelationshipsCommand}"
-                            Padding="10,4" FontSize="12" />
-                    <Button Content="Rel. Matrix" Command="{Binding GoToRelMatrixCommand}"
-                            Padding="10,4" FontSize="12" />
-                    <Button Content="Cultures" Command="{Binding GoToCulturesCommand}"
-                            Padding="10,4" FontSize="12" />
-                    <Button Content="Tags" Command="{Binding GoToTagsCommand}"
-                            Padding="10,4" FontSize="12" />
-                    <Border Width="1" Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" Margin="8,2" />
-                    <Button Content="Refresh" Command="{Binding RefreshCommand}" Padding="10,4" FontSize="12" />
+                    <Button Content="&#x2795; Add" Command="{Binding AddRelationshipKindCommand}"
+                            Padding="8,4" FontSize="12" />
+                    <Button Content="&#x2796; Remove" Command="{Binding RemoveRelationshipKindCommand}"
+                            Padding="8,4" FontSize="12" />
+                    <Rectangle Width="1" Fill="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                               Margin="6,2" />
+                    <Button Content="&#x1F4BE; Save" Command="{Binding SaveRelationshipKindsCommand}"
+                            Padding="8,4" FontSize="12" />
                 </StackPanel>
-            </DockPanel>
-        </Border>
+            </Border>
 
-        <!-- ═══ Content Area ═══ -->
-        <Panel>
+            <Grid ColumnDefinitions="240,Auto,*">
 
-            <!-- ─── ENTITY KINDS SECTION ─── -->
-            <Grid ColumnDefinitions="250,*" IsVisible="{Binding IsEntityKindsActive}">
-
-                <!-- List -->
-                <DockPanel Grid.Column="0"
-                           Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
-                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="4" Margin="4">
-                        <Button Content="+ Add" Command="{Binding AddEntityKindCommand}" Padding="8,3" FontSize="11" />
-                        <Button Content="- Remove" Command="{Binding RemoveEntityKindCommand}" Padding="8,3" FontSize="11" />
-                        <Button Content="Save" Command="{Binding SaveEntityKindsCommand}" Padding="8,3" FontSize="11" />
-                    </StackPanel>
-                    <ListBox ItemsSource="{Binding EntityKindItems}"
-                             SelectedItem="{Binding SelectedEntityKind}"
-                             Margin="0" Padding="0">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate x:DataType="en:EditableEntityKind">
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Border Width="10" Height="10" CornerRadius="2"
-                                            Background="{Binding Color}" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
-                                    <TextBlock Text="[fw]" FontSize="10" Opacity="0.5"
-                                               IsVisible="{Binding IsFramework}" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </DockPanel>
-
-                <!-- Detail -->
-                <Border Grid.Column="1" Padding="12"
-                        BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
-                        BorderThickness="1,0,0,0">
-                    <ScrollViewer IsVisible="{Binding SelectedEntityKind, Converter={x:Static ObjectConverters.IsNotNull}}">
-                        <StackPanel Spacing="8" DataContext="{Binding SelectedEntityKind}">
-                            <TextBlock Text="Entity Kind" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
-
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Kind ID" FontSize="11" Opacity="0.7" />
-                                <TextBox Text="{Binding KindValue}" IsReadOnly="{Binding IsFramework}" />
+                <!-- List pane -->
+                <ListBox Grid.Column="0"
+                         ItemsSource="{Binding RelationshipKindItems}"
+                         SelectedItem="{Binding SelectedRelationshipKind}"
+                         Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Add Relationship Kind" Command="{Binding AddRelationshipKindCommand}" />
+                            <MenuItem Header="Remove" Command="{Binding RemoveRelationshipKindCommand}" />
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="en:EditableRelationshipKind">
+                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="2">
+                                <TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
+                                <TextBlock Text="[fw]" FontSize="10" Opacity="0.4"
+                                           IsVisible="{Binding IsFramework}" VerticalAlignment="Center" />
                             </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Description" FontSize="11" Opacity="0.7" />
-                                <TextBox Text="{Binding Description}" AcceptsReturn="True" MinHeight="48"
-                                         IsReadOnly="{Binding IsFramework}" />
-                            </StackPanel>
+                <!-- Splitter -->
+                <GridSplitter Grid.Column="1" Width="4"
+                              Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
 
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Category" FontSize="11" Opacity="0.7" />
-                                <ComboBox ItemsSource="{Binding #Root.((en:EnumeristViewModel)DataContext).EntityCategories}"
-                                          SelectedItem="{Binding Category}"
-                                          IsEnabled="{Binding !IsFramework}" HorizontalAlignment="Stretch" />
-                            </StackPanel>
-
-                            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto">
-                                <StackPanel Grid.Column="0" Grid.Row="0" Spacing="4" Margin="0,0,8,0">
-                                    <TextBlock Text="Color" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding Color}" IsReadOnly="{Binding IsFramework}" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Grid.Row="0" Spacing="4" Margin="0,0,8,0">
-                                    <TextBlock Text="Shape" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding Shape}" IsReadOnly="{Binding IsFramework}" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="2" Grid.Row="0" Spacing="4">
-                                    <TextBlock Text="Display Name" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding DisplayName}" IsReadOnly="{Binding IsFramework}" />
-                                </StackPanel>
-                            </Grid>
-
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Default Status" FontSize="11" Opacity="0.7" />
-                                <TextBox Text="{Binding DefaultStatusId}" IsReadOnly="{Binding IsFramework}" />
-                            </StackPanel>
-
-                            <CheckBox Content="Is Framework" IsChecked="{Binding IsFramework}" IsEnabled="False" Margin="0,4,0,0" />
-
-                            <!-- Subtypes -->
-                            <TextBlock Text="Subtypes" FontSize="14" FontWeight="SemiBold" Margin="0,12,0,4" />
-                            <DockPanel>
-                                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="4" Margin="0,4,0,0">
-                                    <Button Content="+ Add Subtype"
-                                            Command="{Binding #Root.((en:EnumeristViewModel)DataContext).AddSubtypeCommand}"
-                                            Padding="8,3" FontSize="11" />
-                                    <Button Content="- Remove Subtype"
-                                            Command="{Binding #Root.((en:EnumeristViewModel)DataContext).RemoveSubtypeCommand}"
-                                            Padding="8,3" FontSize="11" />
-                                </StackPanel>
-                                <DataGrid ItemsSource="{Binding Subtypes}"
-                                          SelectedItem="{Binding #Root.((en:EnumeristViewModel)DataContext).SelectedSubtype}"
-                                          AutoGenerateColumns="False" CanUserReorderColumns="False"
-                                          CanUserResizeColumns="True" CanUserSortColumns="False"
-                                          IsReadOnly="{Binding IsFramework}"
-                                          MinHeight="80" MaxHeight="200">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*" />
-                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
-                                        <DataGridCheckBoxColumn Header="Authority" Binding="{Binding IsAuthority}" Width="80" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </DockPanel>
-
-                            <!-- Statuses -->
-                            <TextBlock Text="Statuses" FontSize="14" FontWeight="SemiBold" Margin="0,12,0,4" />
-                            <DockPanel>
-                                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="4" Margin="0,4,0,0">
-                                    <Button Content="+ Add Status"
-                                            Command="{Binding #Root.((en:EnumeristViewModel)DataContext).AddStatusCommand}"
-                                            Padding="8,3" FontSize="11" />
-                                    <Button Content="- Remove Status"
-                                            Command="{Binding #Root.((en:EnumeristViewModel)DataContext).RemoveStatusCommand}"
-                                            Padding="8,3" FontSize="11" />
-                                </StackPanel>
-                                <DataGrid ItemsSource="{Binding Statuses}"
-                                          SelectedItem="{Binding #Root.((en:EnumeristViewModel)DataContext).SelectedStatus}"
-                                          AutoGenerateColumns="False" CanUserReorderColumns="False"
-                                          CanUserResizeColumns="True" CanUserSortColumns="False"
-                                          IsReadOnly="{Binding IsFramework}"
-                                          MinHeight="80" MaxHeight="200">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="*" />
-                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
-                                        <DataGridCheckBoxColumn Header="Terminal" Binding="{Binding IsTerminal}" Width="70" />
-                                        <DataGridTextColumn Header="Polarity" Binding="{Binding Polarity}" Width="80" />
-                                        <DataGridTextColumn Header="Transition Verb" Binding="{Binding TransitionVerb}" Width="*" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </DockPanel>
-                        </StackPanel>
-                    </ScrollViewer>
-                </Border>
-            </Grid>
-
-            <!-- ─── RELATIONSHIPS SECTION ─── -->
-            <Grid ColumnDefinitions="250,*" IsVisible="{Binding IsRelationshipsActive}">
-
-                <!-- List -->
-                <DockPanel Grid.Column="0"
-                           Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
-                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="4" Margin="4">
-                        <Button Content="+ Add" Command="{Binding AddRelationshipKindCommand}" Padding="8,3" FontSize="11" />
-                        <Button Content="- Remove" Command="{Binding RemoveRelationshipKindCommand}" Padding="8,3" FontSize="11" />
-                        <Button Content="Save" Command="{Binding SaveRelationshipKindsCommand}" Padding="8,3" FontSize="11" />
-                    </StackPanel>
-                    <ListBox ItemsSource="{Binding RelationshipKindItems}"
-                             SelectedItem="{Binding SelectedRelationshipKind}"
-                             Margin="0" Padding="0">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate x:DataType="en:EditableRelationshipKind">
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
-                                    <TextBlock Text="[fw]" FontSize="10" Opacity="0.5"
-                                               IsVisible="{Binding IsFramework}" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </DockPanel>
-
-                <!-- Detail -->
-                <Border Grid.Column="1" Padding="12"
-                        BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
-                        BorderThickness="1,0,0,0">
+                <!-- Detail pane -->
+                <Border Grid.Column="2" Padding="16,8">
                     <ScrollViewer IsVisible="{Binding SelectedRelationshipKind, Converter={x:Static ObjectConverters.IsNotNull}}">
-                        <StackPanel Spacing="8" DataContext="{Binding SelectedRelationshipKind}">
-                            <TextBlock Text="Relationship Kind" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <StackPanel Spacing="12" DataContext="{Binding SelectedRelationshipKind}" MaxWidth="700">
 
-                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto">
-                                <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,8,0">
-                                    <TextBlock Text="Kind ID" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding KindValue}" IsReadOnly="{Binding IsFramework}" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Spacing="4">
-                                    <TextBlock Text="Name" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding Name}" IsReadOnly="{Binding IsFramework}" />
-                                </StackPanel>
-                            </Grid>
+                            <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                                <Grid.Styles>
+                                    <Style Selector="TextBlock.label">
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                        <Setter Property="Opacity" Value="0.7" />
+                                        <Setter Property="FontSize" Value="12" />
+                                        <Setter Property="Margin" Value="0,0,12,0" />
+                                    </Style>
+                                    <Style Selector="TextBox">
+                                        <Setter Property="Margin" Value="0,2" />
+                                    </Style>
+                                </Grid.Styles>
 
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Description" FontSize="11" Opacity="0.7" />
-                                <TextBox Text="{Binding Description}" AcceptsReturn="True" MinHeight="48"
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Kind ID" Classes="label" />
+                                <TextBox Grid.Row="0" Grid.Column="1"
+                                         Text="{Binding KindValue}" IsReadOnly="{Binding IsFramework}" />
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Name" Classes="label" />
+                                <TextBox Grid.Row="1" Grid.Column="1"
+                                         Text="{Binding Name}" IsReadOnly="{Binding IsFramework}" />
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Description" Classes="label"
+                                           VerticalAlignment="Top" Margin="0,6,12,0" />
+                                <TextBox Grid.Row="2" Grid.Column="1"
+                                         Text="{Binding Description}" AcceptsReturn="True" MinHeight="48"
                                          IsReadOnly="{Binding IsFramework}" />
-                            </StackPanel>
 
-                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto">
-                                <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,8,0">
-                                    <TextBlock Text="Source Kinds (comma-separated)" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding SrcKindsText}" IsReadOnly="{Binding IsFramework}"
-                                             Watermark="empty = any kind" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Spacing="4">
-                                    <TextBlock Text="Dest Kinds (comma-separated)" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding DstKindsText}" IsReadOnly="{Binding IsFramework}"
-                                             Watermark="empty = any kind" />
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Source Kinds" Classes="label" />
+                                <TextBox Grid.Row="3" Grid.Column="1"
+                                         Text="{Binding SrcKindsText}" IsReadOnly="{Binding IsFramework}"
+                                         Watermark="empty = any kind" />
+
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Dest Kinds" Classes="label" />
+                                <TextBox Grid.Row="4" Grid.Column="1"
+                                         Text="{Binding DstKindsText}" IsReadOnly="{Binding IsFramework}"
+                                         Watermark="empty = any kind" />
+
+                                <TextBlock Grid.Row="5" Grid.Column="0" Text="Category" Classes="label" />
+                                <TextBox Grid.Row="5" Grid.Column="1"
+                                         Text="{Binding Category}" IsReadOnly="{Binding IsFramework}" />
+
+                                <TextBlock Grid.Row="6" Grid.Column="0" Text="Decay Rate" Classes="label" />
+                                <ComboBox Grid.Row="6" Grid.Column="1" Margin="0,2"
+                                          ItemsSource="{ReflectionBinding #Root.DataContext.DecayRates}"
+                                          SelectedItem="{Binding DecayRate}"
+                                          IsEnabled="{Binding !IsFramework}" HorizontalAlignment="Stretch" />
+
+                                <TextBlock Grid.Row="7" Grid.Column="0" Text="Polarity" Classes="label" />
+                                <ComboBox Grid.Row="7" Grid.Column="1" Margin="0,2"
+                                          ItemsSource="{ReflectionBinding #Root.DataContext.PolarityValues}"
+                                          SelectedItem="{Binding Polarity}"
+                                          IsEnabled="{Binding !IsFramework}" HorizontalAlignment="Stretch" />
+
+                                <TextBlock Grid.Row="8" Grid.Column="0" Text="Flags" Classes="label" />
+                                <StackPanel Grid.Row="8" Grid.Column="1" Orientation="Horizontal" Spacing="16" Margin="0,4">
+                                    <CheckBox Content="Symmetric" IsChecked="{Binding Symmetric}" IsEnabled="{Binding !IsFramework}" />
+                                    <CheckBox Content="Cullable" IsChecked="{Binding Cullable}" IsEnabled="{Binding !IsFramework}" />
+                                    <CheckBox Content="Framework" IsChecked="{Binding IsFramework}" IsEnabled="False" />
                                 </StackPanel>
                             </Grid>
-
-                            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto">
-                                <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,8,0">
-                                    <TextBlock Text="Category" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding Category}" IsReadOnly="{Binding IsFramework}" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Spacing="4" Margin="0,0,8,0">
-                                    <TextBlock Text="Decay Rate" FontSize="11" Opacity="0.7" />
-                                    <ComboBox ItemsSource="{Binding #Root.((en:EnumeristViewModel)DataContext).DecayRates}"
-                                              SelectedItem="{Binding DecayRate}"
-                                              IsEnabled="{Binding !IsFramework}" HorizontalAlignment="Stretch" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="2" Spacing="4">
-                                    <TextBlock Text="Polarity" FontSize="11" Opacity="0.7" />
-                                    <ComboBox ItemsSource="{Binding #Root.((en:EnumeristViewModel)DataContext).PolarityValues}"
-                                              SelectedItem="{Binding Polarity}"
-                                              IsEnabled="{Binding !IsFramework}" HorizontalAlignment="Stretch" />
-                                </StackPanel>
-                            </Grid>
-
-                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
-                                <CheckBox Content="Symmetric" IsChecked="{Binding Symmetric}" IsEnabled="{Binding !IsFramework}" />
-                                <CheckBox Content="Cullable" IsChecked="{Binding Cullable}" IsEnabled="{Binding !IsFramework}" />
-                                <CheckBox Content="Is Framework" IsChecked="{Binding IsFramework}" IsEnabled="False" />
-                            </StackPanel>
 
                             <!-- Verbs -->
-                            <TextBlock Text="Verbs" FontSize="14" FontWeight="SemiBold" Margin="0,12,0,4" />
-                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
-                                <StackPanel Grid.Column="0" Grid.Row="0" Spacing="4" Margin="0,0,8,4">
-                                    <TextBlock Text="Formed" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding Formed}" IsReadOnly="{Binding IsFramework}" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Grid.Row="0" Spacing="4" Margin="0,0,0,4">
-                                    <TextBlock Text="Ended" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding Ended}" IsReadOnly="{Binding IsFramework}" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="0" Grid.Row="1" Spacing="4" Margin="0,0,8,0">
-                                    <TextBlock Text="Inverse Formed" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding InverseFormed}" IsReadOnly="{Binding IsFramework}" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Grid.Row="1" Spacing="4">
-                                    <TextBlock Text="Inverse Ended" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding InverseEnded}" IsReadOnly="{Binding IsFramework}" />
-                                </StackPanel>
+                            <TextBlock Text="Verbs" FontSize="13" FontWeight="SemiBold" Margin="0,4,0,4" />
+                            <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                                <Grid.Styles>
+                                    <Style Selector="TextBlock.label">
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                        <Setter Property="Opacity" Value="0.7" />
+                                        <Setter Property="FontSize" Value="12" />
+                                        <Setter Property="Margin" Value="0,0,12,0" />
+                                    </Style>
+                                    <Style Selector="TextBox">
+                                        <Setter Property="Margin" Value="0,2" />
+                                    </Style>
+                                </Grid.Styles>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Formed" Classes="label" />
+                                <TextBox Grid.Row="0" Grid.Column="1"
+                                         Text="{Binding Formed}" IsReadOnly="{Binding IsFramework}" />
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Ended" Classes="label" />
+                                <TextBox Grid.Row="1" Grid.Column="1"
+                                         Text="{Binding Ended}" IsReadOnly="{Binding IsFramework}" />
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Inv. Formed" Classes="label" />
+                                <TextBox Grid.Row="2" Grid.Column="1"
+                                         Text="{Binding InverseFormed}" IsReadOnly="{Binding IsFramework}" />
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Inv. Ended" Classes="label" />
+                                <TextBox Grid.Row="3" Grid.Column="1"
+                                         Text="{Binding InverseEnded}" IsReadOnly="{Binding IsFramework}" />
                             </Grid>
+
                         </StackPanel>
                     </ScrollViewer>
                 </Border>
             </Grid>
+        </DockPanel>
 
-            <!-- ─── REL. MATRIX SECTION ─── -->
-            <Border IsVisible="{Binding IsRelMatrixActive}" Padding="12">
-                <DockPanel>
-                    <TextBlock DockPanel.Dock="Top" Text="Relationship Matrix" FontSize="16"
-                               FontWeight="SemiBold" Margin="0,0,0,8" />
-                    <TextBlock DockPanel.Dock="Top" Text="S = Source, D = Destination, B = Both, - = Neither. Empty SrcKinds/DstKinds = any kind."
-                               FontSize="11" Opacity="0.6" Margin="0,0,0,12" />
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                        <StackPanel Spacing="0">
-                            <!-- Header row -->
-                            <StackPanel Orientation="Horizontal" Spacing="0">
-                                <Border Width="180" Padding="4,2">
-                                    <TextBlock Text="" />
-                                </Border>
-                                <ItemsControl ItemsSource="{Binding MatrixColumnHeaders}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal" Spacing="0" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Width="80" Padding="4,2">
-                                                <TextBlock Text="{Binding}" FontSize="11" FontWeight="SemiBold"
-                                                           TextTrimming="CharacterEllipsis"
-                                                           ToolTip.Tip="{Binding}" />
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-
-                            <!-- Data rows -->
-                            <ItemsControl ItemsSource="{Binding MatrixRows}">
+        <!-- ─── REL. MATRIX SECTION ─── -->
+        <Border IsVisible="{Binding IsRelMatrixActive}" Padding="12">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Relationship Matrix" FontSize="16"
+                           FontWeight="SemiBold" Margin="0,0,0,8" />
+                <TextBlock DockPanel.Dock="Top" Text="S = Source, D = Destination, B = Both, - = Neither. Empty SrcKinds/DstKinds = any kind."
+                           FontSize="11" Opacity="0.6" Margin="0,0,0,12" />
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="0">
+                        <!-- Header row -->
+                        <StackPanel Orientation="Horizontal" Spacing="0">
+                            <Border Width="180" Padding="4,2">
+                                <TextBlock Text="" />
+                            </Border>
+                            <ItemsControl ItemsSource="{Binding MatrixColumnHeaders}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="0" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="en:MatrixRow">
-                                        <StackPanel Orientation="Horizontal" Spacing="0">
-                                            <Border Width="180" Padding="4,2"
-                                                    Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
-                                                <TextBlock Text="{Binding RelKind}" FontSize="11"
-                                                           TextTrimming="CharacterEllipsis"
-                                                           ToolTip.Tip="{Binding RelKind}" />
-                                            </Border>
-                                            <ItemsControl ItemsSource="{Binding Cells}">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <StackPanel Orientation="Horizontal" Spacing="0" />
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate x:DataType="en:MatrixCell">
-                                                        <Border Width="80" Padding="4,2"
-                                                                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
-                                                                BorderThickness="0.5">
-                                                            <TextBlock Text="{Binding Label}" FontSize="12"
-                                                                       HorizontalAlignment="Center"
-                                                                       FontFamily="Cascadia Code,Consolas,monospace" />
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </StackPanel>
+                                    <DataTemplate>
+                                        <Border Width="80" Padding="4,2">
+                                            <TextBlock Text="{Binding}" FontSize="11" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       ToolTip.Tip="{Binding}" />
+                                        </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </StackPanel>
-                    </ScrollViewer>
-                </DockPanel>
+
+                        <!-- Data rows -->
+                        <ItemsControl ItemsSource="{Binding MatrixRows}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="en:MatrixRow">
+                                    <StackPanel Orientation="Horizontal" Spacing="0">
+                                        <Border Width="180" Padding="4,2"
+                                                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+                                            <TextBlock Text="{Binding RelKind}" FontSize="11"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       ToolTip.Tip="{Binding RelKind}" />
+                                        </Border>
+                                        <ItemsControl ItemsSource="{Binding Cells}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Orientation="Horizontal" Spacing="0" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="en:MatrixCell">
+                                                    <Border Width="80" Padding="4,2"
+                                                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                                                            BorderThickness="0.5">
+                                                        <TextBlock Text="{Binding Label}" FontSize="12"
+                                                                   HorizontalAlignment="Center"
+                                                                   FontFamily="Cascadia Code,Consolas,monospace" />
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- ─── CULTURES SECTION ─── -->
+        <DockPanel IsVisible="{Binding IsCulturesActive}">
+
+            <!-- Toolbar -->
+            <Border DockPanel.Dock="Top" Padding="4,2"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="0,0,0,1">
+                <StackPanel Orientation="Horizontal" Spacing="2">
+                    <Button Content="&#x2795; Add" Command="{Binding AddCultureCommand}"
+                            Padding="8,4" FontSize="12" />
+                    <Button Content="&#x2796; Remove" Command="{Binding RemoveCultureCommand}"
+                            Padding="8,4" FontSize="12" />
+                    <Rectangle Width="1" Fill="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                               Margin="6,2" />
+                    <Button Content="&#x1F4BE; Save" Command="{Binding SaveCulturesCommand}"
+                            Padding="8,4" FontSize="12" />
+                </StackPanel>
             </Border>
 
-            <!-- ─── CULTURES SECTION ─── -->
-            <Grid ColumnDefinitions="250,*" IsVisible="{Binding IsCulturesActive}">
+            <Grid ColumnDefinitions="240,Auto,*">
 
-                <!-- List -->
-                <DockPanel Grid.Column="0"
-                           Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
-                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="4" Margin="4">
-                        <Button Content="+ Add" Command="{Binding AddCultureCommand}" Padding="8,3" FontSize="11" />
-                        <Button Content="- Remove" Command="{Binding RemoveCultureCommand}" Padding="8,3" FontSize="11" />
-                        <Button Content="Save" Command="{Binding SaveCulturesCommand}" Padding="8,3" FontSize="11" />
-                    </StackPanel>
-                    <ListBox ItemsSource="{Binding CultureItems}"
-                             SelectedItem="{Binding SelectedCulture}"
-                             Margin="0" Padding="0">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate x:DataType="en:EditableCulture">
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <Border Width="10" Height="10" CornerRadius="2"
-                                            Background="{Binding Color}" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
-                                    <TextBlock Text="[fw]" FontSize="10" Opacity="0.5"
-                                               IsVisible="{Binding IsFramework}" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </DockPanel>
+                <!-- List pane -->
+                <ListBox Grid.Column="0"
+                         ItemsSource="{Binding CultureItems}"
+                         SelectedItem="{Binding SelectedCulture}"
+                         Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Add Culture" Command="{Binding AddCultureCommand}" />
+                            <MenuItem Header="Remove" Command="{Binding RemoveCultureCommand}" />
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="en:EditableCulture">
+                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="2">
+                                <Border Width="10" Height="10" CornerRadius="2"
+                                        Background="{Binding Color}" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
+                                <TextBlock Text="[fw]" FontSize="10" Opacity="0.4"
+                                           IsVisible="{Binding IsFramework}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
-                <!-- Detail -->
-                <Border Grid.Column="1" Padding="12"
-                        BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
-                        BorderThickness="1,0,0,0">
+                <!-- Splitter -->
+                <GridSplitter Grid.Column="1" Width="4"
+                              Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
+
+                <!-- Detail pane -->
+                <Border Grid.Column="2" Padding="16,8">
                     <ScrollViewer IsVisible="{Binding SelectedCulture, Converter={x:Static ObjectConverters.IsNotNull}}">
-                        <StackPanel Spacing="8" DataContext="{Binding SelectedCulture}">
-                            <TextBlock Text="Culture" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                              DataContext="{Binding SelectedCulture}" MaxWidth="700">
+                            <Grid.Styles>
+                                <Style Selector="TextBlock.label">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="Opacity" Value="0.7" />
+                                    <Setter Property="FontSize" Value="12" />
+                                    <Setter Property="Margin" Value="0,0,12,0" />
+                                </Style>
+                                <Style Selector="TextBox">
+                                    <Setter Property="Margin" Value="0,2" />
+                                </Style>
+                            </Grid.Styles>
 
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Culture ID" FontSize="11" Opacity="0.7" />
-                                <TextBox Text="{Binding IdValue}" IsReadOnly="{Binding IsFramework}" />
-                            </StackPanel>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Culture ID" Classes="label" />
+                            <TextBox Grid.Row="0" Grid.Column="1"
+                                     Text="{Binding IdValue}" IsReadOnly="{Binding IsFramework}" />
 
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Name" FontSize="11" Opacity="0.7" />
-                                <TextBox Text="{Binding Name}" IsReadOnly="{Binding IsFramework}" />
-                            </StackPanel>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Name" Classes="label" />
+                            <TextBox Grid.Row="1" Grid.Column="1"
+                                     Text="{Binding Name}" IsReadOnly="{Binding IsFramework}" />
 
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Description" FontSize="11" Opacity="0.7" />
-                                <TextBox Text="{Binding Description}" AcceptsReturn="True" MinHeight="48"
-                                         IsReadOnly="{Binding IsFramework}" />
-                            </StackPanel>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Description" Classes="label"
+                                       VerticalAlignment="Top" Margin="0,6,12,0" />
+                            <TextBox Grid.Row="2" Grid.Column="1"
+                                     Text="{Binding Description}" AcceptsReturn="True" MinHeight="48"
+                                     IsReadOnly="{Binding IsFramework}" />
 
-                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto">
-                                <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,8,0">
-                                    <TextBlock Text="Color" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding Color}" IsReadOnly="{Binding IsFramework}" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Spacing="4">
-                                    <TextBlock Text="Homeland" FontSize="11" Opacity="0.7" />
-                                    <TextBox Text="{Binding Homeland}" IsReadOnly="{Binding IsFramework}" />
-                                </StackPanel>
-                            </Grid>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Color" Classes="label" />
+                            <TextBox Grid.Row="3" Grid.Column="1"
+                                     Text="{Binding Color}" IsReadOnly="{Binding IsFramework}" />
 
-                            <CheckBox Content="Is Framework" IsChecked="{Binding IsFramework}" IsEnabled="False" Margin="0,4,0,0" />
-                        </StackPanel>
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Homeland" Classes="label" />
+                            <TextBox Grid.Row="4" Grid.Column="1"
+                                     Text="{Binding Homeland}" IsReadOnly="{Binding IsFramework}" />
+
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Framework" Classes="label" />
+                            <CheckBox Grid.Row="5" Grid.Column="1" Margin="0,2"
+                                      IsChecked="{Binding IsFramework}" IsEnabled="False" />
+                        </Grid>
                     </ScrollViewer>
                 </Border>
             </Grid>
+        </DockPanel>
 
-            <!-- ─── TAGS SECTION ─── -->
-            <Grid ColumnDefinitions="250,*" IsVisible="{Binding IsTagsActive}">
+        <!-- ─── TAGS SECTION ─── -->
+        <DockPanel IsVisible="{Binding IsTagsActive}">
 
-                <!-- List -->
-                <DockPanel Grid.Column="0"
-                           Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
-                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="4" Margin="4">
-                        <Button Content="+ Add" Command="{Binding AddTagCommand}" Padding="8,3" FontSize="11" />
-                        <Button Content="- Remove" Command="{Binding RemoveTagCommand}" Padding="8,3" FontSize="11" />
-                        <Button Content="Save" Command="{Binding SaveTagsCommand}" Padding="8,3" FontSize="11" />
-                    </StackPanel>
-                    <ListBox ItemsSource="{Binding TagItems}"
-                             SelectedItem="{Binding SelectedTag}"
-                             Margin="0" Padding="0">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate x:DataType="en:EditableTag">
-                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                    <TextBlock Text="{Binding Tag}" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding Category}" FontSize="10" Opacity="0.5"
-                                               VerticalAlignment="Center" />
-                                    <TextBlock Text="[fw]" FontSize="10" Opacity="0.5"
-                                               IsVisible="{Binding IsFramework}" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </DockPanel>
+            <!-- Toolbar -->
+            <Border DockPanel.Dock="Top" Padding="4,2"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="0,0,0,1">
+                <StackPanel Orientation="Horizontal" Spacing="2">
+                    <Button Content="&#x2795; Add" Command="{Binding AddTagCommand}"
+                            Padding="8,4" FontSize="12" />
+                    <Button Content="&#x2796; Remove" Command="{Binding RemoveTagCommand}"
+                            Padding="8,4" FontSize="12" />
+                    <Rectangle Width="1" Fill="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                               Margin="6,2" />
+                    <Button Content="&#x1F4BE; Save" Command="{Binding SaveTagsCommand}"
+                            Padding="8,4" FontSize="12" />
+                </StackPanel>
+            </Border>
 
-                <!-- Detail -->
-                <Border Grid.Column="1" Padding="12"
-                        BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
-                        BorderThickness="1,0,0,0">
+            <Grid ColumnDefinitions="240,Auto,*">
+
+                <!-- List pane -->
+                <ListBox Grid.Column="0"
+                         ItemsSource="{Binding TagItems}"
+                         SelectedItem="{Binding SelectedTag}"
+                         Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Add Tag" Command="{Binding AddTagCommand}" />
+                            <MenuItem Header="Remove" Command="{Binding RemoveTagCommand}" />
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="en:EditableTag">
+                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="2">
+                                <TextBlock Text="{Binding Tag}" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Category}" FontSize="10" Opacity="0.4"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="[fw]" FontSize="10" Opacity="0.4"
+                                           IsVisible="{Binding IsFramework}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Splitter -->
+                <GridSplitter Grid.Column="1" Width="4"
+                              Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
+
+                <!-- Detail pane -->
+                <Border Grid.Column="2" Padding="16,8">
                     <ScrollViewer IsVisible="{Binding SelectedTag, Converter={x:Static ObjectConverters.IsNotNull}}">
-                        <StackPanel Spacing="8" DataContext="{Binding SelectedTag}">
-                            <TextBlock Text="Tag" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,4" />
+                        <StackPanel Spacing="12" DataContext="{Binding SelectedTag}" MaxWidth="700">
 
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Tag" FontSize="11" Opacity="0.7" />
-                                <TextBox Text="{Binding Tag}" IsReadOnly="{Binding IsFramework}" />
-                            </StackPanel>
+                            <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                                  x:Name="TagForm">
+                                <Grid.Styles>
+                                    <Style Selector="TextBlock.label">
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                        <Setter Property="Opacity" Value="0.7" />
+                                        <Setter Property="FontSize" Value="12" />
+                                        <Setter Property="Margin" Value="0,0,12,0" />
+                                    </Style>
+                                    <Style Selector="TextBox">
+                                        <Setter Property="Margin" Value="0,2" />
+                                    </Style>
+                                </Grid.Styles>
 
-                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto">
-                                <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,8,0">
-                                    <TextBlock Text="Category" FontSize="11" Opacity="0.7" />
-                                    <ComboBox ItemsSource="{Binding #Root.((en:EnumeristViewModel)DataContext).TagCategories}"
-                                              SelectedItem="{Binding Category}"
-                                              IsEnabled="{Binding !IsFramework}" HorizontalAlignment="Stretch" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" Spacing="4">
-                                    <TextBlock Text="Rarity" FontSize="11" Opacity="0.7" />
-                                    <ComboBox ItemsSource="{Binding #Root.((en:EnumeristViewModel)DataContext).TagRarities}"
-                                              SelectedItem="{Binding Rarity}"
-                                              IsEnabled="{Binding !IsFramework}" HorizontalAlignment="Stretch" />
-                                </StackPanel>
-                            </Grid>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Tag" Classes="label" />
+                                <TextBox Grid.Row="0" Grid.Column="1"
+                                         Text="{Binding Tag}" IsReadOnly="{Binding IsFramework}" />
 
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Description" FontSize="11" Opacity="0.7" />
-                                <TextBox Text="{Binding Description}" AcceptsReturn="True" MinHeight="48"
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Category" Classes="label" />
+                                <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,2"
+                                          ItemsSource="{ReflectionBinding #Root.DataContext.TagCategories}"
+                                          SelectedItem="{Binding Category}"
+                                          IsEnabled="{Binding !IsFramework}" HorizontalAlignment="Stretch" />
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Rarity" Classes="label" />
+                                <ComboBox Grid.Row="2" Grid.Column="1" Margin="0,2"
+                                          ItemsSource="{ReflectionBinding #Root.DataContext.TagRarities}"
+                                          SelectedItem="{Binding Rarity}"
+                                          IsEnabled="{Binding !IsFramework}" HorizontalAlignment="Stretch" />
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Description" Classes="label"
+                                           VerticalAlignment="Top" Margin="0,6,12,0" />
+                                <TextBox Grid.Row="3" Grid.Column="1"
+                                         Text="{Binding Description}" AcceptsReturn="True" MinHeight="48"
                                          IsReadOnly="{Binding IsFramework}" />
-                            </StackPanel>
 
-                            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto">
-                                <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,8,0">
-                                    <TextBlock Text="Min Usage" FontSize="11" Opacity="0.7" />
-                                    <NumericUpDown Value="{Binding MinUsageDecimal}" Minimum="0"
-                                                   IsReadOnly="{Binding IsFramework}" FormatString="F0" />
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Min Usage" Classes="label" />
+                                <NumericUpDown Grid.Row="4" Grid.Column="1" Margin="0,2"
+                                               Value="{Binding MinUsageDecimal}" Minimum="0"
+                                               IsReadOnly="{Binding IsFramework}" FormatString="F0" />
+
+                                <TextBlock Grid.Row="5" Grid.Column="0" Text="Max Usage" Classes="label" />
+                                <NumericUpDown Grid.Row="5" Grid.Column="1" Margin="0,2"
+                                               Value="{Binding MaxUsageDecimal}" Minimum="0"
+                                               IsReadOnly="{Binding IsFramework}" FormatString="F0" />
+
+                                <TextBlock Grid.Row="6" Grid.Column="0" Text="Flags" Classes="label" />
+                                <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Spacing="16" Margin="0,4">
+                                    <CheckBox Content="Is Axis" IsChecked="{Binding IsAxis}" IsEnabled="{Binding !IsFramework}" />
+                                    <CheckBox Content="Framework" IsChecked="{Binding IsFramework}" IsEnabled="False" />
                                 </StackPanel>
-                                <StackPanel Grid.Column="1" Spacing="4">
-                                    <TextBlock Text="Max Usage" FontSize="11" Opacity="0.7" />
-                                    <NumericUpDown Value="{Binding MaxUsageDecimal}" Minimum="0"
-                                                   IsReadOnly="{Binding IsFramework}" FormatString="F0" />
-                                </StackPanel>
+
+                                <TextBlock Grid.Row="7" Grid.Column="0" Text="Entity Kinds" Classes="label" />
+                                <TextBox Grid.Row="7" Grid.Column="1"
+                                         Text="{Binding EntityKindsText}" IsReadOnly="{Binding IsFramework}"
+                                         Watermark="e.g. character, collective" />
+
+                                <TextBlock Grid.Row="8" Grid.Column="0" Text="Related Tags" Classes="label" />
+                                <TextBox Grid.Row="8" Grid.Column="1"
+                                         Text="{Binding RelatedTagsText}" IsReadOnly="{Binding IsFramework}" />
+
+                                <TextBlock Grid.Row="9" Grid.Column="0" Text="Conflicting Tags" Classes="label" />
+                                <TextBox Grid.Row="9" Grid.Column="1"
+                                         Text="{Binding ConflictingTagsText}" IsReadOnly="{Binding IsFramework}" />
                             </Grid>
 
-                            <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
-                                <CheckBox Content="Is Axis" IsChecked="{Binding IsAxis}" IsEnabled="{Binding !IsFramework}" />
-                                <CheckBox Content="Is Framework" IsChecked="{Binding IsFramework}" IsEnabled="False" />
-                            </StackPanel>
-
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Entity Kinds (comma-separated)" FontSize="11" Opacity="0.7" />
-                                <TextBox Text="{Binding EntityKindsText}" IsReadOnly="{Binding IsFramework}"
-                                         Watermark="e.g. character, collective" />
-                            </StackPanel>
-
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Related Tags (comma-separated)" FontSize="11" Opacity="0.7" />
-                                <TextBox Text="{Binding RelatedTagsText}" IsReadOnly="{Binding IsFramework}" />
-                            </StackPanel>
-
-                            <StackPanel Spacing="4">
-                                <TextBlock Text="Conflicting Tags (comma-separated)" FontSize="11" Opacity="0.7" />
-                                <TextBox Text="{Binding ConflictingTagsText}" IsReadOnly="{Binding IsFramework}" />
-                            </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
                 </Border>
             </Grid>
+        </DockPanel>
 
-        </Panel>
-    </DockPanel>
+    </Panel>
 </UserControl>

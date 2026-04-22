@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:en="using:TheCanonry.Desktop.Enumerist"
+             x:Class="TheCanonry.Desktop.Enumerist.SchemaExplorerView"
+             x:DataType="en:EnumeristViewModel">
+    <DockPanel>
+        <!-- Toolbar -->
+        <Border DockPanel.Dock="Top" Padding="2"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal" Spacing="2">
+                <Button Content="+" ToolTip.Tip="Add Entity Kind"
+                        Command="{Binding AddEntityKindCommand}" Padding="6,2" FontSize="12" />
+                <Button Content="-" ToolTip.Tip="Remove Entity Kind"
+                        Command="{Binding RemoveEntityKindCommand}" Padding="6,2" FontSize="12" />
+                <Rectangle Width="1" Fill="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" Margin="4,2" />
+                <Button Content="Save" ToolTip.Tip="Save All Entity Kinds"
+                        Command="{Binding SaveEntityKindsCommand}" Padding="6,2" FontSize="12" />
+            </StackPanel>
+        </Border>
+
+        <!-- Entity Kinds Tree -->
+        <TreeView ItemsSource="{Binding EntityKindItems}"
+                  SelectedItem="{Binding TreeSelectedItem}">
+            <TreeView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Add Entity Kind" Command="{Binding AddEntityKindCommand}" />
+                    <MenuItem Header="Remove" Command="{Binding RemoveEntityKindCommand}" />
+                </ContextMenu>
+            </TreeView.ContextMenu>
+            <TreeView.DataTemplates>
+                <TreeDataTemplate DataType="en:EditableEntityKind"
+                                  ItemsSource="{Binding TreeChildren}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Border Width="10" Height="10" CornerRadius="2"
+                                Background="{Binding Color}" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding Label}" VerticalAlignment="Center" />
+                        <TextBlock Text="[fw]" FontSize="10" Opacity="0.4"
+                                   IsVisible="{Binding IsFramework}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TreeDataTemplate>
+                <DataTemplate DataType="en:EditableSubtype">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="S" FontSize="9" Opacity="0.5" VerticalAlignment="Center"
+                                   FontFamily="Cascadia Code,Consolas,monospace" />
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontSize="12" />
+                        <TextBlock Text="{Binding Id}" FontSize="10" Opacity="0.4" VerticalAlignment="Center" />
+                    </StackPanel>
+                </DataTemplate>
+                <DataTemplate DataType="en:EditableStatus">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="T" FontSize="9" Opacity="0.5" VerticalAlignment="Center"
+                                   FontFamily="Cascadia Code,Consolas,monospace" />
+                        <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontSize="12" />
+                        <TextBlock Text="{Binding Id}" FontSize="10" Opacity="0.4" VerticalAlignment="Center" />
+                    </StackPanel>
+                </DataTemplate>
+            </TreeView.DataTemplates>
+        </TreeView>
+    </DockPanel>
+</UserControl>

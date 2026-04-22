@@ -5,30 +5,6 @@
              x:DataType="cosmo:CosmographerViewModel">
     <DockPanel>
 
-        <!-- Section Navigation Bar -->
-        <Border DockPanel.Dock="Top" Padding="12,8"
-                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
-                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
-                BorderThickness="0,0,0,1">
-            <DockPanel>
-                <TextBlock DockPanel.Dock="Right" Text="{Binding StatusMessage}"
-                           VerticalAlignment="Center" Opacity="0.6" FontSize="12"
-                           Margin="16,0,0,0" />
-                <StackPanel Orientation="Horizontal" Spacing="4">
-                    <Button Content="Axis Registry" Command="{Binding GoToAxesCommand}"
-                            Classes.accent="{Binding IsAxesActive}" />
-                    <Button Content="Semantic Planes" Command="{Binding GoToPlanesCommand}"
-                            Classes.accent="{Binding IsPlanesActive}" />
-                    <Button Content="Culture Biases" Command="{Binding GoToCulturesCommand}"
-                            Classes.accent="{Binding IsCulturesActive}" />
-                    <Button Content="Entities" Command="{Binding GoToEntitiesCommand}"
-                            Classes.accent="{Binding IsEntitiesActive}" />
-                    <Button Content="Relationships" Command="{Binding GoToRelationshipsCommand}"
-                            Classes.accent="{Binding IsRelationshipsActive}" />
-                </StackPanel>
-            </DockPanel>
-        </Border>
-
         <!-- ═══════════════════════════════════════════════ -->
         <!--  Section 1: Axis Registry                      -->
         <!-- ═══════════════════════════════════════════════ -->
@@ -308,13 +284,13 @@
                         <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
                             <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,8,0">
                                 <TextBlock Text="Kind" FontSize="11" Opacity="0.6" />
-                                <ComboBox ItemsSource="{Binding $parent[UserControl].((cosmo:CosmographerViewModel)DataContext).AvailableEntityKindValues}"
+                                <ComboBox ItemsSource="{ReflectionBinding $parent[UserControl].DataContext.AvailableEntityKindValues}"
                                           SelectedItem="{Binding Kind}"
                                           HorizontalAlignment="Stretch" />
                             </StackPanel>
                             <StackPanel Grid.Row="0" Grid.Column="1">
                                 <TextBlock Text="Subtype" FontSize="11" Opacity="0.6" />
-                                <ComboBox ItemsSource="{Binding $parent[UserControl].((cosmo:CosmographerViewModel)DataContext).AvailableSubtypes}"
+                                <ComboBox ItemsSource="{ReflectionBinding $parent[UserControl].DataContext.AvailableSubtypes}"
                                           SelectedItem="{Binding Subtype}"
                                           HorizontalAlignment="Stretch" />
                             </StackPanel>
@@ -323,21 +299,21 @@
                         <Grid ColumnDefinitions="*,*" RowDefinitions="Auto" Margin="0,4,0,0">
                             <StackPanel Grid.Column="0" Margin="0,0,8,0">
                                 <TextBlock Text="Status" FontSize="11" Opacity="0.6" />
-                                <ComboBox ItemsSource="{Binding $parent[UserControl].((cosmo:CosmographerViewModel)DataContext).AvailableStatuses}"
+                                <ComboBox ItemsSource="{ReflectionBinding $parent[UserControl].DataContext.AvailableStatuses}"
                                           SelectedItem="{Binding Status}"
                                           HorizontalAlignment="Stretch" />
                             </StackPanel>
                             <StackPanel Grid.Column="1">
                                 <TextBlock Text="Culture" FontSize="11" Opacity="0.6" />
-                                <ComboBox ItemsSource="{Binding $parent[UserControl].((cosmo:CosmographerViewModel)DataContext).AvailableCultureNames}"
+                                <ComboBox ItemsSource="{ReflectionBinding $parent[UserControl].DataContext.AvailableCultureNames}"
                                           SelectedItem="{Binding Culture}"
                                           HorizontalAlignment="Stretch" />
                             </StackPanel>
                         </Grid>
 
                         <TextBlock Text="Prominence" FontSize="11" Opacity="0.6" />
-                        <ComboBox ItemsSource="{Binding $parent[UserControl].((cosmo:CosmographerViewModel)DataContext).ProminenceOptions}"
-                                  SelectedItem="{Binding $parent[UserControl].((cosmo:CosmographerViewModel)DataContext).SelectedProminenceOption}"
+                        <ComboBox ItemsSource="{ReflectionBinding $parent[UserControl].DataContext.ProminenceOptions}"
+                                  SelectedItem="{ReflectionBinding $parent[UserControl].DataContext.SelectedProminenceOption}"
                                   HorizontalAlignment="Stretch">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate x:DataType="cosmo:ProminenceOption">

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows.Input;
 
 namespace TheCanonry.Desktop.Shared;
@@ -20,6 +21,19 @@ internal sealed class RelayCommand : ICommand
     public void Execute(object? parameter) => _execute();
 
     public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+
+    /// <summary>
+    /// Auto-raise CanExecuteChanged when a property on the observed source changes.
+    /// </summary>
+    public RelayCommand ObservesProperty(INotifyPropertyChanged source, string propertyName)
+    {
+        source.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == propertyName)
+                RaiseCanExecuteChanged();
+        };
+        return this;
+    }
 }
 
 internal sealed class RelayCommand<T> : ICommand
